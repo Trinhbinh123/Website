@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"></head>
-<body>
+<head th:replace="~{src/partials/_head :: _head}"
+
+></head>
+<body onload="loading()">
 <div class="container-scroller">
     <!--_navbar -->
     <div th:replace="~{src/partials/_navbar :: _navbar}">
@@ -13,15 +15,76 @@
         <!--_sidebar-->
         <div class="main-panel">
             <div class="content-wrapper">
-                <!-- header : phần này là ghi code listAll-->
-                <h1>khuyến mại</h1>
-                <!-- header-->
+                <div class="table-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="table-title">Danh sách Khuyến Mãi</div>
+                        <a th:href="@{/khuyenmai/addkhuyenmai}" class="btn btn-dark">Tạo khuyến mãi</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="multi-filter-select">
+                            <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Giá trị</th>
+                                <th>Ngày bắt đầu</th>
+                                <th>Ngày kết thúc</th>
+                                <th>Ngày tạo</th>
+                                <th>Ngày sửa</th>
+                                <th>Tình trạng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- Dữ liệu khuyến mãi mẫu -->
+                            <tr th:each="khuyenMai : ${khuyenMaiList}">
+                                <td th:text="${khuyenMai.id}"></td>
+                                <td th:text="${khuyenMai.tenKhuyenMai}"></td>
+                                <td th:text="${khuyenMai.giaTriGiam}"></td>
+                                <td th:text="${khuyenMai.ngayBatDau}"></td>
+                                <td th:text="${khuyenMai.ngayKetThuc}"></td>
+                                <td th:text="${khuyenMai.ngayTao}"></td>
+                                <td th:text="${khuyenMai.ngaySua}"></td>
+                                <td th:text="${khuyenMai.tinhTrang}"></td>
+                                <td th:switch="${khuyenMai.trangThai}">
+                                    <span th:case=true class="btn btn-info btn-sm">ON</span>
+                                    <span th:case=false class="btn btn-warning btn-sm">OFF</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/khuyenmai/updatePage(id=${khuyenMai.id})}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/khuyenmai/delete/{id}(id=${khuyenMai.id})}" class="btn btn-dark btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <!--                        <a href="javascript:void(0);" class="btn btn-danger btn-sm"-->
+                                    <!--                           th:onclick="'endPromotionEarly(' + ${promotion.id} + ', \'' + ${promotion.status} + '\'); return false;'"-->
+                                    <!--                           th:disabled="${promotion.status == 0 || promotion.status == 2}">-->
+                                    <!--                            <i class="fas fa-trash"></i>-->
+                                    <!--                        </a>-->
+
+                                </td>
+                            </tr>
+                            <!-- Các dòng khuyến mãi khác -->
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
             </div>
             <!--footer-->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
             <!--footer-->
         </div>
     </div>
+    <script>
+        function loading(){
+            $("#multi-filter-select").DataTable({
+                pageLength: 5
+            });
+        }
+    </script>
 </div>
 <!--script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

@@ -4,13 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Data
-@Component
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "binhluan")
 public class BinhLuan {
     @Id
