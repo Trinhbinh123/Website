@@ -19,9 +19,9 @@ public class Size {
     @Column(name="ma_size")
     private String ma_size;
 
-    @Column(name="tensize")
+    @Column(name="ten_size")
     private String ten_size;
 
-    @Column(name="trangthai")
+    @Column(name="trang_thai")
     private Integer trangthai;
 }

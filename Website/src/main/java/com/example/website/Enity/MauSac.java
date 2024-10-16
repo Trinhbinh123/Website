@@ -8,7 +8,7 @@ import lombok.*;
 @Data
 @Entity
 @Builder
-@Table(name = "mausac")
+@Table(name = "mau_sac")
 @AllArgsConstructor
 @NoArgsConstructor
 public class MauSac {
@@ -19,14 +19,14 @@ public class MauSac {
 
     @NotBlank(message = "Mã màu sắc không được để trống")
     @Size(max = 20, message = "Mã màu sắc không được vượt quá 20 ký tự")
-    @Column(name = "ma_mausac")
+    @Column(name = "ma_mau_sac")
     private String ma_mausac;
 
     @NotBlank(message = "Tên màu sắc không được để trống")
     @Size(max = 50, message = "Tên màu sắc không được vượt quá 50 ký tự")
-    @Column(name = "tenmausac")
+    @Column(name = "ten_mau_sac")
     private String tenmausac;
 
-    @Column(name = "trangthai")
+    @Column(name = "trang_thai")
     private Integer trangthai;
 }

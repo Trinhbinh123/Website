@@ -10,14 +10,14 @@ import lombok.*;
 @Data
 @Entity
 @Builder
-@Table(name = "thuonghieu")
+@Table(name = "thuong_hieu")
 public class ThuongHieu {
     @Column(name="id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="tenthuonghieu")
+    @Column(name="ten_thuong_hieu")
     String tenThuongHieu;
-    @Column(name="mota")
+    @Column(name="mo_ta")
     String moTa;
 
 }

@@ -8,22 +8,22 @@ import org.springframework.stereotype.Component;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "binhluan")
+@Table(name = "binh_luan")
 public class BinhLuan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "id_khachhang")
+    @Column(name = "id_khach_hang")
     private Integer idKhachHang;
 
-    @Column(name = "id_chitietsanpham")
+    @Column(name = "id_chi_tiet_san_pham")
     private Integer idChiTietSanPham;
 
-    @Column(name = "binhluan")
+    @Column(name = "binh_luan")
     private String binhLuan;
 
-    @Column(name = "danhgia")
+    @Column(name = "danh_gia")
     private Integer danhGia;
 }

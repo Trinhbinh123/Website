@@ -10,18 +10,18 @@ import lombok.*;
 @Data
 @Entity
 @Builder
-@Table(name = "loaide")
+@Table(name = "loai_de")
 public class LoaiDe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="ma_loaide")
+    @Column(name="ma_loai_de")
     private String ma_loaide;
 
-    @Column(name="tenloaide")
+    @Column(name="ten_loai_de")
     private String tenloaide;
 
-    @Column(name="trangthai")
+    @Column(name="trang_thai")
     private Integer trangthai;
 }

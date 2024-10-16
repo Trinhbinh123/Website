@@ -10,20 +10,21 @@ import lombok.*;
 @Data
 @Entity
 @Builder
-@Table(name = "sanpham")
+@Table(name = "san_pham")
 public class SanPham {
     @Column(name="id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name="ma_sanpham")
+    @Column(name="ma_san_pham")
     String ma_sanpham;
-    @Column(name="tensanpham")
+    @Column(name="ten_san_pham")
     String tensanpham;
-    @Column(name="trangthai")
+    @Column(name="trang_thai")
     Boolean trangthai;
     @ManyToOne
-    @JoinColumn(name = "id_thuonghieu")
+    @JoinColumn(name = "id_thuong_hieu")
     ThuongHieu thuongHieu;
+    @Column(name="gia_ban")
     Double giaban;
     String url_anh;
 }
