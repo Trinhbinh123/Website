@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,4 +29,6 @@ public class BinhLuan {
 
     @Column(name = "danh_gia")
     private Integer danhGia;
+    @Column(name = "ngay_binh_luan")
+    private LocalDate ngayBinhLuan;
 }
