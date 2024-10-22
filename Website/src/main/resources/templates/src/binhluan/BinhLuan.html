@@ -16,12 +16,13 @@
                     <h3 class="fw-bold fs-4 mb-3">Danh Sách Bình Luận</h3>
                     <div class="row">
                         <div class="col-12 table-responsive">
-<!------------------------------------------------------------------------------------------>
+                            <!------------------------------------------------------------------------------------------>
                             <form action="#" th:action="@{/admin/binhluan}" method="get">
                                 <label for="danhGia">Lọc theo đánh giá:</label>
                                 <select name="danhGia" id="danhGia">
                                     <option value="" th:selected="${danhGia == null}">Tất cả</option>
-                                    <option th:each="dg : ${danhGias}" th:value="${dg}" th:text="${dg}" th:selected="${dg == danhGia}"></option>
+                                    <option th:each="dg : ${danhGias}" th:value="${dg}" th:text="${dg}"
+                                            th:selected="${dg == danhGia}"></option>
                                 </select>
 
                                 <label for="startDate">Ngày bắt đầu:</label>
@@ -32,7 +33,6 @@
 
                                 <button type="submit">Lọc</button>
                             </form>
-
 
 
                             <!-------------------------------------------------------------------------------------------------------->
@@ -72,19 +72,22 @@
                             </table>
                         </div>
                     </div>
-<!----------------------------------------------------------------------------------->
+                    <!----------------------------------------------------------------------------------->
                     <div class="row">
                         <div class="col-12 text-center">
                             <ul class="pagination">
                                 <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage - 1})}">Previous</a>
+                                    <a class="page-link"
+                                       th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage - 1})}">Previous</a>
                                 </li>
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                     th:class="${i == currentPage} ? 'active'">
-                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${i})}" th:text="${i + 1}"></a>
+                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${i})}"
+                                       th:text="${i + 1}"></a>
                                 </li>
                                 <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage + 1})}">Next</a>
+                                    <a class="page-link"
+                                       th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage + 1})}">Next</a>
                                 </li>
                             </ul>
                         </div>
