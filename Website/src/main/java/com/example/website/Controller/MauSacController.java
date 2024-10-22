@@ -52,7 +52,7 @@ public class MauSacController {
     }
 
     @PostMapping("/mau-sac/updateData")
-    public String update(@ModelAttribute @Valid MauSac mauSac, BindingResult bindingResult) {
+    public String update(@ModelAttribute  MauSac mauSac, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "src/mau-sac/UpdateMauSac"; // Trả lại form với thông báo lỗi
         }

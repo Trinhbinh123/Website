@@ -5,6 +5,7 @@ import com.example.website.Response.KhuyenMailResponse;
 import com.example.website.Respository.KhuyenMaiRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class KhuyenMaiController {
+    @Autowired
     private final KhuyenMaiRepo khuyenMaiRepo;
 
     @GetMapping("/admin/khuyenmai")
