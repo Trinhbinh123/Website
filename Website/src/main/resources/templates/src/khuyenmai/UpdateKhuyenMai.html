@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{src/partials/_head :: _head}"></head>
+<body>
+<div class="container-scroller">
+    <!--_navbar -->
+    <div th:replace="~{src/partials/_navbar :: _navbar}">
+    </div>
+    <!-- _navbar -->
+    <div class="container-fluid page-body-wrapper">
+        <!--_sidebar-->
+        <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
+        <!--_sidebar-->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div id="toastContainer" class="toast-container"></div>
+                <form id="promotionForm" method="post" th:action="@{/khuyenmai/update}" th:object="${KM}">
+                    <div class="form-container">
+                        <div class="form-section col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5>Cập nhật đợt khuyến mãi</h5>
+                                    <input class="form-control" style="display: none" id="id" maxlength="255" required
+                                           th:field="*{id}" type="text">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="name">Tên đợt khuyến mãi</label>
+                                        <input class="form-control" id="name" maxlength="255" required
+                                               th:field="*{tenKhuyenMai}" type="text">
+                                    </div>
+
+                                    <label class="form-label" for="price">Giá trị</label>
+                                    <div class="d-flex">
+                                        <div class="mb-3 col-11">
+                                            <input class="form-control" id="price" required th:field="*{giaTriGiam}" type="number">
+                                        </div>
+                                        <div class="">
+                                            <div class="d-flex">
+                                                <input name="loaiKhuyenMai" id="radio" type="radio" th:checked="${KM.loaiKhuyenMai == 'percent'}" value="percent"> %
+                                            </div>
+                                            <div class="d-flex mt-2">
+                                                <input name="loaiKhuyenMai" id="radio1"  type="radio" th:checked="${KM.loaiKhuyenMai == 'vnd'}" value="vnd"> VND
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="dateStart">Ngày bắt đầu</label>
+                                        <input class="form-control" id="dateStart" required th:field="*{ngayBatDau}" type="datetime-local">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="dateEnd">Ngày kết thúc</label>
+                                        <input class="form-control" id="dateEnd" required th:field="*{ngayKetThuc}" type="datetime-local">
+                                    </div>
+
+<!--                                    <input id="selectedProducts" name="selectedProducts" type="hidden" th:value="${khuyenMai.selectedProducts}">-->
+
+                                    <span class="btn btn-dark" onclick="submit(event)">Cập nhật</span>
+                                    <a class="btn btn-primary" th:href="@{/admin/khuyenmai}">Hủy</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--script -->
+                    <div th:replace="~{src/partials/_script :: _script}"></div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        function submit(e){
+            let name =  document.getElementById("name").value;
+            let price =  document.getElementById("price").value;
+            let dateStart =  document.getElementById("dateStart").value;
+            let dateEnd =  document.getElementById("dateEnd").value;
+            let form = document.getElementById("promotionForm");
+            const radio = document.getElementById("radio");
+            const radio1 = document.getElementById("radio1");
+            e.preventDefault();
+            if(name.trim() === ""){
+                showToast("Không được bỏ trống tên khuyến mãi");
+            }
+            else if (radio.checked === true && (price.trim() === "" || price > 100 || price < 1)) {
+                showToast("giá trị phải từ 1-100 %");
+            } else if (radio1.checked === true && (price.trim() === "" || price < 1000)) {
+                showToast("giá trị phải từ 1000");
+            } else if(dateStart.trim() === ""){
+                showToast("Không được bỏ trống ngày bắt đầu");
+            }else if(dateEnd.trim() === ""){
+                showToast("Không được bỏ trống ngày kết thúc");
+            }
+
+            else {
+                form.submit();
+            }
+        }
+        function showToast(message) {
+            const toastContainer = document.getElementById('toastContainer');
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.top = '90px';
+            toastContainer.style.right = '20px';
+            toastContainer.style.zIndex = '1';
+            toastContainer.style.display = 'flex';
+            toastContainer.style.flexDirection = 'column';
+            toastContainer.style.gap = '10px';
+
+            const newToast = document.createElement('div');
+
+            newToast.className = 'toast show';
+            newToast.style.visibility = 'visible'; // Đổi thành 'visible' để hiển thị
+            newToast.style.maxWidth = '300px';
+            newToast.style.backgroundColor = '#333';
+            newToast.style.color = '#fff';
+            newToast.style.borderRadius = '5px';
+            newToast.style.padding = '16px';
+            newToast.style.position = 'relative';
+            newToast.style.fontSize = '17px';
+            newToast.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.1)';
+            newToast.style.display = 'flex';
+            newToast.style.alignItems = 'center';
+            newToast.style.justifyContent = 'space-between';
+            newToast.style.animation = 'fadeInOut 5s ease forwards'; // Hiệu ứng fade in/fade out
+
+            const toastId = `toast-${Date.now()}`;
+            newToast.innerHTML = `
+        <span id="toastMessage">${message}</span>
+        <div class="closeToast">
+          <span id="closeToast" class="close">&times;</span>
+          <div id="countdown">5s</div>
+        </div>
+        <div class="progress"></div>
+      `;
+
+            toastContainer.appendChild(newToast);
+
+            const countdown = newToast.querySelector('#countdown');
+            const closeToast = newToast.querySelector('.close');
+            const progress = newToast.querySelector('.progress');
+
+            progress.style.animation = 'none';
+            setTimeout(() => {
+                progress.style.animation = '';
+            }, 10);
+
+            let remainingTime = 5;
+            countdown.textContent = `${remainingTime}s`;
+
+            const countdownInterval = setInterval(() => {
+                remainingTime -= 1;
+                countdown.textContent = `${remainingTime}s`;
+                if (remainingTime === 0) {
+                    clearInterval(countdownInterval);
+                    toastContainer.removeChild(newToast);
+                }
+            }, 1000);
+
+            closeToast.onclick = function() {
+                clearInterval(countdownInterval);
+                toastContainer.removeChild(newToast);
+            };
+        }
+
+    </script>
+</div>
+</body>
+</html>

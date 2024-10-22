@@ -3,18 +3,28 @@
 <head th:replace="~{src/partials/_head :: _head}"></head>
 <body>
 <div class="container-scroller">
-    <!--_navbar -->
-    <div th:replace="~{src/partials/_navbar :: _navbar}">
-    </div>
-    <!-- _navbar -->
-    <div class="container-fluid page-body-wrapper">
-        <!--_sidebar-->
-        <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
-        <!--_sidebar-->
-        <div class="main-panel">
-            <!-- header : phần này là ghi code listAll-->
-            <div class="content-wrapper">
+    <!-- Navbar -->
+    <div th:replace="~{src/partials/_navbar :: _navbar}"></div>
 
+    <div class="container-fluid page-body-wrapper">
+        <!-- Sidebar -->
+        <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <main class="container-fluid px-3 py-4">
+                    <h3 class="fw-bold fs-4 mb-3">Danh Sách Bình Luận</h3>
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+<!------------------------------------------------------------------------------------------>
+                            <form action="#" th:action="@{/admin/binhluan}" method="get">
+                                <label for="danhGia">Lọc theo đánh giá:</label>
+                                <select name="danhGia" id="danhGia">
+                                    <option value="" th:selected="${danhGia == null}">Tất cả</option>
+                                    <option th:each="dg : ${danhGias}" th:value="${dg}" th:text="${dg}" th:selected="${dg == danhGia}"></option>
+                                </select>
+
+<<<<<<< HEAD
                 <table class="table">
                     <thead>
                     <tr>
@@ -38,15 +48,71 @@
                     </tr>
                     </tbody>
                 </table>
+=======
+                                <label for="startDate">Ngày bắt đầu:</label>
+                                <input type="date" name="startDate" id="startDate" th:value="${startDate}">
 
+                                <label for="endDate">Ngày kết thúc:</label>
+                                <input type="date" name="endDate" id="endDate" th:value="${endDate}">
+>>>>>>> b2f653407714d775cdec36c4de591aacfe2d0a97
+
+                                <button type="submit">Lọc</button>
+                            </form>
+
+
+
+                            <!-------------------------------------------------------------------------------------------------------->
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>ID Khách Hàng</th>
+                                    <th>ID Chi Tiết Sản Phẩm</th>
+                                    <th>Bình Luận</th>
+                                    <th>Đánh Giá</th>
+                                    <th>Ngày Bình Luận </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="bl : ${bl}">
+                                    <td th:text="${bl.id}"></td>
+                                    <td th:text="${bl.idKhachHang}"></td>
+                                    <td th:text="${bl.idChiTietSanPham}"></td>
+                                    <td th:text="${bl.binhLuan}"></td>
+                                    <td th:text="${bl.danhGia}"></td>
+                                    <td th:text="${bl.ngayBinhLuan}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+<!----------------------------------------------------------------------------------->
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <ul class="pagination">
+                                <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage - 1})}">Previous</a>
+                                </li>
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:class="${i == currentPage} ? 'active'">
+                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${i})}" th:text="${i + 1}"></a>
+                                </li>
+                                <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage + 1})}">Next</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </main>
             </div>
-            <!--footer-->
+
+            <!------------------------------------------------------------- Footer -->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
-            <!--footer-->
         </div>
     </div>
 </div>
-<!--script -->
+
+<!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>
 </body>
 </html>

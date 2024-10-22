@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{src/partials/_head :: _head}"></head>
+<body>
+<div class="container-scroller">
+    <!-- Navbar -->
+    <div th:replace="~{src/partials/_navbar :: _navbar}"></div>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- Sidebar -->
+        <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <form th:action="@{/san-pham/updateData}" method="post">
+                    <input type="hidden" th:value="${SP.id}" name="id">
+                    <h5>Thông tin sản phẩm</h5>
+                    <div class="mb-3">
+                        <label for="ma" class="form-label">Mã sản phẩm</label>
+                        <input type="text" id="ma" th:value="${SP.ma_sanpham}" name="ma_sanpham" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tensanpham" class="form-label">Tên sản phẩm</label>
+                        <input type="text" id="tensanpham" th:value="${SP.tensanpham}" name="tensanpham" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="thuonghieu" class="form-label">Thương hiệu</label>
+                        <select id="thuonghieu" name="thuongHieu.id" class="form-select" required>
+                            <option th:each="th : ${thuongHieus}" th:value="${th.id}" th:text="${th.tenThuongHieu}" th:selected="${th.id == SP.thuongHieu.id}"></option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="giaban" class="form-label">Giá bán</label>
+                        <input type="number" id="giaban" th:value="${SP.giaban}" name="giaban" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="url_anh" class="form-label">URL ảnh</label>
+                        <input type="text" id="url_anh" name="url_anh" class="form-control" required readonly>
+                        <button type="button" class="btn btn-info mt-2" onclick="openFileDialog()">Chọn ảnh từ ổ D</button>
+                    </div>
+                    <div class="mb-3">
+                        <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>
+                    </div>
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
+                </form>
+            </div>
+            <!-- Footer -->
+            <div th:replace="~{src/partials/_footer :: _footer}"></div>
+        </div>
+    </div>
+</div>
+<!-- Script -->
+<div th:replace="~{src/partials/_script :: _script}"></div>
+<script>
+    function openFileDialog() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = event => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                    document.getElementById('url_anh').value = e.target.result; // Lưu URL vào input
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        fileInput.click();
+    }
+</script>
+</body>
+</html>
+

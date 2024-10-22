@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{src/partials/_head :: _head}">
+
+</head>
+<body onload="loadingg()">
+<div class="container-scroller">
+    <!--_navbar -->
+    <div th:replace="~{src/partials/_navbar :: _navbar}">
+    </div>
+    <!-- _navbar -->
+    <div class="container-fluid page-body-wrapper">
+        <!--_sidebar-->
+        <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
+        <!--_sidebar-->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <form th:action="@{/khachhang/updateData}" method="post" enctype="multipart/form-data" onsubmit="return collectAddressNames()">
+                    <div class="row">
+                        <!-- Phần thông tin bên trái -->
+                        <div class="col-md-6">
+                            <div class="rounded-box">
+                                <input type="text" th:value="${KH.id}" name="id" style="display: none">
+                                <h5>Thông tin khách hàng</h5>
+                                <div class="mb-3">
+                                    <label for="customerCode" class="form-label">Tên khách hàng</label>
+                                    <input type="text" id="customerCode" th:value="${KH.hoTen}" name="hoTen" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Số điện thoại</label>
+                                    <input type="text" id="phone" th:value="${KH.soDienThoai}"  name="soDienThoai" class="form-control" required
+                                           pattern="\d{10}" title="Vui lòng nhập đúng 10 số">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Ngày sinh</label>
+                                    <input type="date" id="ngaySinh" th:value="${KH.ngaySinh}" name="ngaySinh" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" id="email" th:value="${KH.email}" name="email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Giới tính</label>
+                                    <select id="gender" name="gioiTinh" class="form-select">
+                                        <option value="Nam" th:selected="${KH.gioiTinh == 'Nam'}">Nam</option>
+                                        <option value="Nữ" th:selected="${KH.gioiTinh == 'Nữ'}">Nữ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phần thông tin bên phải -->
+                        <div class="col-md-6">
+                            <div class="rounded-box">
+                                <h5>Thông tin địa chỉ</h5>
+                                <div class="mb-3">
+                                    <label for="province" class="form-label">Tỉnh/ Thành phố</label>
+                                    <select id="province" name="thanhPho" class="form-select" required>
+                                        <option value="">Chọn</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="district" class="form-label">Quận/ Huyện</label>
+                                    <select id="district" name="huyen" class="form-select" required>
+                                        <option value="">Chọn</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ward" class="form-label">Phường/ Xã</label>
+                                    <select id="ward" name="xa" class="form-select" required>
+                                        <option value="">Chọn</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="addressDetails" class="form-label">Địa chỉ chi tiết</label>
+                                    <input type="text" id="addressDetails" name="diaChi" class="form-control" placeholder="Số nhà, đường..." required>
+                                </div>
+                                <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
+                                <input type="hidden" th:value="${KH.thanhPho}" id="provinceName" name="1">
+                                <input type="hidden" th:value="${KH.huyen}" id="districtName" name="2">
+                                <input type="hidden" th:value="${KH.xa}" id="wardName" name="3">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <a href="/admin/khachhang" class="btn btn-secondary">Hủy</a>
+                </form>
+            </div>
+            <!--footer-->
+            <div th:replace="~{src/partials/_footer :: _footer}"></div>
+            <!--footer-->
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function loadingg() {
+            const provinceName = document.getElementById("provinceName").value;
+            const districtName = document.getElementById("districtName").value;
+            const wardName = document.getElementById("wardName").value;
+
+            const host = "https://provinces.open-api.vn/api/";
+
+            const callAPI = (api) => {
+                return axios.get(api)
+                    .then((response) => response.data)
+                    .catch(error => {
+                        console.error("Error loading data:", error);
+                    });
+            };
+
+            const renderData = (array, select) => {
+                let row = '<option value="">Chọn</option>';
+                array.forEach(element => {
+                    row += `<option value="${element.code}" data-name="${element.name}">${element.name}</option>`;
+                });
+                document.querySelector("#" + select).innerHTML = row;
+            };
+
+            const selectOptionByName = (selectId, name) => {
+                const options = document.querySelectorAll(`#${selectId} option`);
+                options.forEach(option => {
+                    if (option.getAttribute('data-name') === name) {
+                        option.selected = true;
+                    }
+                });
+            };
+
+            // Hàm xử lý khi tỉnh thay đổi
+            const handleProvinceChange = () => {
+                const provinceCode = document.querySelector("#province").value;
+                if (provinceCode) {
+                    callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
+                        renderData(provinceData.districts, "district");
+                        document.querySelector("#ward").innerHTML = '<option value="">Chọn xã</option>'; // Xóa xã khi chọn tỉnh mới
+                    });
+                }
+            };
+
+            // Hàm xử lý khi huyện thay đổi
+            const handleDistrictChange = () => {
+                const districtCode = document.querySelector("#district").value;
+                if (districtCode) {
+                    callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
+                        renderData(districtData.wards, "ward");
+                    });
+                }
+            };
+
+            // Gọi API để lấy tỉnh
+            callAPI(host + "p").then(provinces => {
+                renderData(provinces, "province");
+                selectOptionByName("province", provinceName);
+
+                let provinceCode = document.querySelector("#province").value;
+                if (provinceCode) {
+                    // Gọi API để lấy danh sách huyện
+                    callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
+                        renderData(provinceData.districts, "district");
+                        selectOptionByName("district", districtName);
+                        let districtCode = document.querySelector("#district").value;
+                        if (districtCode) {
+                            // Gọi API để lấy danh sách xã
+                            callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
+                                renderData(districtData.wards, "ward");
+                                selectOptionByName("ward", wardName);
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Thêm sự kiện khi thay đổi tỉnh
+            document.querySelector("#province").addEventListener("change", handleProvinceChange);
+            // Thêm sự kiện khi thay đổi huyện
+            document.querySelector("#district").addEventListener("change", handleDistrictChange);
+        }
+
+    </script>
+</div>
+<!--script -->
+<div th:replace="~{src/partials/_script :: _script}"></div>
+</body>
+</html>

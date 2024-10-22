@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"></head>
-<body>
+<head th:replace="~{src/partials/_head :: _head}"
+></head>
+<body onload="loading()">
 <div class="container-scroller">
     <!--_navbar -->
     <div th:replace="~{src/partials/_navbar :: _navbar}">
@@ -13,15 +14,75 @@
         <!--_sidebar-->
         <div class="main-panel">
             <div class="content-wrapper">
-                <!-- header : phần này là ghi code listAll-->
-                <h1>khách hàng</h1>
-                <!-- header-->
+                <main class="container-fluid px-3 py-4">
+                    <h3 class="fw-bold fs-4 mb-3">Danh Sách Khách Hàng</h3>
+                    <!-- Thông báo -->
+
+                    <div class="row">
+                        <div class="col-12 text-end mb-3">
+                            <a class="btn btn-dark" th:href="@{/khachhang/add}">
+                                <i class="lni lni-plus"></i> Thêm mới
+                            </a>
+                        </div>
+
+                        <div class="col-12 table-responsive">
+                            <table class="table table-striped table-hover table-bordered" id="multi-filter-select">
+                                <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Tên khách hàng</th>
+                                    <th scope="col">Số điện thoại</th>
+                                    <th scope="col">Ngày sinh</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Địa chỉ</th>
+                                    <th scope="col">Giới tính</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="customer : ${khachHangs}">
+                                    <td th:text="${customer.id}"></td>
+                                    <td th:text="${customer.hoTen}"></td>
+                                    <td th:text="${customer.soDienThoai}"></td>
+                                    <td th:text="${customer.ngaySinh}"></td>
+                                    <td th:text="${customer.email}"></td>
+                                    <td th:text="${customer.diaChi}+ ', ' +${customer.xa} +', '+ ${customer.huyen} +', '+ ${customer.xa}">
+                                    </td>
+                                    <td th:text="${customer.gioiTinh}"></td>
+                                    <td th:text="${customer.trangThai}"></td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <a class="btn btn-primary btn-sm me-1" th:href="@{/khachhang/update(id=${customer.id})}">
+                                                <i class="lni lni-pencil">Update</i>
+                                            </a>
+                                            <a class="btn btn-danger btn-sm" th:href="@{/khachhang/delete(id=${customer.id})}"
+                                               onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái của khách hàng này?')">
+                                                <i class="lni" th:classappend="${customer.trangThai.equals('Hoạt động') ? 'lni-ban' : 'lni-checkmark-circle'}">Delete</i>
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </main>
             </div>
             <!--footer-->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
             <!--footer-->
         </div>
     </div>
+    <script>
+        function loading(){
+            $("#multi-filter-select").DataTable({
+                pageLength: 5
+            });
+        }
+    </script>
 </div>
 <!--script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

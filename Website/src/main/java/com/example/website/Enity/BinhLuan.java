@@ -4,29 +4,31 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Data
-@Component
-@Table(name = "binhluan")
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "binh_luan")
 public class BinhLuan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "id_khachhang")
+    @Column(name = "id_khach_hang")
     private Integer idKhachHang;
 
-    @Column(name = "id_chitietsanpham")
+    @Column(name = "id_chi_tiet_san_pham")
     private Integer idChiTietSanPham;
 
-    @Column(name = "binhluan")
+    @Column(name = "binh_luan")
     private String binhLuan;
 
-    @Column(name = "danhgia")
+    @Column(name = "danh_gia")
     private Integer danhGia;
+    @Column(name = "ngay_binh_luan")
+    private LocalDate ngayBinhLuan;
 }
