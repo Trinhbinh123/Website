@@ -45,6 +45,7 @@
                                     <th>Bình Luận</th>
                                     <th>Đánh Giá</th>
                                     <th>Ngày Bình Luận </th>
+                                    <th>Chức Năng </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -55,6 +56,17 @@
                                     <td th:text="${bl.binhLuan}"></td>
                                     <td th:text="${bl.danhGia}"></td>
                                     <td th:text="${bl.ngayBinhLuan}"></td>
+                                    <td>
+                                        <div class="d-flex justify-content-center">
+                                            <form th:action="@{/binhluan/delete}" method="post" style="display:inline;">
+                                                <input type="hidden" name="id" th:value="${bl.id}" />
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận  này không?')">
+                                                    <i class="fas fa-trash"></i> Xóa
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+
                                 </tr>
                                 </tbody>
                             </table>
