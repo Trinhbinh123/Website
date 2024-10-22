@@ -27,7 +27,11 @@ public class KhuyenMaiController {
         for(KhuyenMai khuyenMai : khuyenMais){
             KhuyenMailResponse khuyenMailResponse = new KhuyenMailResponse();
             BeanUtils.copyProperties(khuyenMai,khuyenMailResponse);
-            khuyenMailResponse.setNgayTao(khuyenMai.getNgayTao().format(formatter));
+            if (khuyenMai.getNgayTao() != null) {
+                khuyenMailResponse.setNgayTao(khuyenMai.getNgayTao().format(formatter));
+            } else {
+                khuyenMailResponse.setNgayTao("Ngày tạo không xác định");
+            }
             khuyenMailResponse.setNgayBatDau(khuyenMai.getNgayBatDau().format(formatter));
             khuyenMailResponse.setNgayKetThuc(khuyenMai.getNgayKetThuc().format(formatter));
             if(khuyenMai.getNgaySua() != null){
