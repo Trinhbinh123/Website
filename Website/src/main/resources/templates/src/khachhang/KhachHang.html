@@ -54,11 +54,11 @@
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center">
                                             <a class="btn btn-primary btn-sm me-1" th:href="@{/khachhang/update(id=${customer.id})}">
-                                                <i class="lni lni-pencil"></i>
+                                                <i class="lni lni-pencil">Update</i>
                                             </a>
                                             <a class="btn btn-danger btn-sm" th:href="@{/khachhang/delete(id=${customer.id})}"
                                                onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái của khách hàng này?')">
-                                                <i class="lni" th:classappend="${customer.trangThai.equals('Hoạt động') ? 'lni-ban' : 'lni-checkmark-circle'}"></i>
+                                                <i class="lni" th:classappend="${customer.trangThai.equals('Hoạt động') ? 'lni-ban' : 'lni-checkmark-circle'}">Delete</i>
                                             </a>
                                         </div>
                                     </td>
