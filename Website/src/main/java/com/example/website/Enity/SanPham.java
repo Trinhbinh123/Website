@@ -27,4 +27,5 @@ public class SanPham {
     @Column(name="gia_ban")
     Double giaban;
     String url_anh;
+
 }
