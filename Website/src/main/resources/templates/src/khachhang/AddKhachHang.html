@@ -15,7 +15,7 @@
         <!--_sidebar-->
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/khachHang/save}" method="post" enctype="multipart/form-data" onsubmit="return collectAddressNames()">
+                <form th:action="@{/khachHang/save}" method="post" enctype="multipart/form-data" id="myForm">
                     <div class="row">
                         <!-- Phần thông tin bên trái -->
                         <div class="col-md-6">
@@ -27,7 +27,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="phone" class="form-label">Số điện thoại</label>
-                                    <input type="text" id="phone" name="soDienThoai" class="form-control" required
+                                    <input type="number" id="phone" name="soDienThoai" class="form-control" required
                                            pattern="\d{10}" title="Vui lòng nhập đúng 10 số">
                                 </div>
                                 <div class="mb-3">
@@ -81,9 +81,10 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button class="btn btn-success" onclick="checkValidate(event)">Lưu</button>
                     <a href="/admin/khachhang" class="btn btn-secondary">Hủy</a>
                 </form>
+                <span id="error" style="color: red"></span>
             </div>
             <!--footer-->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
@@ -93,7 +94,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         function loadingg() {
-            console.log("haha")
             const host = "https://provinces.open-api.vn/api/";
 
             const callAPI = (api) => {
@@ -132,12 +132,10 @@
                 }
             });
 
-            // Gọi API tỉnh khi trang tải
             callAPI(host + "p");
         }
 
         function collectAddressNames() {
-            // Lấy tên từ các option đã chọn
             const provinceSelect = document.querySelector("#province");
             const districtSelect = document.querySelector("#district");
             const wardSelect = document.querySelector("#ward");
@@ -146,13 +144,109 @@
             const districtName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
             const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
 
-            // Gán tên vào các trường ẩn
             document.querySelector("#provinceName").value = provinceName;
             document.querySelector("#districtName").value = districtName;
             document.querySelector("#wardName").value = wardName;
 
-            return true; // Cho phép gửi form
+            return true;
         }
+
+        function checkValidate(e) {
+            e.preventDefault();
+
+            const form = document.getElementById('myForm');
+            const error = document.getElementById("error");
+            const formData = new FormData(form);
+            let dataCheck = {};
+
+            formData.forEach((value, key) => {
+                dataCheck[key] = value.trim(); // Trim để loại bỏ khoảng trắng
+            });
+
+            if (dataCheck.hoTen === "") {
+                error.textContent = "Không được bỏ trống tên";
+                return;
+            }
+
+            if (dataCheck.soDienThoai === "" || dataCheck.soDienThoai.length !== 10 || !/^\d{10}$/.test(dataCheck.soDienThoai)) {
+                error.textContent = "Số điện thoại phải là 10 chữ số";
+                return;
+            }
+
+            if (dataCheck.ngaySinh === "") {
+                error.textContent = "Không được bỏ trống ngày sinh";
+                return;
+            }
+
+            const birthYear = new Date(dataCheck.ngaySinh).getFullYear();
+            const currentYear = new Date().getFullYear();
+            if (birthYear > currentYear - 16) {
+                error.textContent = "Người dùng phải trên 16 tuổi";
+                return;
+            }
+
+            if (dataCheck.email === "") {
+                error.textContent = "Không được bỏ trống email";
+                return;
+            }
+
+            if (!isValidEmail(dataCheck.email)) {
+                error.textContent = "Email không hợp lệ";
+                return;
+            }
+
+            if (dataCheck.thanhPho === "") {
+                error.textContent = "Hãy chọn thành phố";
+                return;
+            }
+
+            if (dataCheck.huyen === "") {
+                error.textContent = "Hãy chọn huyện";
+                return;
+            }
+
+            if (dataCheck.xa === "") {
+                error.textContent = "Hãy chọn xã";
+                return;
+            }
+
+            if (dataCheck.diaChi === "") {
+                error.textContent = "Không được bỏ trống địa chỉ";
+                return;
+            }
+
+            $.ajax({
+                url: "/api/khachHang/data",
+                method: "GET",
+                success: function (data) {
+                    const isPhoneDuplicate = data.some(item => item.soDienThoai === dataCheck.soDienThoai);
+                    const isEmailDuplicate = data.some(item => item.email === dataCheck.email);
+
+                    if (isPhoneDuplicate) {
+                        error.textContent = "Số điện thoại đã được sử dụng";
+                        return;
+                    }
+
+                    if (isEmailDuplicate) {
+                        error.textContent = "Email đã được sử dụng";
+                        return;
+                    }
+
+                    // Nếu không trùng lặp, submit form
+                    form.submit();
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return emailRegex.test(email);
+        }
+
+
     </script>
 </div>
 <!--script -->

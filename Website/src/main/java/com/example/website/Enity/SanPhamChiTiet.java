@@ -1,5 +1,6 @@
 package com.example.website.Enity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -44,5 +45,10 @@ public class SanPhamChiTiet {
     private LocalDateTime ngay_nhap;
     @Column(name="trang_thai")
     Boolean trang_thai;
+
+    @OneToOne
+    @JsonIgnore
+    @JoinColumn(name = "id_san_pham_khuyen_mai")
+    private KhuyenMaiChiTiet khuyenMaiChiTiet;
 
 }
