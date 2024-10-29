@@ -3,11 +3,8 @@ package com.example.website.Controller;
 import com.example.website.Enity.SanPham;
 import com.example.website.Respository.SanPhamRepo;
 import com.example.website.Enity.ThuongHieu;
-import com.example.website.Respository.ThuongHieuRepo; // Giả sử bạn có repo cho Thương Hiệu
+import com.example.website.Respository.ThuongHieuRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +18,7 @@ public class SanPhamController {
 
     @GetMapping("/admin/san-pham")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<SanPham> sanPhamPage = sanPhamRepo.findAll(pageable);
-
-        model.addAttribute("sp", sanPhamPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", sanPhamPage.getTotalPages());
+        model.addAttribute("sp",sanPhamRepo.findAll());
         return "src/san-pham/hien-thi"; // Template hiển thị danh sách
     }
 

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{src/partials/_head :: _head}"></head>
-<body>
+<body onload="loading()">
 <div class="container-scroller">
+
     <!-- Navbar -->
     <div th:replace="~{src/partials/_navbar :: _navbar}"></div>
 
@@ -20,7 +21,7 @@
                         </a>
                     </div>
                     <div class="col-12 table-responsive">
-                        <table class="table table-striped table-hover table-bordered">
+                        <table class="table table-striped table-hover table-bordered" id="multi-filter-select">
                             <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
@@ -61,28 +62,18 @@
                         </table>
                     </div>
                 </div>
-                <!-- Pagination -->
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <ul class="pagination">
-                            <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/san-pham(page=${currentPage - 1})}">Previous</a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                th:class="${i == currentPage} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/san-pham(page=${i})}" th:text="${i + 1}"></a>
-                            </li>
-                            <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/san-pham(page=${currentPage + 1})}">Next</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
             <!-- Footer -->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+    <script>
+        function loading(){
+            $("#multi-filter-select").DataTable({
+                pageLength: 5
+            });
+        }
+    </script>
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>
