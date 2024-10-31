@@ -49,16 +49,16 @@
                         <label for="soLuong" class="form-label">Số lượng</label>
                         <input type="number" id="soLuong" th:value="${spct.so_luong}" name="so_luong" class="form-control" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="giaNhap" class="form-label">Giá nhập</label>
-                        <input type="number" id="giaNhap" th:value="${spct.gia_nhap}" name="gia_nhap" class="form-control" required>
-                    </div>
+<!--                    <div class="mb-3">-->
+<!--                        <label for="giaNhap" class="form-label">Giá nhập</label>-->
+<!--                        <input type="number" id="giaNhap" th:value="${spct.gia_nhap}" name="gia_nhap" class="form-control" required>-->
+<!--                    </div>-->
                     <div class="mb-3">
                         <label for="giaBan" class="form-label">Giá bán</label>
                         <input type="number" id="giaBan" th:value="${spct.gia_ban}" name="gia_ban" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="ngayNhap" class="form-label">Giá bán</label>
+                        <label for="ngayNhap" class="form-label">Ngày nhập</label>
                         <input type="datetime-local" id="ngayNhap" th:value="${spct.ngay_nhap}" name="ngay_nhap" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-success">Lưu</button>
