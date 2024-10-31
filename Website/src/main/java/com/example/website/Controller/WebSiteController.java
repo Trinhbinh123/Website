@@ -33,7 +33,6 @@ public class WebSiteController {
         model.addAttribute("soLuongGioHang", soLuong);
         return "src/website/WebSite";
     }
-<<<<<<< HEAD
 
     @GetMapping("/detail/{idSanPham}")
     public String detail(Model model, @PathVariable Integer idSanPham) {
@@ -52,12 +51,9 @@ public class WebSiteController {
         Set<Size> listSize = new HashSet<>(sizes);
         model.addAttribute("mauSacs", new ArrayList<>(listMauSac));
         model.addAttribute("sizes", new ArrayList<>(listSize));
-=======
-    @GetMapping("/detail")
-    public String detail() {
->>>>>>> f72893b768e8c13f4cc08ebd2ee798da4cfcdf57
         return "src/website/detail"; // Trả về trang home.html
     }
+
     @GetMapping("/shop")
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
