@@ -1,8 +1,9 @@
-package com.example.website.Controller;
+package com.example.website.Controller.KhachHang;
 
+import com.example.website.Controller.MailService;
 import com.example.website.Enity.KhachHang;
-import com.example.website.Enity.KhuyenMai;
 import com.example.website.Respository.KhachHangRepo;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,12 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
 public class KhachHangController {
 
     private final KhachHangRepo khachHangRepo;
+    private final MailService mailService;
 
     @GetMapping("/admin/khachhang")
     public String getAdmin(Model model) {
@@ -43,7 +46,7 @@ public class KhachHangController {
 
     @GetMapping("/khachhang/update")
     public String getUpdate(
-    Model model, @RequestParam Integer id) {
+            Model model, @RequestParam Integer id) {
         model.addAttribute("KH", khachHangRepo.getReferenceById(id));
         return "src/khachhang/UpdateKhachHang";
     }
@@ -67,7 +70,8 @@ public class KhachHangController {
     }
     @PostMapping("/khachHang/save")
     public String save(
-            @ModelAttribute KhachHang khachHang){
+            @ModelAttribute KhachHang khachHang) throws MessagingException {
+
         String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
         String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
         String[] wardDetails = getWardDetails(khachHang.getXa());
@@ -77,7 +81,13 @@ public class KhachHangController {
         khachHang.setThanhPho(provinceName);
         khachHang.setHuyen(districtName);
         khachHang.setXa(wardName);
-        khachHang.setTrangThai("Hoạt động");
+        khachHang.setTrangThai("Đang hoạt động");
+
+        khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0,8));
+
+        mailService.sendEmail(khachHang.getEmail(),khachHang.getHoTen(),khachHang.getMatKhau(),"/src/mail");
+
+
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }
