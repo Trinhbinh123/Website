@@ -53,7 +53,7 @@ public class WebSiteController {
         Set<Size> listSize = new HashSet<>(sizes);
         model.addAttribute("mauSacs", new ArrayList<>(listMauSac));
         model.addAttribute("sizes", new ArrayList<>(listSize));
-
+    }
     @GetMapping("/shop")
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
