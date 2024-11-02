@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"></head>
+<head th:replace="~{src/partials/_head :: _head}">
+
+</head>
+
 <body>
 <div class="container-scroller">
     <!-- Navbar -->
@@ -25,11 +28,11 @@
                                             th:selected="${dg == danhGia}"></option>
                                 </select>
 
-                                <label for="startDate">Ngày bắt đầu:</label>
-                                <input type="date" name="startDate" id="startDate" th:value="${startDate}">
+                                <label  for="startDate">Ngày bắt đầu:</label>
+                                <input class="control" type="date" name="startDate" id="startDate" th:value="${startDate}">
 
                                 <label for="endDate">Ngày kết thúc:</label>
-                                <input type="date" name="endDate" id="endDate" th:value="${endDate}">
+                                <input  class="control" type="date" name="endDate" id="endDate" th:value="${endDate}">
 
                                 <button type="submit">Lọc</button>
                             </form>
@@ -51,8 +54,8 @@
                                 <tbody>
                                 <tr th:each="bl : ${bl}">
                                     <td th:text="${bl.id}"></td>
-                                    <td th:text="${bl.idKhachHang}"></td>
-                                    <td th:text="${bl.idChiTietSanPham}"></td>
+                                    <td th:text="${bl.khachHang.getHoTen()}"></td>
+                                    <td th:text="${bl.sanPhamChiTiet.ma_SPCT}"></td>
                                     <td th:text="${bl.binhLuan}"></td>
                                     <td th:text="${bl.danhGia}"></td>
                                     <td th:text="${bl.ngayBinhLuan}"></td>
@@ -61,7 +64,7 @@
                                             <form th:action="@{/binhluan/delete}" method="post" style="display:inline;">
                                                 <input type="hidden" name="id" th:value="${bl.id}" />
                                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa bình luận  này không?')">
-                                                    <i class="fas fa-trash"></i> Xóa
+                                                    <i >Xóa</i>
                                                 </button>
                                             </form>
                                         </div>
@@ -73,25 +76,38 @@
                         </div>
                     </div>
                     <!----------------------------------------------------------------------------------->
+
                     <div class="row">
                         <div class="col-12 text-center">
-                            <ul class="pagination">
-                                <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+                            <ul class="pagination justify-content-center">
+                                <!-- Nút "Previous" -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage - 1})}">Previous</a>
+                                       th:href="${currentPage > 0} ? @{/admin/binhluan(danhGia=${danhGia}, page=${currentPage - 1})} : '#'"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
                                 </li>
-                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                    th:class="${i == currentPage} ? 'active'">
+
+                                <!-- Các số trang -->
+                                <li class="page-item mx-1" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                    th:classappend="${i == currentPage} ? 'active'">
                                     <a class="page-link" th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${i})}"
                                        th:text="${i + 1}"></a>
                                 </li>
-                                <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
+
+                                <!-- Nút "Next" -->
+                                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/admin/binhluan(danhGia=${danhGia}, page=${currentPage + 1})}">Next</a>
+                                       th:href="${currentPage < totalPages - 1} ? @{/admin/binhluan(danhGia=${danhGia}, page=${currentPage + 1})} : '#'"
+                                       aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
                                 </li>
                             </ul>
                         </div>
                     </div>
+
                 </main>
             </div>
 
