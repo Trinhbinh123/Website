@@ -10,12 +10,10 @@ public class WebSiteController {
     public String getAdmin() {
         return "src/website/WebSite";
     }
-
     @GetMapping("/detail")
     public String detail() {
         return "src/website/detail"; // Trả về trang home.html
     }
-
     @GetMapping("/shop")
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
