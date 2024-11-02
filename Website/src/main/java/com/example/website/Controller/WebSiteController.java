@@ -45,7 +45,7 @@ public class WebSiteController {
         List<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepo.findBySanPham(sanPham);
         List<MauSac> mauSacs = new ArrayList<>();
         List<Size> sizes = new ArrayList<>();
-        for(SanPhamChiTiet sanPhamChiTiet : sanPhamChiTiets){
+        for (SanPhamChiTiet sanPhamChiTiet : sanPhamChiTiets) {
             mauSacs.add(sanPhamChiTiet.getMauSac());
             sizes.add(sanPhamChiTiet.getSize());
         }
@@ -59,17 +59,18 @@ public class WebSiteController {
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
     }
+
     @PostMapping("/checkout")
-    public String checkout(Model model,@RequestParam List<Integer> integers) {
+    public String checkout(Model model, @RequestParam List<Integer> integers) {
         List<GioHang> gioHangs = new ArrayList<>();
-        for(Integer i : integers){
+        for (Integer i : integers) {
             gioHangs.add(gioHangRepo.getReferenceById(i));
         }
         model.addAttribute("productDetail", gioHangs);
         model.addAttribute("list", integers);
 
         int tongTien = 0;
-        for(GioHang gioHang : gioHangs){
+        for (GioHang gioHang : gioHangs) {
             tongTien += gioHang.getTongTien();
         }
         model.addAttribute("tongTien", tongTien);
@@ -106,16 +107,16 @@ public class WebSiteController {
         hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
         hoaDon.setNgayDatHang(new Date());
         hoaDon.setTrangThai("Chờ xác nhận");
-        if(payment.equals("1")){
+        if (payment.equals("1")) {
             hoaDon.setHinhThuc("Thanh toán khi nhận hàng");
-        }else {
+        } else {
             hoaDon.setHinhThuc("Thanh toán bằng VN Pay");
         }
         HoaDon saveHoaDon = hoaDonRepo.save(hoaDon);
 
         int tongTien = 0;
 
-        for(Integer i : integers){
+        for (Integer i : integers) {
             GioHang gioHang = gioHangRepo.getReferenceById(i);
 
             HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
@@ -147,6 +148,7 @@ public class WebSiteController {
         String url = "https://provinces.open-api.vn/api/w/" + wardCode;
         return getDetailsFromApi(url);
     }
+
     private String[] getDetailsFromApi(String url) {
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -170,6 +172,7 @@ public class WebSiteController {
     public String cart(Model model) {
         return "src/website/cart"; // Trả về trang about.html
     }
+
     @GetMapping("/contact")
     public String contact() {
         return "src/website/contact"; // Trả về trang about.html
