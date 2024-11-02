@@ -23,10 +23,120 @@
     <link th:href="@{../static/src/websitelib/owlcarousel/assets/owl.carousel.min.css }" rel="stylesheet">
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link th:href="@{../static/src/website/css/style.css }" rel="stylesheet">
+    <link th:href="@{../static/src/website/css/style.css}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .input{
+            width: 100px;
+            border: none;
+            border-bottom: 1px solid;
+            text-align: end;
+        }
+    </style>
+    <script>
+        function loadingg() {
+            const provinceName = document.getElementById("provinceName").value;
+            const districtName = document.getElementById("districtName").value;
+            const wardName = document.getElementById("wardName").value;
+
+            const host = "https://provinces.open-api.vn/api/";
+
+            const callAPI = (api) => {
+                return axios.get(api)
+                    .then((response) => response.data)
+                    .catch(error => {
+                        console.error("Error loading data:", error);
+                    });
+            };
+
+            const renderData = (array, select) => {
+                let row = '<option value="">Chọn</option>';
+                array.forEach(element => {
+                    row += `<option value="${element.code}" data-name="${element.name}">${element.name}</option>`;
+                });
+                document.querySelector("#" + select).innerHTML = row;
+            };
+
+            const selectOptionByName = (selectId, name) => {
+                const options = document.querySelectorAll(`#${selectId} option`);
+                options.forEach(option => {
+                    if (option.getAttribute('data-name') === name) {
+                        option.selected = true;
+                    }
+                });
+            };
+
+            // Hàm xử lý khi tỉnh thay đổi
+            const handleProvinceChange = () => {
+                const provinceCode = document.querySelector("#province").value;
+                if (provinceCode) {
+                    callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
+                        renderData(provinceData.districts, "district");
+                        document.querySelector("#ward").innerHTML = '<option value="">Chọn xã</option>'; // Xóa xã khi chọn tỉnh mới
+                    });
+                }
+            };
+
+            // Hàm xử lý khi huyện thay đổi
+            const handleDistrictChange = () => {
+                const districtCode = document.querySelector("#district").value;
+                if (districtCode) {
+                    callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
+                        renderData(districtData.wards, "ward");
+                    });
+                }
+            };
+
+            // Gọi API để lấy tỉnh
+            callAPI(host + "p").then(provinces => {
+                renderData(provinces, "province");
+                selectOptionByName("province", provinceName);
+
+                let provinceCode = document.querySelector("#province").value;
+                if (provinceCode) {
+                    // Gọi API để lấy danh sách huyện
+                    callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
+                        renderData(provinceData.districts, "district");
+                        selectOptionByName("district", districtName);
+                        let districtCode = document.querySelector("#district").value;
+                        if (districtCode) {
+                            // Gọi API để lấy danh sách xã
+                            callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
+                                renderData(districtData.wards, "ward");
+                                selectOptionByName("ward", wardName);
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Thêm sự kiện khi thay đổi tỉnh
+            document.querySelector("#province").addEventListener("change", handleProvinceChange);
+            // Thêm sự kiện khi thay đổi huyện
+            document.querySelector("#district").addEventListener("change", handleDistrictChange);
+
+
+            const tongTien = document.getElementById("tongTien").innerText;
+            const shipping = document.getElementById("shipping").innerText;
+            const totalPrice = document.getElementById("totalPrice");
+            const total = parseInt(tongTien) + parseInt(shipping);
+            totalPrice.innerText = total.toFixed(0);
+        }
+        function totalPrice(){
+            const tongTien = document.getElementById("tongTien").innerText;
+            const shipping = document.getElementById("shipping").value;
+            const totalPrice = document.getElementById("totalPrice");
+            if(shipping >= 10000){
+                const total = parseInt(tongTien) + parseInt(shipping);
+                totalPrice.innerText = total.toFixed(0);
+            }else {
+                console.log("ngu")
+            }
+        }
+    </script>
 </head>
 
-<body>
+<body onload="loadingg()">
 <!-- Topbar Start -->
 <div class="container-fluid">
     <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
@@ -150,184 +260,164 @@
 
 <!-- Checkout Start -->
 <div class="container-fluid">
-    <div class="row px-xl-5">
-        <div class="col-lg-8">
-            <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
-            <div class="bg-light p-30 mb-5">
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>First Name</label>
-                        <input class="form-control" type="text" placeholder="John">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Last Name</label>
-                        <input class="form-control" type="text" placeholder="Doe">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>E-mail</label>
-                        <input class="form-control" type="text" placeholder="example@email.com">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Mobile No</label>
-                        <input class="form-control" type="text" placeholder="+123 456 789">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 1</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 2</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Country</label>
-                        <select class="custom-select">
-                            <option selected>United States</option>
-                            <option>Afghanistan</option>
-                            <option>Albania</option>
-                            <option>Algeria</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>City</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>State</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>ZIP Code</label>
-                        <input class="form-control" type="text" placeholder="123">
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="newaccount">
-                            <label class="custom-control-label" for="newaccount">Create an account</label>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="shipto">
-                            <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="collapse mb-5" id="shipping-address">
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
-                <div class="bg-light p-30">
+    <form action="/checkout/success" method="POST">
+        <div class="row px-xl-5">
+            <div class="col-lg-8">
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
+                <div class="bg-light p-30 mb-5">
                     <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>First Name</label>
-                            <input class="form-control" type="text" placeholder="John">
+                        <div class="col-md-12 form-group">
+                            <label>Tên người nhận</label>
+                            <input class="form-control" style="display: none" type="text" name="id" th:value="${KH.id}" placeholder="John">
+                            <input class="form-control" type="text" name="hoTen" th:value="${KH.hoTen}" placeholder="John">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>Last Name</label>
-                            <input class="form-control" type="text" placeholder="Doe">
+                            <label>Email</label>
+                            <input class="form-control" type="text" name="email" th:value="${KH.email}" placeholder="example@gmail.com">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>E-mail</label>
-                            <input class="form-control" type="text" placeholder="example@email.com">
+                            <label>Số điện thoại</label>
+                            <input class="form-control" th:value="${KH.soDienThoai}" name="soDienThoai" type="text" placeholder="+84 123 456 789">
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>Mobile No</label>
-                            <input class="form-control" type="text" placeholder="+123 456 789">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Address Line 1</label>
-                            <input class="form-control" type="text" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Address Line 2</label>
-                            <input class="form-control" type="text" placeholder="123 Street">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Country</label>
-                            <select class="custom-select">
-                                <option selected>United States</option>
-                                <option>Afghanistan</option>
-                                <option>Albania</option>
-                                <option>Algeria</option>
+                        <div class="col-md-4 form-group">
+                            <label for="province" class="form-label">Tỉnh/ Thành phố</label>
+                            <select id="province" name="thanhPho" class="custom-select" required>
+                                <option value="">Chọn</option>
                             </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>City</label>
-                            <input class="form-control" type="text" placeholder="New York">
+                        <div class="col-md-4 form-group">
+                            <label for="district" class="form-label">Quận/ Huyện</label>
+                            <select id="district" name="huyen" class="custom-select" required>
+                                <option value="">Chọn</option>
+                            </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>State</label>
-                            <input class="form-control" type="text" placeholder="New York">
+                        <div class="col-md-4 form-group">
+                            <label for="ward" class="form-label">Phường/ Xã</label>
+                            <select id="ward" name="xa" class="custom-select" required>
+                                <option value="">Chọn</option>
+                            </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label>ZIP Code</label>
-                            <input class="form-control" type="text" placeholder="123">
+                        <div class="col-md-12 form-group">
+                            <label>Điạ chỉ chi tiết</label>
+                            <input class="form-control" th:value="${KH.diaChi}" name="diaChi" type="text" placeholder="Hà nội">
                         </div>
+                        <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
+                        <input type="hidden" th:value="${KH.thanhPho}" id="provinceName" name="1">
+                        <input type="hidden" th:value="${KH.huyen}" id="districtName" name="2">
+                        <input type="hidden" th:value="${KH.xa}" id="wardName" name="3">
+                    </div>
+                </div>
+                <div class="collapse mb-5" id="shipping-address">
+                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
+                    <div class="bg-light p-30">
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label>First Name</label>
+                                <input class="form-control" type="text" placeholder="John">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Last Name</label>
+                                <input class="form-control" type="text" placeholder="Doe">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>E-mail</label>
+                                <input class="form-control" type="text" placeholder="example@email.com">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Mobile No</label>
+                                <input class="form-control" type="text" placeholder="+123 456 789">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Address Line 1</label>
+                                <input class="form-control" type="text" placeholder="123 Street">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Address Line 2</label>
+                                <input class="form-control" type="text" placeholder="123 Street">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Country</label>
+                                <select class="custom-select">
+                                    <option selected>United States</option>
+                                    <option>Afghanistan</option>
+                                    <option>Albania</option>
+                                    <option>Algeria</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>City</label>
+                                <input class="form-control" type="text" placeholder="New York">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>State</label>
+                                <input class="form-control" type="text" placeholder="New York">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>ZIP Code</label>
+                                <input class="form-control" type="text" placeholder="123">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
+                <div class="bg-light p-30 mb-5">
+                    <div class="border-bottom">
+                        <h6 class="mb-3">Products</h6>
+                        <div class="d-flex justify-content-between" th:each="list : ${productDetail}">
+                            <p th:text="${list.sanPhamChiTiet.sanPham.tensanpham + ' [ ' + list.sanPhamChiTiet.mauSac.tenmausac + ' - ' + list.sanPhamChiTiet.size.ten_size + ' ]'}"></p>
+                            <p th:text="${list.tongTien}"></p>
+                        </div>
+                    </div>
+                    <div class="border-bottom pt-3 pb-2">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6>Subtotal</h6>
+                            <h6 id="tongTien" th:text="${tongTien}"></h6>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Shipping</h6>
+                            <h6 id="shipping">30000</h6>
+                            <!--                            <input class="input" id="shipping" onchange="totalPrice()" value="0" type="text">-->
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5>Total</h5>
+                            <h5 id="totalPrice"></h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-5">
+                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
+                    <div class="bg-light p-30">
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="paypal">
+                                <label class="custom-control-label" for="paypal">Thanh toán VN Pay</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" value="1" id="directcheck" checked>
+                                <label class="custom-control-label" for="directcheck">Thanh toán khi nhận hàng</label>
+                            </div>
+                        </div>
+                        <!--                        <div class="form-group mb-4">-->
+                        <!--                            <div class="custom-control custom-radio">-->
+                        <!--                                <input type="radio" class="custom-control-input" name="payment" id="banktransfer">-->
+                        <!--                                <label class="custom-control-label" for="banktransfer">Bank Transfer</label>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                        <div class="" th:each="list : ${list}">
+                            <input type="text" name="integers" th:value="${list}" style="display: none">
+                        </div>
+                        <button class="btn btn-block btn-primary font-weight-bold py-3">Xác nhận</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
-            <div class="bg-light p-30 mb-5">
-                <div class="border-bottom">
-                    <h6 class="mb-3">Products</h6>
-                    <div class="d-flex justify-content-between">
-                        <p>Product Name 1</p>
-                        <p>$150</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p>Product Name 2</p>
-                        <p>$150</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p>Product Name 3</p>
-                        <p>$150</p>
-                    </div>
-                </div>
-                <div class="border-bottom pt-3 pb-2">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h6>Subtotal</h6>
-                        <h6>$150</h6>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">$10</h6>
-                    </div>
-                </div>
-                <div class="pt-2">
-                    <div class="d-flex justify-content-between mt-2">
-                        <h5>Total</h5>
-                        <h5>$160</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-5">
-                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Payment</span></h5>
-                <div class="bg-light p-30">
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                            <label class="custom-control-label" for="paypal">Paypal</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                            <label class="custom-control-label" for="directcheck">Direct Check</label>
-                        </div>
-                    </div>
-                    <div class="form-group mb-4">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
-                            <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                        </div>
-                    </div>
-                    <button class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
 <!-- Checkout End -->
 

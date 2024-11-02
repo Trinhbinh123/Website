@@ -23,9 +23,10 @@ public class KhachHangController {
 
     @GetMapping("/admin/khachhang")
     public String getAdmin(Model model) {
-        model.addAttribute("khachHangs",khachHangRepo.findAll());
+        model.addAttribute("khachHangs", khachHangRepo.findAll());
         return "src/khachhang/KhachHang";
     }
+
     @GetMapping("/khachhang/add")
     public String getAddPage(
     ) {
@@ -33,11 +34,11 @@ public class KhachHangController {
     }
 
     @GetMapping("/khachhang/delete")
-    public String deleteKH(@RequestParam Integer id){
+    public String deleteKH(@RequestParam Integer id) {
         KhachHang khachHang = khachHangRepo.getReferenceById(id);
-        if(khachHang.getTrangThai().equals("Đang hoạt động")){
+        if (khachHang.getTrangThai().equals("Đang hoạt động")) {
             khachHang.setTrangThai("Ngừng hoạt động");
-        }else {
+        } else {
             khachHang.setTrangThai("Đang hoạt động");
         }
         khachHangRepo.save(khachHang);
@@ -52,7 +53,7 @@ public class KhachHangController {
     }
 
     @PostMapping("/khachhang/updateData")
-    public String update(@ModelAttribute KhachHang khachHang){
+    public String update(@ModelAttribute KhachHang khachHang) {
         System.out.println(khachHang);
         String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
         String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
@@ -68,6 +69,7 @@ public class KhachHangController {
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }
+
     @PostMapping("/khachHang/save")
     public String save(
             @ModelAttribute KhachHang khachHang) throws MessagingException {
@@ -83,14 +85,15 @@ public class KhachHangController {
         khachHang.setXa(wardName);
         khachHang.setTrangThai("Đang hoạt động");
 
-        khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0,8));
+        khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 
-        mailService.sendEmail(khachHang.getEmail(),khachHang.getHoTen(),khachHang.getMatKhau(),"/src/mail");
+        mailService.sendEmail(khachHang.getEmail(), khachHang.getHoTen(), khachHang.getMatKhau(), "/src/mail");
 
 
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }
+
     private String[] getProvinceDetails(String provinceCode) {
         String url = "https://provinces.open-api.vn/api/p/" + provinceCode;
         return getDetailsFromApi(url);
@@ -105,6 +108,7 @@ public class KhachHangController {
         String url = "https://provinces.open-api.vn/api/w/" + wardCode;
         return getDetailsFromApi(url);
     }
+
     private String[] getDetailsFromApi(String url) {
         try {
             RestTemplate restTemplate = new RestTemplate();

@@ -18,11 +18,13 @@ public class BinhLuan {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "id_khach_hang")
-    private Integer idKhachHang;
+    @ManyToOne
+    @JoinColumn(name = "id_khach_hang")
+    private KhachHang khachHang;
 
-    @Column(name = "id_chi_tiet_san_pham")
-    private Integer idChiTietSanPham;
+    @ManyToOne
+    @JoinColumn(name = "id_chi_tiet_san_pham")
+    private SanPhamChiTiet sanPhamChiTiet;
 
     @Column(name = "binh_luan")
     private String binhLuan;
