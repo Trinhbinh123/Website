@@ -35,6 +35,7 @@ public class WebSiteController {
         return "src/website/WebSite";
     }
 
+
     @GetMapping("/detail/{idSanPham}")
     public String detail(Model model, @PathVariable Integer idSanPham) {
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
@@ -52,8 +53,6 @@ public class WebSiteController {
         Set<Size> listSize = new HashSet<>(sizes);
         model.addAttribute("mauSacs", new ArrayList<>(listMauSac));
         model.addAttribute("sizes", new ArrayList<>(listSize));
-        return "src/website/detail"; // Trả về trang home.html
-    }
 
     @GetMapping("/shop")
     public String shop() {
