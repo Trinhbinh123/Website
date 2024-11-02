@@ -55,7 +55,6 @@ public class WebSiteController {
         model.addAttribute("sizes", new ArrayList<>(listSize));
         return "src/website/detail";
     }
-
     @GetMapping("/shop")
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
