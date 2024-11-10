@@ -28,6 +28,12 @@
                             <option th:each="th : ${thuongHieus}" th:value="${th.id}" th:text="${th.tenThuongHieu}"></option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="loaiDe" class="form-label">Loại đế</label>
+                        <select id="loaiDe" name="loaiDe" class="form-control" required>
+                            <option th:each="ld : ${listLD}" th:value="${ld.id}" th:text="${ld.tenloaide}"></option>
+                        </select>
+                    </div>
 <!--                    <div class="mb-3">-->
 <!--                        <label for="giaban" class="form-label">Giá bán</label>-->
 <!--                        <input type="number" id="giaban" name="giaban" class="form-control" required>-->

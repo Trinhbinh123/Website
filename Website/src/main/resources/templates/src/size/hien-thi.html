@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{src/partials/_head :: _head}"></head>
-<body>
+<body onload="loading()">
 <div class="container-scroller">
+
     <!-- Navbar -->
     <div th:replace="~{src/partials/_navbar :: _navbar}"></div>
 
@@ -12,7 +13,7 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <h3 class="fw-bold fs-4 mb-3">Danh Sách Kích Thước</h3>
+                <h3 class="fw-bold fs-4 mb-3">Danh Sách size</h3>
                 <div class="row">
                     <div class="col-12 text-end mb-3">
                         <a class="btn btn-dark" th:href="@{/size/add}">
@@ -20,7 +21,7 @@
                         </a>
                     </div>
                     <div class="col-12 table-responsive">
-                        <table class="table table-striped table-hover table-bordered">
+                        <table class="table table-striped table-hover table-bordered" id="multi-filter-select">
                             <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
@@ -31,42 +32,26 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="size : ${sizes}">
-                                <td th:text="${size.id}"></td>
-                                <td th:text="${size.ma_size}"></td>
-                                <td th:text="${size.ten_size}"></td>
-                                <td th:text="${size.trangthai == 1 ? 'Active' : 'Inactive'}"></td>
+                            <tr th:each="sp : ${sizes}">
+                                <td th:text="${sp.id}"></td>
+                                <td th:text="${sp.ma_size}"></td>
+                                <td th:text="${sp.ten_size}"></td>
+                                <td th:text="${sp.trangthai == 1 ? 'Active' : 'Inactive'}"></td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
-                                        <a class="btn btn-primary btn-sm me-1" th:href="@{/size/update(id=${size.id})}">
+                                        <a class="btn btn-primary btn-sm me-1" th:href="@{/size/update(id=${sp.id})}">
                                             <i class="lni lni-pencil"></i> Sửa
                                         </a>
                                         <form th:action="@{/size/delete}" method="post" style="display:inline;">
-                                            <input type="hidden" name="id" th:value="${size.id}" />
+                                            <input type="hidden" name="id" th:value="${sp.id}" />
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>
                                         </form>
                                     </div>
                                 </td>
                             </tr>
+
                             </tbody>
                         </table>
-                    </div>
-                </div>
-                <!-- Pagination -->
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <ul class="pagination">
-                            <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/size(page=${currentPage - 1})}">Previous</a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                                th:class="${i == currentPage} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/size(page=${i})}" th:text="${i + 1}"></a>
-                            </li>
-                            <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/size(page=${currentPage + 1})}">Next</a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -74,6 +59,13 @@
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+    <script>
+        function loading(){
+            $("#multi-filter-select").DataTable({
+                pageLength: 5
+            });
+        }
+    </script>
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

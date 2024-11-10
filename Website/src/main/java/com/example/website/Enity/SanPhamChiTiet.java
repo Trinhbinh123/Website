@@ -30,9 +30,6 @@ public class SanPhamChiTiet {
     @ManyToOne
     @JoinColumn(name = "id_size")
     Size size;
-    @ManyToOne
-    @JoinColumn(name = "id_loai_de")
-    LoaiDe loaiDe;
     @Column(name="ma_chi_tiet_san_pham")
     String ma_SPCT;
     @Column(name="so_luong")
