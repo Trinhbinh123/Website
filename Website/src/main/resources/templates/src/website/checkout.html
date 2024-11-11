@@ -268,7 +268,7 @@
                     <div class="row">
                         <div class="col-md-12 form-group">
                             <label>Tên người nhận</label>
-                            <input class="form-control" style="display: none" type="text" name="id" th:value="${KH.id}" placeholder="John">
+                            <input class="form-control" id="idKh" style="display: none" type="text" name="id" th:value="${KH.id}" placeholder="John">
                             <input class="form-control" type="text" name="hoTen" th:value="${KH.hoTen}" placeholder="John">
                         </div>
                         <div class="col-md-6 form-group">
@@ -299,7 +299,7 @@
                         </div>
                         <div class="col-md-12 form-group">
                             <label>Điạ chỉ chi tiết</label>
-                            <input class="form-control" th:value="${KH.diaChi}" name="diaChi" type="text" placeholder="Hà nội">
+                            <input class="form-control" th:value="${KH.diaChi}" id="diaChi" name="diaChi" type="text" placeholder="Hà nội">
                         </div>
                         <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
                         <input type="hidden" th:value="${KH.thanhPho}" id="provinceName" name="1">
@@ -313,11 +313,11 @@
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>First Name</label>
-                                <input class="form-control" type="text" placeholder="John">
+                                <input class="form-control" type="text" >
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Last Name</label>
-                                <input class="form-control" type="text" placeholder="Doe">
+                                <input class="form-control" type="text" >
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>E-mail</label>
@@ -325,15 +325,15 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Mobile No</label>
-                                <input class="form-control" type="text" placeholder="+123 456 789">
+                                <input class="form-control" type="text" >
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Address Line 1</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
+                                <input class="form-control" type="text" >
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Address Line 2</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
+                                <input class="form-control" type="text">
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Country</label>
@@ -397,6 +397,9 @@
                                 <label class="custom-control-label" for="paypal">Thanh toán VN Pay</label>
                             </div>
                         </div>
+                        <div>
+                            <img id="qrImage" src="" alt="QR Code" style="display: none;" />
+                        </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" value="1" id="directcheck" checked>
@@ -412,7 +415,7 @@
                         <div class="" th:each="list : ${list}">
                             <input type="text" name="integers" th:value="${list}" style="display: none">
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold py-3">Xác nhận</button>
+                        <button id="btnConfirm" class="btn btn-block btn-primary font-weight-bold py-3">Xác nhận</button>
                     </div>
                 </div>
             </div>
@@ -488,6 +491,7 @@
         </div>
         <div class="col-md-6 px-xl-0 text-center text-md-right">
             <img class="img-fluid" src="img/payments.png" alt="">
+
         </div>
     </div>
 </div>
@@ -510,6 +514,31 @@
 
 <!-- Template Javascript -->
 <script th:src="@{../static/src/website/js/main.js}"></script>
+<script>
+    document.getElementById('paypal').addEventListener('change', function() {
+        if (this.checked) {
+            const tongtien = document.getElementById('tongTien').innerText;
+            const idKh = document.getElementById('idKh').value;
+            const diaChi = document.getElementById('diaChi').value;
+            console.log({
+                tongtien, idKh, diaChi
+            })
+            // const paymentInfo = `${tongtien}${idKh}${diaChi}`;
+            const paymentInfo = `Bill's total: ${tongtien}`;
+            const qrImage = document.getElementById('qrImage');
+
+            qrImage.src = `/generate-qr?paymentInfo=${encodeURIComponent(paymentInfo)}`;
+            qrImage.style.display = 'block';
+            document.getElementById('btnConfirm').innerText = 'Xác nhận đã thanh toán QR';
+        }
+    });
+    document.getElementById('directcheck').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('qrImage').style.display = 'none';
+        }
+        document.getElementById('btnConfirm').innerText = 'Xác nhận';
+    });
+</script>
 </body>
 
 </html>
