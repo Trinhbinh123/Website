@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"
-
-></head>
+<head th:replace="~{src/partials/_head :: _head}">
+</head>
 <body onload="loading()">
-<div class="container-scroller">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="container-scroller" style="background-color: red">
     <!--_navbar -->
     <div th:replace="~{src/partials/_navbar :: _navbar}">
     </div>
@@ -21,51 +21,32 @@
                         <a th:href="@{/khuyenmai/addkhuyenmai}" class="btn btn-dark">Tạo khuyến mãi</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped" id="multi-filter-select">
-                            <thead>
+                        <table class="table table-striped table-hover table-bordered" id="multi-filter-select">
+                            <thead class="table-dark">
                             <tr>
                                 <th>Mã</th>
                                 <th>Tên</th>
                                 <th>Giá trị</th>
                                 <th>Ngày bắt đầu</th>
                                 <th>Ngày kết thúc</th>
-                                <th>Ngày tạo</th>
-                                <th>Ngày sửa</th>
                                 <th>Tình trạng</th>
                                 <th>Trạng thái</th>
                                 <th>Thao tác</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <!-- Dữ liệu khuyến mãi mẫu -->
-                            <tr th:each="khuyenMai : ${khuyenMaiList}">
-                                <td th:text="${khuyenMai.id}"></td>
-                                <td th:text="${khuyenMai.tenKhuyenMai}"></td>
-                                <td th:text="${khuyenMai.giaTriGiam}"></td>
-                                <td th:text="${khuyenMai.ngayBatDau}"></td>
-                                <td th:text="${khuyenMai.ngayKetThuc}"></td>
-                                <td th:text="${khuyenMai.ngayTao}"></td>
-                                <td th:text="${khuyenMai.ngaySua}"></td>
-                                <td th:text="${khuyenMai.tinhTrang}"></td>
-                                <td th:switch="${khuyenMai.trangThai}">
-                                    <span th:case=true class="btn btn-info btn-sm">ON</span>
-                                    <span th:case=false class="btn btn-warning btn-sm">OFF</span>
-                                </td>
-                                <td>
-                                    <a th:href="@{/khuyenmai/updatePage(id=${khuyenMai.id})}" class="btn btn-warning btn-sm">
-                                        <i class="fas fa-edit">Upadate</i>
-                                    </a>
-                                    <a th:href="@{/khuyenmai/delete/{id}(id=${khuyenMai.id})}" class="btn btn-dark btn-sm">
-                                        <i class="fas fa-eye">Delete</i>
-                                    </a>
-                                    <!--                        <a href="javascript:void(0);" class="btn btn-danger btn-sm"-->
-                                    <!--                           th:onclick="'endPromotionEarly(' + ${promotion.id} + ', \'' + ${promotion.status} + '\'); return false;'"-->
-                                    <!--                           th:disabled="${promotion.status == 0 || promotion.status == 2}">-->
-                                    <!--                            <i class="fas fa-trash"></i>-->
-                                    <!--                        </a>-->
-
-                                </td>
+                            <tbody id="listKM">
+                            <tr>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
+                                <td>1</td>
                             </tr>
+                            <!-- Dữ liệu khuyến mãi mẫu -->
+
                             <!-- Các dòng khuyến mãi khác -->
                             </tbody>
                         </table>
@@ -79,9 +60,145 @@
         </div>
     </div>
     <script>
-        function loading(){
-            $("#multi-filter-select").DataTable({
-                pageLength: 5
+        const listKM = document.getElementById("listKM");
+        function loading() {
+            const message = sessionStorage.getItem("message");
+            if (message !== null) {
+                showToast(message, "success");
+                sessionStorage.clear();
+            }
+            $.ajax({
+                url: "/khuyenmai",
+                type: "GET",
+                success: function (data) {
+
+                    generateVoucher(data);
+                    $("#multi-filter-select").DataTable({
+                        pageLength: 5
+                    });
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            })
+        }
+
+        function listenToSSE() {
+            const eventSource = new EventSource( "/api/stream/promotion");
+
+            eventSource.addEventListener("promotionUpdate", function(event) {
+                const updatedVoucher = JSON.parse(event.data);
+                updateVoucherInUI(updatedVoucher);
+            });
+
+            eventSource.onerror = function(err) {
+                console.error("EventSource failed: ", err);
+            };
+        }
+
+        function updateVoucherInUI(voucher) {
+            const voucherRow = document.getElementById("row" + voucher.id);
+            if (voucherRow) {
+                const conditionButton = voucherRow.querySelector("td button");
+                // console.log(conditionButton);
+                if (conditionButton) {
+                    conditionButton.innerHTML = voucher.tinhTrang;
+                }
+            }
+        }
+        listenToSSE();
+        function generateVoucher(data) {
+            listKM.innerHTML=``;
+            console.log(data);
+            data.forEach(item => {
+                const row = voucherData(item);
+                listKM.append(row);
+            });
+        }
+
+        function voucherData(item){
+            let voucherItem = document.createElement("tr");
+            voucherItem.setAttribute("id", "row"+item.id);
+            let date_start = formatDate(item.ngayBatDau);
+            let date_end = formatDate(item.ngayKetThuc);
+            let statusVoucher;
+            if(item.trangThai === true){
+                statusVoucher = "ON";
+            }else {
+                statusVoucher = "OFF";
+            }
+            let discount = "";
+            if(item.giaTriGiam < 100){
+                discount = item.giaTriGiam + "%";
+            }else {
+                discount = parseFloat(item.giaTriGiam).toLocaleString('vi-VN') + " VND";
+            }
+
+            voucherItem.innerHTML = `
+                                    <td>${item.id}</td>
+                                    <td>${item.tenKhuyenMai}</td>
+                                    <td>${discount}</td>
+                                <td>${date_start}</td>
+                                <td>${date_end}</td>
+                                <td><button class="btn btn-primary rounded-pill">${item.tinhTrang}</button></td>
+                                <td><button class="btn btn-primary" onclick="updateStatusKM(${item.id})">${statusVoucher}</button></td>
+                                <td>
+                                    <button class="btn btn-primary" onclick="updatePage('` + item.id + `', '` + item.trangThai + `', '` + item.tinhTrang + `')"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-primary"><i class="fa-solid fa-eye"></i></button>
+                                </td>
+
+                                `;
+            return voucherItem;
+            // listKM.appendChild(voucherItem);
+        }
+        function updatePage(id, status, tinhTrang){
+            console.log(id, status, tinhTrang)
+            if(status === "true" && tinhTrang !== "Đã kết thúc"){
+                window.location.href= `http://localhost:8080/khuyenmai/updatePage?id=${id}`;
+            }else {
+                showToast("Đợt giảm giá 'đã bị huỷ' hoặc 'đã kết thúc' không thể sửa", "warning");
+            }
+        }
+
+
+        function updateStatusKM(id){
+            $.ajax({
+                url: "/khuyenmai/delete/" + id,
+                method : "PUT",
+                success : function (data){
+                    const newRow = voucherData(data);
+                    const oldRow = document.getElementById("row" + id);
+                    listKM.replaceChild(newRow, oldRow);
+                }
+            })
+        }
+
+        function formatDate(inputDate) {
+            let date = new Date(inputDate);
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            let hours = String(date.getHours()).padStart(2, '0');
+            let minutes = String(date.getMinutes()).padStart(2, '0');
+            let seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+        }
+
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
             });
         }
     </script>

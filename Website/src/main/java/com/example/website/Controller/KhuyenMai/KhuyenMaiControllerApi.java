@@ -24,6 +24,11 @@ public class KhuyenMaiControllerApi {
     private final KhuyenMaiRepo khuyenMaiRepo;
     private final KhuyenMaiChiTietRepo khuyenMaiChiTietRepo;
 
+    @GetMapping("/khuyenmai")
+    public List<KhuyenMai> getAllKM(){
+        return khuyenMaiRepo.findAll();
+    }
+
     @GetMapping("/khuyenmai/sanphamchitiet/{idSanPham}")
     public List<SanPhamChiTiet> getProductDetailsToAdd(@PathVariable int idSanPham) {
         SanPham product = sanPhamRepo.findById(idSanPham)
@@ -84,11 +89,13 @@ public class KhuyenMaiControllerApi {
         for(KhuyenMaiChiTiet promotionDetail : productDetailList){
             productDetailsOfPromotion.add(promotionDetail.getSanPhamChiTiet());
         }
+
         for(SanPhamChiTiet productDetail: productDetailsOfPromotion){
             if(productDetail.getSanPham().getId().equals(product.getId())){
                 productDetails.add(productDetail);
             }
         }
+
         for(SanPhamChiTiet productDetail: sanPhamChiTietRepo.findBySanPham(product)){
             if(productDetail.getKhuyenMaiChiTiet() == null){
                 productDetails.add(productDetail);
@@ -96,5 +103,20 @@ public class KhuyenMaiControllerApi {
         }
 
         return productDetails;
+    }
+
+    @PutMapping("/khuyenmai/delete/{id}")
+    public KhuyenMai khuyenMai(@PathVariable Integer id){
+        KhuyenMai khuyenMai = khuyenMaiRepo.getReferenceById(id);
+        if(khuyenMai.isTrangThai()){
+            khuyenMai.setTrangThai(false);
+            List<KhuyenMaiChiTiet> khuyenMaiChiTiets = khuyenMaiChiTietRepo.findByKhuyenMai(khuyenMai);
+            for(KhuyenMaiChiTiet khuyenMaiChiTiet : khuyenMaiChiTiets){
+                SanPhamChiTiet sanPhamChiTiet = khuyenMaiChiTiet.getSanPhamChiTiet();
+                sanPhamChiTiet.setKhuyenMaiChiTiet(null);
+                sanPhamChiTietRepo.save(sanPhamChiTiet);
+            }
+        }
+        return khuyenMaiRepo.save(khuyenMai);
     }
 }
