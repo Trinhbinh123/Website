@@ -13,4 +13,5 @@ import java.util.List;
 public interface SanPhamChiTietRepo extends JpaRepository<SanPhamChiTiet,Integer> {
     List<SanPhamChiTiet> findBySanPham(SanPham sanPham);
     List<SanPhamChiTiet> findBySanPhamAndMauSacAndSize(SanPham sanPham, MauSac mauSac, Size size);
+
 }

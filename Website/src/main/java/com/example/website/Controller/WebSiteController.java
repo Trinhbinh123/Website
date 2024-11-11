@@ -185,6 +185,7 @@ public class WebSiteController {
         return "src/website/contact"; // Trả về trang about.html
     }
 
+
     @GetMapping("/generate-qr")
     @ResponseBody
     public ResponseEntity<byte[]> generateQRCode(@RequestParam("paymentInfo") String paymentInfo) {
@@ -210,43 +211,9 @@ public class WebSiteController {
                     .body(qrCodeImage);
         } catch (WriterException | IOException e) {
             return ResponseEntity.badRequest().build();
-        }
-//        try {
-//            int width = 250;
-//            int height = 250;
-//            String backgroundImagePath = "/static/src/assets/images/qr.png";  // Đường dẫn tới ảnh nền của bạn
-//            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-//            BitMatrix bitMatrix = qrCodeWriter.encode(paymentInfo, BarcodeFormat.QR_CODE, width, height);
-//
-//            // Tải hình ảnh nền
-//            BufferedImage backgroundImage = ImageIO.read(new File(backgroundImagePath));
-//            BufferedImage qrImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//
-//            // Chồng mã QR lên ảnh nền
-//            for (int x = 0; x < width; x++) {
-//                for (int y = 0; y < height; y++) {
-//                    // Kiểm tra xem có phải là một điểm đen của mã QR không
-//                    if (bitMatrix.get(x, y)) {
-//                        qrImage.setRGB(x, y, 0xFF000000); // Điểm đen mã QR
-//                    } else {
-//                        // Nếu không phải, thì lấy điểm ảnh từ ảnh nền
-//                        qrImage.setRGB(x, y, backgroundImage.getRGB(x % backgroundImage.getWidth(), y % backgroundImage.getHeight()));
-//                    }
-//                }
-//            }
-//
-//            // Chuyển đổi ảnh QR thành byte array
-//            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-//            ImageIO.write(qrImage, "PNG", pngOutputStream);
-//            byte[] qrCodeImage = pngOutputStream.toByteArray();
-//
-//            return ResponseEntity.ok()
-//                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=qr.png")
-//                    .contentType(MediaType.IMAGE_PNG)
-//                    .body(qrCodeImage);
-//        } catch (WriterException | IOException e) {
-//            return ResponseEntity.badRequest().build();
-//        }
+        }       
     }
 
 }
+
+

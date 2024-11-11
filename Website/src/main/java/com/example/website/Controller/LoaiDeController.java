@@ -18,12 +18,7 @@ public class LoaiDeController {
 
     @GetMapping("/admin/loai-de")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<LoaiDe> loaiDePage = loaiDeRepo.findAll(pageable);
-
-        model.addAttribute("ld", loaiDePage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", loaiDePage.getTotalPages());
+        model.addAttribute("ld", loaiDeRepo.findAll());
         return "src/loai-de/hien-thi"; // Template hiển thị danh sách
     }
 
