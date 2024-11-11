@@ -3,9 +3,6 @@ package com.example.website.Controller;
 import com.example.website.Enity.ThuongHieu;
 import com.example.website.Respository.ThuongHieuRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +15,7 @@ public class ThuongHieuController {
 
     @GetMapping("/admin/thuong-hieu")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<ThuongHieu> thuongHieuPage = thuongHieuRepo.findAll(pageable);
-
-        model.addAttribute("thuongHieus", thuongHieuPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", thuongHieuPage.getTotalPages());
+        model.addAttribute("thuongHieus", thuongHieuRepo.findAll());
         return "src/thuong-hieu/hien-thi"; // Template hiển thị danh sách
     }
 

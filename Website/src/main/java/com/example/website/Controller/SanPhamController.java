@@ -1,6 +1,7 @@
 package com.example.website.Controller;
 
 import com.example.website.Enity.SanPham;
+import com.example.website.Respository.LoaiDeRepo;
 import com.example.website.Respository.SanPhamRepo;
 import com.example.website.Enity.ThuongHieu;
 import com.example.website.Respository.ThuongHieuRepo;
@@ -15,6 +16,7 @@ public class SanPhamController {
 
     private final SanPhamRepo sanPhamRepo;
     private final ThuongHieuRepo thuongHieuRepo; // Thêm repo cho Thương Hiệu
+    private final LoaiDeRepo loaiDeRepo;
 
     @GetMapping("/admin/san-pham")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -25,6 +27,7 @@ public class SanPhamController {
     @GetMapping("/san-pham/add")
     public String getAddPage(Model model) {
         model.addAttribute("thuongHieus", thuongHieuRepo.findAll()); // Lấy danh sách thương hiệu
+        model.addAttribute("listLD", loaiDeRepo.findAll());
         return "src/san-pham/AddSanPham"; // Template thêm sản phẩm
     }
 
@@ -42,6 +45,7 @@ public class SanPhamController {
     public String getUpdate(Model model, @RequestParam Integer id) {
         model.addAttribute("SP", sanPhamRepo.getReferenceById(id));
         model.addAttribute("thuongHieus", thuongHieuRepo.findAll()); // Lấy danh sách thương hiệu
+        model.addAttribute("listLD", loaiDeRepo.findAll());
         return "src/san-pham/UpdateSanPham"; // Template cập nhật sản phẩm
     }
 

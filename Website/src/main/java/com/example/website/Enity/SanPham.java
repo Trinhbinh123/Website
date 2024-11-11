@@ -24,6 +24,9 @@ public class SanPham {
     @ManyToOne
     @JoinColumn(name = "id_thuong_hieu")
     ThuongHieu thuongHieu;
+    @ManyToOne
+    @JoinColumn(name = "id_loai_de")
+    LoaiDe loaiDe;
     @Column(name="gia_ban")
     Double giaban;
     String url_anh;

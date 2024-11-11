@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -50,4 +51,6 @@ public class HoaDon {
 
     @Column(name = "hinh_thuc")
     private String hinhThuc;
+
+
 }

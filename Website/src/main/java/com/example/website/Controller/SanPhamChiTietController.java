@@ -15,7 +15,6 @@ public class SanPhamChiTietController {
     private final MauSacRepo mauSacRepo;
     private final ChatLieuRepo chatLieuRepo;
     private final SizeRepo sizeRepo;
-    private final LoaiDeRepo loaiDeRepo;
 
     @GetMapping("/admin/san-pham-chi-tiet")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -29,7 +28,6 @@ public class SanPhamChiTietController {
         model.addAttribute("listMS", mauSacRepo.findAll());
         model.addAttribute("listSize", sizeRepo.findAll());
         model.addAttribute("listCL", chatLieuRepo.findAll());
-        model.addAttribute("listLD", loaiDeRepo.findAll());
         return "src/san-pham-chi-tiet/AddSPCT"; // Template thêm sản phẩm
     }
 
@@ -50,7 +48,6 @@ public class SanPhamChiTietController {
         model.addAttribute("listMS", mauSacRepo.findAll());
         model.addAttribute("listSize", sizeRepo.findAll());
         model.addAttribute("listCL", chatLieuRepo.findAll());
-        model.addAttribute("listLD", loaiDeRepo.findAll());
         return "src/san-pham-chi-tiet/UpdateSPCT"; // Template cập nhật sản phẩm
     }
 
