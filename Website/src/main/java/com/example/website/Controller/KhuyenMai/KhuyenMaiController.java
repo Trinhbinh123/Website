@@ -101,13 +101,13 @@ public class KhuyenMaiController {
         }
         return promotionDetail;
     }
-    @GetMapping("/khuyenmai/delete/{id}")
-    public String deleteKM(@PathVariable Integer id){
-        KhuyenMai khuyenMai = khuyenMaiRepo.getReferenceById(id);
-        khuyenMai.setTrangThai(!khuyenMai.isTrangThai());
-        khuyenMaiRepo.save(khuyenMai);
-        return "redirect:/admin/khuyenmai";
-    }
+    //    @GetMapping("/khuyenmai/delete/{id}")
+//    public String deleteKM(@PathVariable Integer id){
+//        KhuyenMai khuyenMai = khuyenMaiRepo.getReferenceById(id);
+//        khuyenMai.setTrangThai(!khuyenMai.isTrangThai());
+//        khuyenMaiRepo.save(khuyenMai);
+//        return "redirect:/admin/khuyenmai";
+//    }
     @GetMapping("/khuyenmai/updatePage")
     public String updatePage(Model model, @RequestParam Integer id){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
