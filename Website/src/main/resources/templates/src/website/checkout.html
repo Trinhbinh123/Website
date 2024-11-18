@@ -7,7 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
 
@@ -123,15 +123,118 @@
             totalPrice.innerText = total.toFixed(0);
         }
         function totalPrice(){
-            const tongTien = document.getElementById("tongTien").innerText;
+            const tongTien = document.getElementById("tongTien").innerText; // tong tien chua ship
             const shipping = document.getElementById("shipping").value;
             const totalPrice = document.getElementById("totalPrice");
             if(shipping >= 10000){
-                const total = parseInt(tongTien) + parseInt(shipping);
+                const total = parseInt(tongTien) + parseInt(shipping); //tong tien ca ship
                 totalPrice.innerText = total.toFixed(0);
             }else {
                 console.log("ngu")
             }
+        }
+        function validateForm() {
+            // Lấy các giá trị từ form
+            const hoTen = document.getElementsByName("hoTen")[0].value.trim();
+            const email = document.getElementsByName("email")[0].value.trim();
+            const soDienThoai = document.getElementsByName("soDienThoai")[0].value.trim();
+            const diaChi = document.getElementsByName("diaChi")[0].value.trim();
+            const thanhPho = document.getElementsByName("thanhPho")[0].value;
+            const huyen = document.getElementsByName("huyen")[0].value;
+            const xa = document.getElementsByName("xa")[0].value;
+
+            // Kiểm tra từng trường và hiển thị lỗi đầu tiên gặp phải
+            if (hoTen === "") {
+                showToast("Họ tên không được để trống.", "info");
+                return false;
+            }
+
+            // Kiểm tra định dạng email
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (email === "") {
+                showToast("Email không được để trống.", "info");
+                return false;
+            } else if (!emailPattern.test(email)) {
+                showToast("Email không hợp lệ.", "info");
+                return false;
+            }
+
+            // Kiểm tra số điện thoại (chỉ gồm 10 chữ số)
+            const phonePattern = /^\d{10}$/;
+            if (soDienThoai === "") {
+                showToast("Số điện thoại không được để trống.", "info");
+                return false;
+            } else if (!phonePattern.test(soDienThoai)) {
+                showToast("Số điện thoại phải gồm 10 chữ số.", "info");
+                return false;
+            }
+
+            // Kiểm tra địa chỉ chi tiết
+            if (diaChi === "") {
+                showToast("Địa chỉ chi tiết không được để trống.", "info");
+                return false;
+            }
+
+            // Kiểm tra các trường Tỉnh/Thành phố, Quận/Huyện, Phường/Xã
+            if (thanhPho === "") {
+                showToast("Vui lòng chọn Tỉnh/Thành phố.", "info");
+                return false;
+            }
+            if (huyen === "") {
+                showToast("Vui lòng chọn Quận/Huyện.", "info");
+                return false;
+            }
+            if (xa === "") {
+                showToast("Vui lòng chọn Phường/Xã.", "info");
+                return false;
+            }
+
+            // Trả về true nếu tất cả các kiểm tra đều hợp lệ
+            return true;
+        }
+
+
+
+        function checkout(e){
+            e.preventDefault();
+            if(validateForm()) {
+                const formSubmit = document.getElementById("formCheckOut");
+                const inputs = document.querySelectorAll('.integers');
+                const integers = Array.from(inputs).map(input => parseInt(input.value, 10));
+                console.log(integers)
+                $.ajax({
+                    url : "/checkout/checkSoLuongSP",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(integers),
+                    success : function (message){
+                        if(message !== ""){
+                            sessionStorage.setItem("message", message);
+                            window.location.href = "/cart";
+                        }else {
+                            formSubmit.submit();
+                        }
+                    }
+                })
+            }
+        }
+
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
         }
     </script>
 </head>
@@ -260,7 +363,7 @@
 
 <!-- Checkout Start -->
 <div class="container-fluid">
-    <form action="/checkout/success" method="POST">
+    <form action="/checkout/success" method="POST" id="formCheckOut">
         <div class="row px-xl-5">
             <div class="col-lg-8">
                 <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
@@ -268,7 +371,7 @@
                     <div class="row">
                         <div class="col-md-12 form-group">
                             <label>Tên người nhận</label>
-                            <input class="form-control" style="display: none" type="text" name="id" th:value="${KH.id}" placeholder="John">
+                            <input class="form-control" id="idKh" style="display: none" type="text" name="id" th:value="${KH.id}" placeholder="John">
                             <input class="form-control" type="text" name="hoTen" th:value="${KH.hoTen}" placeholder="John">
                         </div>
                         <div class="col-md-6 form-group">
@@ -299,64 +402,12 @@
                         </div>
                         <div class="col-md-12 form-group">
                             <label>Điạ chỉ chi tiết</label>
-                            <input class="form-control" th:value="${KH.diaChi}" name="diaChi" type="text" placeholder="Hà nội">
+                            <input class="form-control" th:value="${KH.diaChi}" id="diaChi" name="diaChi" type="text" placeholder="Hà nội">
                         </div>
                         <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
                         <input type="hidden" th:value="${KH.thanhPho}" id="provinceName" name="1">
                         <input type="hidden" th:value="${KH.huyen}" id="districtName" name="2">
                         <input type="hidden" th:value="${KH.xa}" id="wardName" name="3">
-                    </div>
-                </div>
-                <div class="collapse mb-5" id="shipping-address">
-                    <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Shipping Address</span></h5>
-                    <div class="bg-light p-30">
-                        <div class="row">
-                            <div class="col-md-6 form-group">
-                                <label>First Name</label>
-                                <input class="form-control" type="text" placeholder="John">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Last Name</label>
-                                <input class="form-control" type="text" placeholder="Doe">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>E-mail</label>
-                                <input class="form-control" type="text" placeholder="example@email.com">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Mobile No</label>
-                                <input class="form-control" type="text" placeholder="+123 456 789">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Address Line 1</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Address Line 2</label>
-                                <input class="form-control" type="text" placeholder="123 Street">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>Country</label>
-                                <select class="custom-select">
-                                    <option selected>United States</option>
-                                    <option>Afghanistan</option>
-                                    <option>Albania</option>
-                                    <option>Algeria</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>City</label>
-                                <input class="form-control" type="text" placeholder="New York">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>State</label>
-                                <input class="form-control" type="text" placeholder="New York">
-                            </div>
-                            <div class="col-md-6 form-group">
-                                <label>ZIP Code</label>
-                                <input class="form-control" type="text" placeholder="123">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -397,6 +448,9 @@
                                 <label class="custom-control-label" for="paypal">Thanh toán VN Pay</label>
                             </div>
                         </div>
+                        <div>
+                            <img id="qrImage" src="" alt="QR Code" style="display: none;" />
+                        </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" value="1" id="directcheck" checked>
@@ -410,9 +464,9 @@
                         <!--                            </div>-->
                         <!--                        </div>-->
                         <div class="" th:each="list : ${list}">
-                            <input type="text" name="integers" th:value="${list}" style="display: none">
+                            <input type="hidden" class="integers" name="integers" th:value="${list}">
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold py-3">Xác nhận</button>
+                        <button id="btnConfirm" onclick="checkout(event)" class="btn btn-block btn-primary font-weight-bold py-3">Xác nhận</button>
                     </div>
                 </div>
             </div>
@@ -488,6 +542,7 @@
         </div>
         <div class="col-md-6 px-xl-0 text-center text-md-right">
             <img class="img-fluid" src="img/payments.png" alt="">
+
         </div>
     </div>
 </div>
@@ -510,6 +565,31 @@
 
 <!-- Template Javascript -->
 <script th:src="@{../static/src/website/js/main.js}"></script>
+<script>
+    document.getElementById('paypal').addEventListener('change', function() {
+        if (this.checked) {
+            const tongtien = document.getElementById('tongTien').innerText;
+            const idKh = document.getElementById('idKh').value;
+            const diaChi = document.getElementById('diaChi').value;
+            console.log({
+                tongtien, idKh, diaChi
+            })
+            // const paymentInfo = `${tongtien}${idKh}${diaChi}`;
+            const paymentInfo = `Bill's total: ${tongtien}`;
+            const qrImage = document.getElementById('qrImage');
+
+            qrImage.src = `/generate-qr?paymentInfo=${encodeURIComponent(paymentInfo)}`;
+            qrImage.style.display = 'block';
+            document.getElementById('btnConfirm').innerText = 'Xác nhận đã thanh toán QR';
+        }
+    });
+    document.getElementById('directcheck').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('qrImage').style.display = 'none';
+        }
+        document.getElementById('btnConfirm').innerText = 'Xác nhận';
+    });
+</script>
 </body>
 
 </html>
