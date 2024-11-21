@@ -29,6 +29,7 @@
                                 <th>Tên sản phẩm</th>
                                 <th>Thương hiệu</th>
                                 <th>Loại Đế</th>
+                                <th>Chất Liệu</th>
 <!--                                <th>Giá bán</th>-->
                                 <th>Ảnh</th>
                                 <th>Trạng thái</th>
@@ -42,6 +43,7 @@
                                 <td th:text="${sp.tensanpham}"></td>
                                 <td th:text="${sp.thuongHieu.tenThuongHieu}"></td>
                                 <td th:text="${sp.loaiDe != null ? sp.loaiDe.tenloaide : 'N/A'}"></td>
+                                <td th:text="${sp.chatLieu != null ? sp.chatLieu.tenchatlieu : 'N/A'}"></td>
 <!--                                <td th:text="${sp.giaban}"></td>-->
                                 <td>
                                     <img th:src="${sp.url_anh}" alt="Ảnh sản phẩm" style="max-width: 50px; max-height: 50px;"/>
@@ -75,6 +77,23 @@
                 pageLength: 5
             });
         }
+        // function showToast(message, status) {
+        //     const Toast = Swal.mixin({
+        //         toast: true,
+        //         position: "top-end",
+        //         showConfirmButton: false,
+        //         timer: 2500,
+        //         timerProgressBar: true,
+        //         didOpen: (toast) => {
+        //             toast.onmouseenter = Swal.stopTimer;
+        //             toast.onmouseleave = Swal.resumeTimer;
+        //         }
+        //     });
+        //     Toast.fire({
+        //         icon: status,
+        //         title: message
+        //     });
+        // }
     </script>
 </div>
 <!-- Script -->
