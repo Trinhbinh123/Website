@@ -1,15 +1,17 @@
 package com.example.website.Controller;
 
+import com.example.website.Enity.MauSac;
 import com.example.website.Enity.SanPham;
-import com.example.website.Respository.ChatLieuRepo;
-import com.example.website.Respository.LoaiDeRepo;
-import com.example.website.Respository.SanPhamRepo;
-import com.example.website.Respository.ThuongHieuRepo;
+import com.example.website.Enity.SanPhamChiTiet;
+import com.example.website.Enity.Size;
+import com.example.website.Respository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +24,9 @@ public class SanPhamController {
     private final ThuongHieuRepo thuongHieuRepo; // Thêm repo cho Thương Hiệu
     private final LoaiDeRepo loaiDeRepo;
     private final ChatLieuRepo chatLieuRepo;
+    private final SizeRepo sizeRepo;
+    private final MauSacRepo mauSacRepo;
+    private final SanPhamChiTietRepo sanPhamChiTietRepo;
 
     @GetMapping("/admin/san-pham")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -35,6 +40,9 @@ public class SanPhamController {
         model.addAttribute("listLD", loaiDeRepo.findAll());
         model.addAttribute("listCL", chatLieuRepo.findAll());
 
+        model.addAttribute("listSize", sizeRepo.findAll());
+        model.addAttribute("listMauSac", mauSacRepo.findAll());
+        model.addAttribute("listSanPhamChiTiet", sanPhamChiTietRepo.findAll());
         // Tạo mã sản phẩm mới (mã SP tự động tăng)
         String maSanPhamMoi = "SP" + String.format("%03d", sanPhamRepo.count() + 1);  // Giả sử mã sản phẩm tăng dần từ 001
         model.addAttribute("maSanPhamMoi", maSanPhamMoi);
@@ -70,7 +78,9 @@ public class SanPhamController {
     }
 
     @PostMapping("/san-pham/save")
-    public String save(@ModelAttribute SanPham sanPham, Model model) {
+    public String save(@ModelAttribute SanPham sanPham, Model model,
+                       @RequestParam(value = "sizes", required = false) List<Integer> sizeIds,
+                       @RequestParam(value = "mauSacs", required = false) List<Integer> mauSacIds) {
         // Kiểm tra nếu tên sản phẩm trống hoặc chỉ chứa khoảng trắng
         if (sanPham.getTensanpham().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
@@ -81,29 +91,63 @@ public class SanPhamController {
         }
         sanPham.setTrangthai(true); // Đặt trạng thái thành Active
         sanPhamRepo.save(sanPham);
+        // Kiểm tra size và màu sắc được chọn
+        if (sizeIds != null && mauSacIds != null) {
+            for (Integer sizeId : sizeIds) {
+                for (Integer mauSacId : mauSacIds) {
+                    // Lấy thông tin size và màu sắc
+                    Size size = sizeRepo.findById(sizeId).orElse(null);
+                    MauSac mauSac = mauSacRepo.findById(mauSacId).orElse(null);
+                    if (size != null && mauSac != null) {
+                        // Tạo sản phẩm chi tiết
+                        SanPhamChiTiet spct = new SanPhamChiTiet();
+                        spct.setSanPham(sanPham);
+                        spct.setSize(size);
+                        spct.setMauSac(mauSac);
+                        spct.setTrang_thai(true);
+                        spct.setMa_SPCT(a1());
+                        sanPhamChiTietRepo.save(spct);
+                    }
+                }
+            }
+        }
         return "redirect:/admin/san-pham";
     }
     public String generateProductCode() {
-        // Lấy danh sách mã sản phẩm
         List<String> productCodes = sanPhamRepo.findAll()
                 .stream()
                 .map(SanPham::getMa_sanpham)
                 .collect(Collectors.toList());
-
-        // Tìm mã sản phẩm cao nhất
         int maxNumber = productCodes.stream()
-                .filter(code -> code.startsWith("SP")) // Lọc mã bắt đầu bằng "SP"
-                .map(code -> Integer.parseInt(code.substring(2))) // Lấy phần số sau "SP"
+                .filter(code -> code.startsWith("SP"))
+                .map(code -> Integer.parseInt(code.substring(2)))
                 .max(Comparator.naturalOrder())
-                .orElse(0); // Nếu không có mã nào, mặc định là 0
-
-        // Sinh mã mới
+                .orElse(0);
         int newNumber = maxNumber + 1;
         if (newNumber > 999) {
             throw new RuntimeException("Số lượng mã sản phẩm đã đạt giới hạn");
         }
-
-        // Trả về mã sản phẩm mới (dạng SP001, SP002,...)
         return String.format("SP%03d", newNumber);
+    }
+    public String a1() {
+        List<String> existingCodes = sanPhamChiTietRepo.findAll()
+                .stream()
+                .map(SanPhamChiTiet::getMa_SPCT)
+                .collect(Collectors.toList());
+        int maxNumber = existingCodes.stream()
+                .filter(code -> code.startsWith("CTSP"))
+                .map(code -> Integer.parseInt(code.substring(4))) // Lấy số sau "SPCT"
+                .max(Comparator.naturalOrder())
+                .orElse(0);
+        // Tìm mã mới không trùng
+        int newNumber = maxNumber + 1;
+        String newCode;
+        do {
+            newCode = String.format("CTSP%03d", newNumber++);
+        } while (existingCodes.contains(newCode) && newNumber <= 999);
+        if (newNumber > 999) {
+            throw new RuntimeException("Số lượng mã sản phẩm chi tiết đã đạt giới hạn");
+        }
+        return newCode;
     }
 }

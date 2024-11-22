@@ -70,6 +70,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Size</label>
+                        <div th:each="size : ${listSize}">
+                            <input type="checkbox" th:id="${'size_' + size.id}" th:value="${size.id}" name="sizes" th:text="${size.ten_size}" onchange="updatePreview()">
+                            <label th:for="${'size_' + size.id}"></label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Màu sắc</label>
+                        <div th:each="mauSac : ${listMauSac}">
+                            <input type="checkbox" th:id="${'mauSac_' + mauSac.id}" th:value="${mauSac.id}" name="mauSacs" th:text="${mauSac.tenmausac}" onchange="updatePreview()">
+                            <label th:for="${'mauSac_' + mauSac.id}"></label>
+                        </div>
+                    </div>
+                    <h4>Dự kiến sản phẩm chi tiết sẽ thêm</h4>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Size</th>
+                            <th>Màu Sắc</th>
+                        </tr>
+                        </thead>
+                        <tbody id="preview-table">
+                        <!-- Hàng dữ liệu sẽ được thêm ở đây bởi JavaScript -->
+                        </tbody>
+                    </table>
+
                     <button type="submit" class="btn btn-success">Lưu</button>
                     <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
                 </form>
@@ -108,6 +137,47 @@
         }
         return true; // Cho phép gửi form
     }
+    function updatePreview() {
+        // Lấy danh sách size và màu sắc được chọn
+        const sizes = Array.from(document.querySelectorAll("input[name='sizes']:checked")).map(cb => ({
+            id: cb.value,
+            name: cb.nextSibling.textContent.trim()
+        }));
+        const colors = Array.from(document.querySelectorAll("input[name='mauSacs']:checked")).map(cb => ({
+            id: cb.value,
+            name: cb.nextSibling.textContent.trim()
+        }));
+
+        // Xóa dữ liệu cũ trong bảng
+        const previewTable = document.getElementById("preview-table");
+        previewTable.innerHTML = "";
+
+        // Tạo các dòng dựa trên tổ hợp size và màu sắc
+        let index = 1;
+        sizes.forEach(size => {
+            colors.forEach(color => {
+                const row = document.createElement("tr");
+
+                // Cột STT
+                const sttCell = document.createElement("td");
+                sttCell.textContent = index++;
+                row.appendChild(sttCell);
+
+                // Cột Size
+                const sizeCell = document.createElement("td");
+                sizeCell.textContent = size.name;
+                row.appendChild(sizeCell);
+
+                // Cột Màu Sắc
+                const colorCell = document.createElement("td");
+                colorCell.textContent = color.name;
+                row.appendChild(colorCell);
+
+                previewTable.appendChild(row);
+            });
+        });
+    }
+
 </script>
 </body>
 </html>
