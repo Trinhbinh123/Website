@@ -92,6 +92,9 @@
                             <th>STT</th>
                             <th>Size</th>
                             <th>Màu Sắc</th>
+                            <th>Số lượng</th>
+                            <th>Giá bán</th>
+<!--                            <th>Hành động</th>-->
                         </tr>
                         </thead>
                         <tbody id="preview-table">
@@ -172,6 +175,39 @@
                 const colorCell = document.createElement("td");
                 colorCell.textContent = color.name;
                 row.appendChild(colorCell);
+
+                // Cột Số lượng
+                const quantityCell = document.createElement("td");
+                const quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.name = "quantities";
+                quantityInput.min = "1";
+                quantityInput.value = "1"; // Giá trị mặc định
+                quantityInput.classList.add("form-control");
+                quantityCell.appendChild(quantityInput);
+                row.appendChild(quantityCell);
+
+                // Cột Giá bán
+                const priceCell = document.createElement("td");
+                const priceInput = document.createElement("input");
+                priceInput.type = "number";
+                priceInput.name = "prices"; // Gửi danh sách giá bán
+                priceInput.min = "0";
+                priceInput.step = "1"; // Bước tăng/giảm là 1000
+                priceInput.value = "0"; // Giá trị mặc định
+                priceInput.classList.add("form-control");
+                priceCell.appendChild(priceInput);
+                row.appendChild(priceCell);
+
+                // Cột Hành động
+                // const actionCell = document.createElement("td");
+                // const deleteButton = document.createElement("button");
+                // deleteButton.type = "button";
+                // deleteButton.classList.add("btn", "btn-danger");
+                // deleteButton.textContent = "Xóa";
+                // deleteButton.onclick = () => row.remove(); // Xóa dòng hiện tại
+                // actionCell.appendChild(deleteButton);
+                // row.appendChild(actionCell);
 
                 previewTable.appendChild(row);
             });

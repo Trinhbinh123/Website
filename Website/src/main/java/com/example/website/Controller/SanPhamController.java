@@ -10,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,7 +80,9 @@ public class SanPhamController {
     @PostMapping("/san-pham/save")
     public String save(@ModelAttribute SanPham sanPham, Model model,
                        @RequestParam(value = "sizes", required = false) List<Integer> sizeIds,
-                       @RequestParam(value = "mauSacs", required = false) List<Integer> mauSacIds) {
+                       @RequestParam(value = "mauSacs", required = false) List<Integer> mauSacIds,
+                       @RequestParam(value = "quantities", required = false) List<Integer> quantities,
+                       @RequestParam(value = "prices", required = false) List<Double> prices) {
         // Kiểm tra nếu tên sản phẩm trống hoặc chỉ chứa khoảng trắng
         if (sanPham.getTensanpham().trim().isEmpty()) {
             model.addAttribute("errorMessage", "Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
@@ -92,22 +94,26 @@ public class SanPhamController {
         sanPham.setTrangthai(true); // Đặt trạng thái thành Active
         sanPhamRepo.save(sanPham);
         // Kiểm tra size và màu sắc được chọn
-        if (sizeIds != null && mauSacIds != null) {
+        if (sizeIds != null && mauSacIds != null && quantities != null && prices != null) {
+            int index = 0;
             for (Integer sizeId : sizeIds) {
                 for (Integer mauSacId : mauSacIds) {
                     // Lấy thông tin size và màu sắc
                     Size size = sizeRepo.findById(sizeId).orElse(null);
                     MauSac mauSac = mauSacRepo.findById(mauSacId).orElse(null);
                     if (size != null && mauSac != null) {
-                        // Tạo sản phẩm chi tiết
                         SanPhamChiTiet spct = new SanPhamChiTiet();
                         spct.setSanPham(sanPham);
                         spct.setSize(size);
                         spct.setMauSac(mauSac);
+                        spct.setSo_luong(quantities.get(index));
+                        spct.setGia_ban(prices.get(index));// Lấy số lượng tương ứng
                         spct.setTrang_thai(true);
+                        spct.setNgay_nhap(LocalDateTime.now()); // Ngày hiện tại
                         spct.setMa_SPCT(a1());
                         sanPhamChiTietRepo.save(spct);
                     }
+                    index++;
                 }
             }
         }
