@@ -29,7 +29,6 @@
             const mauSac = document.querySelector('input[name="color"]:checked').value;
             const size = document.querySelector('input[name="size"]:checked').value;
             const soLuong = document.getElementById("soLuong").value;
-
             $.ajax({
                 url : `/cart/${id}/${mauSac}/${size}/${soLuong}`,
                 method : "POST",

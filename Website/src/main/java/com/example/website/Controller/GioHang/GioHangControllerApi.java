@@ -33,7 +33,7 @@ public class GioHangControllerApi {
                 sanPhamRepo.getReferenceById(idSanPham),
                 mauSacRepo.getReferenceById(idMauSac),
                 sizeRepo.getReferenceById(idSize)).get(0);
-        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
+//        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
 
         gioHang.setKhachHang(khachHang);
         boolean check = false;
