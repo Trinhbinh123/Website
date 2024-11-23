@@ -3,9 +3,6 @@ package com.example.website.Controller;
 import com.example.website.Enity.ChatLieu;
 import com.example.website.Respository.ChatLieuRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +15,7 @@ public class ChatLieuController {
 
     @GetMapping("/admin/chat-lieu")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<ChatLieu> chatLieuPage = chatLieuRepo.findAll(pageable);
-
-        model.addAttribute("cl", chatLieuPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", chatLieuPage.getTotalPages());
+        model.addAttribute("cl", chatLieuRepo.findAll());
         return "src/chat-lieu/hien-thi"; // Template hiển thị danh sách
     }
 

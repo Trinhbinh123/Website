@@ -3,6 +3,8 @@ package com.example.website.Enity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -24,8 +26,13 @@ public class SanPham {
     @ManyToOne
     @JoinColumn(name = "id_thuong_hieu")
     ThuongHieu thuongHieu;
+    @ManyToOne
+    @JoinColumn(name = "id_loai_de")
+    LoaiDe loaiDe;
+    @ManyToOne
+    @JoinColumn(name = "id_chat_lieu")
+    ChatLieu chatLieu;
     @Column(name="gia_ban")
     Double giaban;
     String url_anh;
-
 }

@@ -3,9 +3,6 @@ package com.example.website.Controller;
 import com.example.website.Enity.Size;
 import com.example.website.Respository.SizeRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +15,7 @@ public class SizeController {
 
     @GetMapping("/admin/size")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<Size> sizePage = sizeRepo.findAll(pageable);
-
-        model.addAttribute("sizes", sizePage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", sizePage.getTotalPages());
+        model.addAttribute("sizes", sizeRepo.findAll());
         return "src/size/hien-thi"; // Template hiển thị danh sách
     }
 
