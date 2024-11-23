@@ -1,6 +1,8 @@
 package com.example.website.Respository;
 
 import com.example.website.Enity.HoaDon;
+import com.example.website.Enity.HoaDonChiTiet;
+import com.example.website.Enity.KhachHang;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +18,6 @@ public interface HoaDonRepo extends JpaRepository<HoaDon, Integer> {
     List<HoaDon> findByTrangThaiOrderByNgayDatHangDesc(@Param("trangThai") String trangThai);
     List<HoaDon> findByTrangThai(String trangThai);
     long countByTrangThai(String trangThai);
+    List<HoaDon> findByKhachHang(KhachHang khachHang);
 
 }
