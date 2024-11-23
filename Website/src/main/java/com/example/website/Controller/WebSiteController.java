@@ -217,7 +217,6 @@ public class WebSiteController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 }
 
 
