@@ -79,7 +79,10 @@ public class DonHangController {
                     }
                     break;
                 case "Đã giao":
-                    // Đã giao không thể chuyển lại các trạng thái khác
+                    // Chỉ có thể chuyển từ "Đã giao" sang "Đổi trả" (trả hàng)
+                    if ("Đổi trả".equals(trangThai)) {
+                        hoaDon.setTrangThai(trangThai);
+                    }
                     break;
                 case "Đơn bị hủy":
                     // Đơn bị hủy không thể thay đổi lại trạng thái
@@ -95,7 +98,7 @@ public class DonHangController {
     @PostMapping("/donhang/cancelOrder")
     public String cancelOrder(@RequestParam Integer id) {
         HoaDon hoaDon = hoaDonRepo.findById(id).orElse(null);
-        if (hoaDon != null && "Chờ xác nhận".equals(hoaDon.getTrangThai())) {
+        if (hoaDon != null && "Chờ xác nhận".equals(hoaDon.getTrangThai())|| "Xác nhận".equals(hoaDon.getTrangThai())) {
             hoaDon.setTrangThai("Đơn bị hủy");
             hoaDonRepo.save(hoaDon);
         }

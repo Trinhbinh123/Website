@@ -8,7 +8,7 @@
         <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/san-pham-chi-tiet/updateData}" method="post">
+                <form th:action="@{/san-pham-chi-tiet/updateData}" method="post" onsubmit="return validateForm()">
                     <input type="hidden" th:value="${spct.id}" name="id">
                     <h4>Thông tin sản phẩm chi tiết</h4>
                     <hr>
@@ -19,7 +19,7 @@
                             <div class="rounded-box">
                                 <div class="mb-3">
                                     <label for="ma" class="form-label">Mã sản phẩm chi tiết</label>
-                                    <input type="text" id="ma" th:value="${spct.ma_SPCT}" name="ma_SPCT" class="form-control" required>
+                                    <input type="text" id="ma" th:value="${spct.ma_SPCT}" name="ma_SPCT" class="form-control" readonly>
                                 </div>
                                 <div class="mb-3">
                                     <label for="sanPham" class="form-label">Sản phẩm</label>
@@ -52,12 +52,6 @@
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="chatLieu" class="form-label">Chất liệu</label>
-                                    <select id="chatLieu" name="chatLieu" class="form-control" required>
-                                        <option th:each="cl : ${listCL}" th:value="${cl.id}" th:text="${cl.tenchatlieu}" th:selected="${cl.id == spct.chatLieu.id}"></option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
                                     <label for="size" class="form-label">Size</label>
                                     <select id="size" name="size" class="form-control" required>
                                         <option th:each="sz : ${listSize}" th:value="${sz.id}" th:text="${sz.ten_size}" th:selected="${sz.id == spct.size.id}"></option>
@@ -75,5 +69,26 @@
     </div>
 </div>
 <div th:replace="~{src/partials/_script :: _script}"></div>
+<script>
+    function validateForm() {
+        // Lấy giá trị từ các trường giá bán và số lượng
+        var giaBan = document.getElementById("giaBan").value.trim();
+        var soLuong = document.getElementById("soLuong").value.trim();
+
+        // Kiểm tra giá bán
+        if (parseFloat(giaBan) < 0) {
+            alert("Giá bán phải lớn hơn hoặc bằng 0.");
+            return false; // Ngừng gửi form
+        }
+
+        // Kiểm tra số lượng
+        if (parseInt(soLuong) < 0) {
+            alert("Số lượng phải lớn hơn hoặc bằng 0.");
+            return false; // Ngừng gửi form
+        }
+
+        return true; // Cho phép gửi form
+    }
+</script>
 </body>
 </html>

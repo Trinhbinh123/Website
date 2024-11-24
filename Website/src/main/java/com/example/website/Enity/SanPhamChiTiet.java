@@ -25,9 +25,6 @@ public class SanPhamChiTiet {
     @JoinColumn(name = "id_mau_sac")
     MauSac mauSac;
     @ManyToOne
-    @JoinColumn(name = "id_chat_lieu")
-    ChatLieu chatLieu;
-    @ManyToOne
     @JoinColumn(name = "id_size")
     Size size;
     @Column(name="ma_chi_tiet_san_pham")
