@@ -4,9 +4,6 @@ import com.example.website.Enity.MauSac;
 import com.example.website.Respository.MauSacRepo;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,12 +18,7 @@ public class MauSacController {
 
     @GetMapping("/admin/mau-sac")
     public String getAdmin(@RequestParam(defaultValue = "0") int page, Model model) {
-        Pageable pageable = PageRequest.of(page, 5); // 5 items per page
-        Page<MauSac> mauSacPage = mauSacRepo.findAll(pageable);
-
-        model.addAttribute("ms", mauSacPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", mauSacPage.getTotalPages());
+        model.addAttribute("ms", mauSacRepo.findAll());
         return "src/mau-sac/hien-thi"; // Template hiển thị danh sách
     }
 

@@ -185,6 +185,7 @@ public class WebSiteController {
         return "src/website/contact"; // Trả về trang about.html
     }
 
+
     @GetMapping("/generate-qr")
     @ResponseBody
     public ResponseEntity<byte[]> generateQRCode(@RequestParam("paymentInfo") String paymentInfo) {
@@ -210,8 +211,11 @@ public class WebSiteController {
                     .body(qrCodeImage);
         } catch (WriterException | IOException e) {
             return ResponseEntity.badRequest().build();
+
         }
 
+        }
     }
 
-}
+
+
