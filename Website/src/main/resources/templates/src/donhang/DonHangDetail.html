@@ -13,7 +13,7 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <h3 class="fw-bold fs-4 mb-3">Chi tiết đơn hàng</h3>
+                <h3 class="fw-bold fs-4 mb-3">Chi tiết đơn hàng <span th:text="${dh.ghiChu == null ? '' : '( ' + dh.ghiChu + ' )'}"></span></h3>
 
                 <form th:action="@{/donhang/updateData}" method="post" class="row g-3">
                     <!-- Hidden ID Field -->

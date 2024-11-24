@@ -127,4 +127,8 @@ public class KhachHangController {
             return new String[]{"Unknown", "Unknown"};
         }
     }
+    @GetMapping("/khachHang/donhang")
+    public String getDonHangMap(Model model){
+        return "src/website/donhang";
+    }
 }

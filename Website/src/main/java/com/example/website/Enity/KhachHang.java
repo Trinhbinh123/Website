@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Proxy;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Proxy(lazy = false)
 public class KhachHang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

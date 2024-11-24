@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>MultiShop - Online Shop Website Template</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS (Bundle includes Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Libraries Stylesheet -->
+    <link th:href="@{../static/src/website/lib/animate/animate.min.css}" rel="stylesheet">
+    <link th:href="@{../static/src/website/lib/owlcarousel/assets/owl.carousel.min.css}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link th:href="@{../static/src/website/css/style.css}" rel="stylesheet">
+    <link th:href="@{../static/src/website/website.css}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <script defer>
+        function loading(){
+            renderStatusBill();
+            renderBill("Chờ xác nhận");
+        }
+        function renderStatusBill(){
+            $.ajax({
+                url : "/khachHang/getQuantityStatusOfBill",
+                method : "GET",
+                success : function (data){
+                    console.log(data)
+                    const statusBill = document.getElementById("statusBill");
+                    statusBill.innerHTML = `<button class="btn-outline-success btn rounded-pill" onclick="renderBill('Chờ xác nhận')">Chờ xác nhận <sup>(${data[0]})</sup></button>
+            <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Xác nhận')">Đã xác nhận <sup>(${data[1]})</sup></button>
+            <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Đang giao')">Đang giao hàng <sup>(${data[2]})</sup></button>
+            <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Ðã giao')">Đã nhận hàng <sup>(${data[3]})</sup></button>
+            <button class="btn-outline-success btn rounded-pill">Trả hàng <sup>(99)</sup></button>
+            <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Đơn bị hủy')">Đã huỷ <sup>(${data[4]})</sup></button>`;
+                }
+            })
+        }
+        function renderBill(status){
+            $.ajax({
+                url : "/khachHang/checkBillByStatus?status=" + status,
+                method : "GET",
+                success : function (data){
+                    console.log(data)
+                    const listBill = document.getElementById("listBill");
+                    listBill.innerHTML = "";
+                    data.forEach(item => {
+                        const row = billHtml(item);
+                        listBill.append(row);
+                        const rowImg = renderImg(item.id);
+                        const imgRow = document.getElementById("img-" + item.id);
+                        imgRow.append(rowImg);
+
+                        const btnHuy = document.getElementById("btn-huy-"+ item.id);
+                        console.log(item)
+                        if(item.trangThai === "Đang giao" || item.trangThai === "Ðã giao" || item.trangThai === "Đơn bị hủy"){
+                            btnHuy.style.display = 'none';
+                        }
+                    })
+
+                }
+            })
+        }
+        function billHtml(item){
+            const row = document.createElement("tr");
+            row.classList.add('text-center');
+            row.setAttribute("id", item.id);
+            row.innerHTML = `
+                <td id="img-${item.id}"></td>
+                <td style="line-height: 50px">${item.tongTien} VND</td>
+                <td style="line-height: 50px">${item.hinhThuc}</td>
+                <td style="line-height: 50px">
+                    <button class="btn rounded-pill btn-outline-warning" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onclick="renderBillDetail(${item.id})">Xem chi tiết
+                    </button>
+                    <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="btn-huy-${item.id}" onclick="idBill(${item.id})">Huỷ</button>
+                </td>`;
+            return row;
+        }
+
+        function renderBillDetail(idBill){
+            $.ajax({
+                url : "/khachHang/getBillDetailByBill/" + idBill,
+                method : "GET",
+                success : function (data){
+                    const listBillDetail = document.getElementById("list-bill-detail");
+                    listBillDetail.innerHTML = "";
+                    data.forEach(item => {
+                        console.log(item)
+                        const row = document.createElement("div");
+                        row.innerHTML = `<div class="d-flex">
+                <div class="col-3">
+                  <img height="80px"
+                       src="${item.sanPhamChiTiet.anh_spct}" alt="">
+                </div>
+                <div class="col-9">
+                  <p>${item.sanPhamChiTiet.sanPham.tensanpham} <sup>(${item.soLuong})</sup> <br> [ ${item.sanPhamChiTiet.mauSac.tenmausac} - ${item.sanPhamChiTiet.size.ten_size} ] <br> Tổng tiền : <span>${item.donGia} VND</span></p>
+
+                </div>
+              </div>
+              <hr style="border: 1px solid #4e4e4e">`;
+                        listBillDetail.append(row);
+                    })
+                    if(data[0].hoaDon.ghiChu !== null){
+                        const lydo = document.createElement("div");
+                        lydo.innerHTML = `Lý do huỷ đơn: <strong>${data[0].hoaDon.ghiChu}</strong>`;
+                        listBillDetail.append(lydo);
+                    }
+                },
+                error : function (error){
+                    console.log(error)
+                }
+            })
+        }
+        function renderImg(idBill){
+            const row = document.createElement("td");
+            row.style.border = 'none'
+            $.ajax({
+                url : "/khachHang/getImg/" + idBill,
+                method : "GET",
+                success : function (data){
+                    row.innerHTML = "";
+                    data.forEach(item => {
+                        row.innerHTML += `<img src="${item}"
+                         style="border-radius: 50%" width="20px" alt="a">`;
+                    })
+                }
+            })
+            return row;
+        }
+        let id = 0;
+        function idBill(idBill){
+            id = idBill;
+            const description = document.getElementById("description");
+            const btnHuyDon = document.getElementById("btn-huydon");
+            if(description.value === ""){
+                btnHuyDon.disabled = true;
+            }else {
+                btnHuyDon.disabled = false
+            }
+        }
+
+        function chooseReason(status){
+            const description = document.getElementById("description");
+            const btnHuyDon = document.getElementById("btn-huydon");
+            description.value = status;
+            btnHuyDon.disabled = false;
+        }
+
+        function huydon(){
+            const description = document.getElementById("description").value;
+            $.ajax({
+                url : "/khachHang/huydon/" + id + "?message=" + description,
+                method : "PUT",
+                success : function (){
+                    const row = document.getElementById(id);
+                    row.remove();
+                    renderStatusBill();
+                    showToast("Huỷ thành công", "success");
+                }
+            })
+        }
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
+        }
+    </script>
+</head>
+
+<body onload="loading()">
+<!-- Topbar Start -->
+<div class="container-fluid">
+    <div class="container-fluid">
+        <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
+            <div class="col-lg-4">
+                <a href="" class="text-decoration-none">
+                    <span class="h1 text-uppercase text-primary bg-dark px-2">Multi</span>
+                    <span class="h1 text-uppercase text-dark bg-primary px-2 ml-n1">Shop</span>
+                </a>
+            </div>
+            <div class="col-lg-4 col-6 text-left">
+                <form action="">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for products">
+                        <div class="input-group-append">
+                                <span class="input-group-text bg-transparent text-primary">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="d-inline-flex align-items-center">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My
+                        Account
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <button class="dropdown-item" type="button">Sign in</button>
+                        <button class="dropdown-item" type="button">Sign up</button>
+                        <button class="dropdown-item" type="button">Đơn hàng của bạn</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-dark mb-30">
+        <div class="row px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a class="btn d-flex align-items-center justify-content-between bg-primary w-100" data-toggle="collapse"
+                   href="#navbar-vertical" style="height: 65px; padding: 0 30px;">
+                    <h6 class="text-dark m-0"><i class="fa fa-bars mr-2"></i>Categories</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
+                     id="navbar-vertical" style="width: calc(100% - 30px); z-index: 999;">
+                    <div class="navbar-nav w-100">
+                        <div class="nav-item dropdown dropright">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Dresses <i
+                                    class="fa fa-angle-right float-right mt-1"></i></a>
+                            <div class="dropdown-menu position-absolute rounded-0 border-0 m-0">
+                                <a href="" class="dropdown-item">Men's Dresses</a>
+                                <a href="" class="dropdown-item">Women's Dresses</a>
+                                <a href="" class="dropdown-item">Baby's Dresses</a>
+                            </div>
+                        </div>
+                        <a href="" class="nav-item nav-link">Shirts</a>
+                        <a href="" class="nav-item nav-link">Jeans</a>
+                        <a href="" class="nav-item nav-link">Swimwear</a>
+                        <a href="" class="nav-item nav-link">Sleepwear</a>
+                        <a href="" class="nav-item nav-link">Sportswear</a>
+                        <a href="" class="nav-item nav-link">Jumpsuits</a>
+                        <a href="" class="nav-item nav-link">Blazers</a>
+                        <a href="" class="nav-item nav-link">Jackets</a>
+                        <a href="" class="nav-item nav-link">Shoes</a>
+                    </div>
+                </nav>
+            </div>
+            <div class="col-lg-9">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
+                    <a href="" class="text-decoration-none d-block d-lg-none">
+                        <span class="h1 text-uppercase text-dark bg-light px-2">Multi</span>
+                        <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
+                    </a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto py-0">
+                            <a th:href="@{/website}" class="nav-item nav-link active">Home</a>
+                            <a th:href="@{/shop}" class="nav-item nav-link">Shop</a>
+                            <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i
+                                        class="fa fa-angle-down mt-1"></i></a>
+                                <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
+                                    <a th:href="@{/cart}" class="dropdown-item">Shopping Cart</a>
+                                    <a th:href="@{/checkout}" class="dropdown-item">Checkout</a>
+                                </div>
+                            </div>
+                            <a th:href="@{/contact}" class="nav-item nav-link">Contact</a>
+                        </div>
+                        <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
+                            <a href="" class="btn px-0">
+                                <i class="fas fa-heart text-primary">
+                                </i>
+                                <span class="badge text-secondary border border-secondary rounded-circle"
+                                      style="padding-bottom: 2px;">0</span>
+                            </a>
+                            <a th:href="@{/cart}" class="btn px-0 ml-3">
+                                <i class="fas fa-shopping-cart text-primary"></i>
+                                <span class="badge text-secondary border border-secondary rounded-circle"
+                                      style="padding-bottom: 2px;" th:text="${soLuongGioHang}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+    <div class="d-flex justify-content-center">
+        <div class="col-7 d-flex justify-content-between" id="statusBill">
+
+        </div>
+    </div>
+    <div class="mt-5">
+        <table class="table">
+            <tbody id="listBill">
+
+
+            </tbody>
+        </table>
+        <!-- Button trigger modal -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lý do huỷ đơn</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="description" aria-label="Text input with dropdown button" readonly>
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" onclick="chooseReason('Chọn nhầm size hoặc màu')">Chọn nhầm size hoặc màu</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReason('Muốn thay đổi địa chỉ mua hàng')">Muốn thay đổi địa chỉ mua hàng</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReason('Không muốn mua nữa')">Không muốn mua nữa</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-huydon" data-bs-dismiss="modal" onclick="huydon()">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Sản phẩm đã mua</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" id="list-bill-detail">
+
+
+
+        </div>
+    </div>
+    <!-- Carousel Start -->
+
+    <!-- Vendor End -->
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-secondary mt-5 pt-5">
+        <div class="row px-xl-5 pt-5">
+            <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
+                <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
+                <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor.
+                    Rebum tempor no vero est magna amet no</p>
+                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
+                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
+                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+            </div>
+            <div class="col-lg-8 col-md-12">
+                <div class="row">
+                    <div class="col-md-4 mb-5">
+                        <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop
+                                Detail</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                            <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
+                        <div class="d-flex flex-column justify-content-start">
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop
+                                Detail</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                            <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                            <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-5">
+                        <h5 class="text-secondary text-uppercase mb-4">Newsletter</h5>
+                        <p>Duo stet tempor ipsum sit amet magna ipsum tempor est</p>
+                        <form action="">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Your Email Address">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary">Sign Up</button>
+                                </div>
+                            </div>
+                        </form>
+                        <h6 class="text-secondary text-uppercase mt-4 mb-3">Follow Us</h6>
+                        <div class="d-flex">
+                            <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a class="btn btn-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
+            <div class="col-md-6 px-xl-0">
+                <p class="mb-md-0 text-center text-md-left text-secondary">
+                    &copy; <a class="text-primary" href="#">Domain</a>. All Rights Reserved. Designed
+                    by
+                    <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
+                </p>
+            </div>
+            <div class="col-md-6 px-xl-0 text-center text-md-right">
+                <img class="img-fluid" src="img/payments.png" alt="">
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{../static/src/website/lib/easing/easing.min.js}"></script>
+    <script th:src="@{../static/src/website/lib/owlcarousel/owl.carousel.min.js}"></script>
+
+    <!-- Contact Javascript File -->
+    <script th:src="@{../static/src/website/mail/jqBootstrapValidation.min.js}"></script>
+    <script th:src="@{../static/src/website/mail/contact.js}"></script>
+
+    <!-- Template Javascript -->
+    <script th:src="@{../static/src/website/js/main.js}"></script>
+</div>
+</body>
+</html>

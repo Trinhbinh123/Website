@@ -14,7 +14,7 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
@@ -65,7 +65,8 @@
                 url : `/cart/${productId}/${mauSac.value}/${size.value}/${soLuong}`,
                 method : "POST",
                 success : function (data) {
-                    console.log("thanhcong");
+                   showToast("Thêm vào giỏ hàng thành công", "success")
+
                 }
             })
 
@@ -88,6 +89,23 @@
             //     });
 
     }
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
+        }
     </script>
 </head>
 
