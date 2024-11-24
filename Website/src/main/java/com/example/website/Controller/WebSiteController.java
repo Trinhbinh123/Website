@@ -6,6 +6,10 @@ import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +36,14 @@ public class WebSiteController {
     private final GioHangRepo gioHangRepo;
     private final HoaDonRepo hoaDonRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
+    private final ChatLieuRepo  chatLieuRepo;
+    private final LoaiDeRepo  loaiDeRepo;
 
     @GetMapping("/website")
     public String getAdmin(Model model) {
-        model.addAttribute("sanPhams", sanPhamRepo.findAll());
+        org.springframework.data.domain.Pageable top10 = org.springframework.data.domain.PageRequest.of(0, 12);
+        List<SanPham> sanPhams = sanPhamRepo.findTop10ByOrderByCreatedAtDesc(top10).getContent();
+        model.addAttribute("sanPhams", sanPhams);
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
         Integer soLuong = gioHangRepo.findByKhachHang(khachHang).size();
         model.addAttribute("soLuongGioHang", soLuong);
@@ -44,24 +52,53 @@ public class WebSiteController {
 
 
     @GetMapping("/detail/{idSanPham}")
-    public String detail(Model model, @PathVariable Integer idSanPham) {
+    public String details(Model model, @PathVariable Integer idSanPham
+                          ) {
+        List<ChatLieu> chatLieu = chatLieuRepo.findAll();
+        model.addAttribute("chatlieu",chatLieu);
+        List<LoaiDe> loaiDe = loaiDeRepo.findAll();
+        model.addAttribute("loaide",loaiDe);
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
         model.addAttribute("khachHang", khachHang);
         SanPham sanPham = sanPhamRepo.getReferenceById(idSanPham);
-        model.addAttribute("sanPham", sanPham);
         List<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepo.findBySanPham(sanPham);
         List<MauSac> mauSacs = new ArrayList<>();
         List<Size> sizes = new ArrayList<>();
-        for (SanPhamChiTiet sanPhamChiTiet : sanPhamChiTiets) {
-            mauSacs.add(sanPhamChiTiet.getMauSac());
-            sizes.add(sanPhamChiTiet.getSize());
+        if (sanPhamChiTiets != null && !sanPhamChiTiets.isEmpty()) {
+            for (SanPhamChiTiet spc : sanPhamChiTiets) {
+                mauSacs.add(spc.getMauSac());
+                sizes.add(spc.getSize());
+            }
         }
+        Double giaMacDinh = sanPham.getGiaban();
         Set<MauSac> listMauSac = new HashSet<>(mauSacs);
         Set<Size> listSize = new HashSet<>(sizes);
+        model.addAttribute("sanPham", sanPham);
+        model.addAttribute("sanPhamChiTiets", sanPhamChiTiets);
         model.addAttribute("mauSacs", new ArrayList<>(listMauSac));
         model.addAttribute("sizes", new ArrayList<>(listSize));
+        model.addAttribute("giaMacDinh", giaMacDinh);
         return "src/website/detail";
     }
+    @GetMapping("/get-price")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPrice(
+            @RequestParam Integer idSanPham,
+            @RequestParam Integer sizeId) {
+        // Lấy sản phẩm dựa vào ID
+        SanPham sanPham = sanPhamRepo.findById(idSanPham)
+                .orElseThrow(() -> new IllegalArgumentException("Sản phẩm không tồn tại"));
+
+        // Lấy thông tin sản phẩm chi tiết dựa vào sản phẩm và kích thước
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.findBySanPhamAndSize_Id(sanPham, sizeId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin sản phẩm cho kích thước này"));
+
+        // Chuẩn bị phản hồi
+        Map<String, Object> response = new HashMap<>();
+        response.put("gia_ban", sanPhamChiTiet.getGia_ban()); // Giá của sản phẩm
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/shop")
     public String shop() {
         return "src/website/shop"; // Trả về trang about.html
@@ -80,7 +117,7 @@ public class WebSiteController {
         for (GioHang gioHang : gioHangs) {
             tongTien += gioHang.getTongTien();
         }
-        model.addAttribute("tongTien", tongTien); // tong tien chua ship
+        model.addAttribute("tongTien", tongTien);
 
 
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
@@ -133,10 +170,6 @@ public class WebSiteController {
             hoaDonChiTiet.setDonGia(gioHang.getTongTien());
             tongTien += gioHang.getTongTien();
             hoaDonChiTietRepo.save(hoaDonChiTiet);
-
-            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-            sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - gioHang.getSoLuong());
-            sanPhamChiTietRepo.save(sanPhamChiTiet);
         }
 
         saveHoaDon.setTongTien(tongTien);
@@ -218,5 +251,3 @@ public class WebSiteController {
         }
     }
 }
-
-

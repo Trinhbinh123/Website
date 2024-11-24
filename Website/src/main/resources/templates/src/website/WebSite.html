@@ -24,6 +24,8 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link th:href="@{../static/src/website/css/style.css}" rel="stylesheet">
+    <link th:href="@{../static/src/website/website.css}" rel="stylesheet">
+
 </head>
 
 <body>
@@ -408,16 +410,20 @@
                     <div class="product-img position-relative overflow-hidden">
                         <img class="img-fluid w-100" style="height: 250px" th:src="${list.url_anh}" alt="">
                         <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                            <a class="btn btn-outline-dark btn-square"  th:href="@{/detail/{idSanPham}(idSanPham=${list.id})}"><i class="fa fa-shopping-cart"></i></a>
                             <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
                             <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
                             <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
                         </div>
                     </div>
                     <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" th:href="@{/detail/{idSanPham}(idSanPham=${list.id})}"><p th:text="${list.tensanpham}"></p></a>
+                        <a class="product-title h6 text-decoration-none text-truncate"
+                           th:href="@{/detail/{idSanPham}(idSanPham=${list.id})}">
+                            <span th:text="${list.tensanpham}"></span>
+                            (<span th:text="${list.loaiDe.tenloaide}"></span>,<span th:text="${list.chatLieu.tenchatlieu}"></span>)
+                        </a>
                         <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5>1000</h5><h6 class="text-muted ml-2"><del th:text="${list.giaban}"></del></h6>
+                            <h5></h5><h6 class="text-muted ml-2"><del th:text="${list.giaban}"></del></h6>
                         </div>
                         <div class="d-flex align-items-center justify-content-center mb-1">
                             <small class="fa fa-star text-primary mr-1"></small>
@@ -461,43 +467,6 @@
         </div>
     </div>
     <!-- Offer End -->
-
-
-    <!-- Products Start -->
-    <div class="container-fluid pt-5 pb-3">
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Recent Products</span></h2>
-        <div class="row px-xl-5">
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-1" th:each="list : ${sanPhams}">
-                <div class="product-item bg-light mb-4">
-                    <div class="product-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" style="height: 250px" th:src="${list.url_anh}" alt="">
-                        <div class="product-action">
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <a class="h6 text-decoration-none text-truncate" th:href="@{/detail/{idSanPham}(idSanPham=${list.id})}" th:text="${list.tensanpham}"></a>
-                        <div class="d-flex align-items-center justify-content-center mt-2">
-                            <h5 th:text="${list.giaban}"></h5><h6 class="text-muted ml-2"><del>$123.00</del></h6>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center mb-1">
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small class="fa fa-star text-primary mr-1"></small>
-                            <small>(99)</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Products End -->
-
 
     <!-- Vendor Start -->
     <div class="container-fluid py-5">

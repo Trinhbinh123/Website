@@ -1,0 +1,8 @@
+.product-title {
+    white-space: nowrap; /* Không xuống dòng */
+    overflow: hidden; /* Ẩn nội dung vượt quá */
+    text-overflow: ellipsis; /* Thêm "..." nếu quá dài */
+    display: inline-block; /* Hiển thị như một khối nội tuyến */
+    font-size: 14px; /* Cỡ chữ nhỏ gọn hơn */
+    line-height: 1.2; /* Tăng tính cân đối */
+}

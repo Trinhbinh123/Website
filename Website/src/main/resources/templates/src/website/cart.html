@@ -26,6 +26,16 @@
     <!-- Customized Bootstrap Stylesheet -->
     <link th:href="@{../static/src/website/css/style.css}" rel="stylesheet">
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            console.log("Dữ liệu giỏ hàng:", cart);
+
+            const cartTableBody = document.getElementById("cart-table-body"); // tbody của bảng giỏ hàng
+            cart.forEach((item) => {
+                const row = renderCart(item); // Hàm renderCart đã được định nghĩa
+                cartTableBody.appendChild(row);
+            });
+        });
         function load() {
             let listCart = document.getElementById("listCart");
             const message = sessionStorage.getItem("message");
