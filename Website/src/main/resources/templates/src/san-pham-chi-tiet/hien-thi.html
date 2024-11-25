@@ -24,8 +24,8 @@
                                     <th>Mã Sản Phẩm Chi Tiết</th>
                                     <th>Sản Phẩm</th>
                                     <th>Màu Sắc</th>
-                                    <th>Chất Liệu</th>
                                     <th>Size</th>
+                                    <th>Số lượng</th>
                                     <th>Giá Bán</th>
                                     <th>Ngày nhập</th>
                                     <th>Trạng Thái</th>
@@ -38,8 +38,8 @@
                                     <td th:text="${spct.ma_SPCT}"></td>
                                     <td th:text="${spct.sanPham != null ? spct.sanPham.tensanpham : 'N/A'}"></td>
                                     <td th:text="${spct.mauSac != null ? spct.mauSac.tenmausac : 'N/A'}"></td>
-                                    <td th:text="${spct.chatLieu != null ? spct.chatLieu.tenchatlieu : 'N/A'}"></td>
                                     <td th:text="${spct.size != null ? spct.size.ten_size : 'N/A'}"></td>
+                                    <td th:text="${spct.so_luong}"></td>
                                     <td th:text="${spct.gia_ban}"></td>
                                     <td th:text="${spct.ngay_nhap}"></td>
                                     <td th:text="${spct.trang_thai ? 'Active' : 'Inactive'}"></td>

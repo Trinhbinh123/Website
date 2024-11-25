@@ -51,6 +51,12 @@
                         Trả hàng
                         <span class="badge bg-secondary ms-2" th:text="${soDonDoiTra}" th:if="${soDonDoiTra > 0}"></span>
                     </a>
+                    <a th:href="@{/admin/donhang(trangThai='Đơn bị hủy')}"
+                       class="btn btn-outline-primary"
+                       th:classappend="${trangThaiHienTai == 'Đơn bị hủy' ? ' active' : ''}">
+                        Đơn bị hủy
+                        <span class="badge bg-danger ms-2" th:text="${soDonBiHuy}" th:if="${soDonBiHuy > 0}"></span>
+                    </a>
                 </div>
 
                 <div class="table-responsive">

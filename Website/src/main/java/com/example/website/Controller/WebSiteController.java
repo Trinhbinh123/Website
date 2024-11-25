@@ -80,7 +80,7 @@ public class WebSiteController {
         for (GioHang gioHang : gioHangs) {
             tongTien += gioHang.getTongTien();
         }
-        model.addAttribute("tongTien", tongTien);
+        model.addAttribute("tongTien", tongTien); // tong tien chua ship
 
 
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
@@ -133,6 +133,10 @@ public class WebSiteController {
             hoaDonChiTiet.setDonGia(gioHang.getTongTien());
             tongTien += gioHang.getTongTien();
             hoaDonChiTietRepo.save(hoaDonChiTiet);
+
+            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
+            sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - gioHang.getSoLuong());
+            sanPhamChiTietRepo.save(sanPhamChiTiet);
         }
 
         saveHoaDon.setTongTien(tongTien);
@@ -212,10 +216,15 @@ public class WebSiteController {
         } catch (WriterException | IOException e) {
             return ResponseEntity.badRequest().build();
 
+
         }
 
         }
     }
+
+
+
+
 
 
 
