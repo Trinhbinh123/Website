@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+        .login-container .register-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-container .register-link a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .login-container .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>Đăng Nhập</h1>
+    <form method="POST" action="/login">
+        <div th:if="${param.error}" class="alert alert-danger">
+            Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.
+        </div>
+
+        <input type="email" id="email" name="email" placeholder="Nhập email" required>
+        <input type="password" id="matKhau" name="matKhau" placeholder="Nhập mật khẩu" required>
+
+        <button type="submit">Đăng nhập</button>
+    </form>
+</div>
+
+<script>
+    // Nếu đăng nhập thành công, điều hướng người dùng đến trang /website
+    document.querySelector("form").addEventListener("submit", function(event) {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("matKhau").value;
+
+        // Email validation
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(email)) {
+            alert("Vui lòng nhập địa chỉ email hợp lệ.");
+            event.preventDefault();
+            return;
+        }
+
+        // Mật khẩu tối thiểu 6 ký tự
+        // if (password.length < 6) {
+        //     alert("Mật khẩu phải có ít nhất 6 ký tự.");
+        //     event.preventDefault();
+        // }
+    });
+</script>
+</body>
+</html>

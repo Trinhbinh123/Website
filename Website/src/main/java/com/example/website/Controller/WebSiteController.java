@@ -249,6 +249,12 @@ public class WebSiteController {
                     .body(qrCodeImage);
         } catch (WriterException | IOException e) {
             return ResponseEntity.badRequest().build();
+
+
+        }
+
         }
     }
+
 }
+
