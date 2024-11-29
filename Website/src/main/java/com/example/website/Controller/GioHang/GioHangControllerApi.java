@@ -4,6 +4,7 @@ import com.example.website.Enity.*;
 import com.example.website.Respository.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,10 @@ public class GioHangControllerApi {
     private final SanPhamRepo sanPhamRepo;
     private final MauSacRepo mauSacRepo;
     private final SizeRepo sizeRepo;
-
+    @GetMapping("/cart")
+    public String cart() {
+        return "src/website/cart";
+    }
     @PostMapping("/{idSanPham}/{idMauSac}/{idSize}/{soLuong}")
     public String addToCart(
             @PathVariable Integer idSanPham,
@@ -33,7 +37,7 @@ public class GioHangControllerApi {
                 sanPhamRepo.getReferenceById(idSanPham),
                 mauSacRepo.getReferenceById(idMauSac),
                 sizeRepo.getReferenceById(idSize)).get(0);
-        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
+//        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
 
         gioHang.setKhachHang(khachHang);
         boolean check = false;
