@@ -32,7 +32,8 @@ public class KhachHangController {
     ) {
         return "src/khachhang/AddKhachHang";
     }
-
+//    /admin/** => nhân viên hoặc admin mới vào đc
+//    /khachhang/** => nhân viên hoặc admin mới vào đc
     @GetMapping("/khachhang/delete")
     public String deleteKH(@RequestParam Integer id) {
         KhachHang khachHang = khachHangRepo.getReferenceById(id);

@@ -104,7 +104,7 @@ public class WebSiteController {
         return "src/website/shop"; // Trả về trang about.html
     }
 
-    @PostMapping("/checkout")
+    @PostMapping("/checkout") //3
     public String checkout(Model model, @RequestParam List<Integer> integers) {
         List<GioHang> gioHangs = new ArrayList<>();
         for (Integer i : integers) {
@@ -125,7 +125,7 @@ public class WebSiteController {
         return "src/website/checkout"; // Trả về trang about.html
     }
 
-    @PostMapping("/checkout/success")
+    @PostMapping("/checkout/success") //1
     public String checkoutSuccess(
             Model model,
             @RequestParam List<Integer> integers,
@@ -213,7 +213,7 @@ public class WebSiteController {
         }
     }
 
-    @GetMapping("/cart")
+    @GetMapping("/cart") //2
     public String cart(Model model) {
         return "src/website/cart"; // Trả về trang about.html
     }
