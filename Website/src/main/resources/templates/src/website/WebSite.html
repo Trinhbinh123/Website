@@ -52,16 +52,17 @@
                 </form>
             </div>
             <div class="d-inline-flex align-items-center">
-                <div class="btn-group">
-
-                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+                <div class="btn-group" th:if="${user.hoTen != null}">
+                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" th:text="${user.hoTen}"></button>
                     <div class="dropdown-menu dropdown-menu-right">
                         <button class="dropdown-item" type="button">Sign in</button>
                         <button class="dropdown-item" type="button">Sign up</button>
                         <button class="dropdown-item" th:onclick="'window.location.href=\'' + @{/khachHang/donhang} + '\''" type="button">Đơn hàng của bạn</button>
                     </div>
-                        <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
-
+                    <a th:href="@{/logout}" class="nav-item nav-link active">Logout</a>
+                </div>
+                <div class="btn-group" th:if="${user.hoTen == null}">
+                    <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
                 </div>
             </div>
         </div>
@@ -446,10 +447,10 @@
 
 
 
-  <!-- JavaScript Libraries -->
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-  <script th:src="@{../static/src/website/lib/easing/easing.min.js}"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{../static/src/website/lib/easing/easing.min.js}"></script>
     <script th:src="@{../static/src/website/lib/owlcarousel/owl.carousel.min.js}"></script>
 
     <!-- Offer Start -->

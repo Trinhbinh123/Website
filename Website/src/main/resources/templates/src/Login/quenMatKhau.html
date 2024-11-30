@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quen mat khau</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" integrity="sha512-jnSuA4Ss2PkkikSOLtYs8BlYIeeIK1h99ty4YfvRPAlzr377vr3CXDb7sb7eEEBYjDtcYj+AjBH3FLv5uSJuXg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+        .login-container .register-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-container .register-link a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .login-container .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>Nhập mật khẩu mới</h1>
+    <form id="form">
+        <input type="hidden" id="id" name="id" th:value="${id}">
+        <input type="email" id="newPassword" name="newPassword" placeholder="Mật khẩu mới" required>
+        <input type="password" id="reNewPassword" name="reNewPassword" placeholder="Nhập lại mật khẩu mới" required>
+
+        <button onclick="submitForm(event)">Xác nhận</button>
+    </form>
+    <script>
+        function submitForm(e){
+            e.preventDefault();
+            const newPassWord = document.getElementById("newPassword").value.trim();
+            const reNewPassword = document.getElementById("reNewPassword").value.trim();
+            const id = document.getElementById("id").value;
+            console.log(id)
+            if(newPassWord !== reNewPassword){
+                console.log("Mật khẩu không trùng khớp");
+            }else if(newPassWord === "" || reNewPassword === ""){
+                console.log("Vui lòng nhập đủ thông tin");
+            }else {
+                window.location.href = "http://localhost:8080/quenMk/changePassword/" + id + "/" + newPassWord;
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

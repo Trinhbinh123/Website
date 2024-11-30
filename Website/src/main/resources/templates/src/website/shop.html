@@ -50,12 +50,17 @@
                 </form>
             </div>
             <div class="d-inline-flex align-items-center">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+                <div class="btn-group" th:if="${user.hoTen != null}">
+                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" th:text="${user.hoTen}"></button>
                     <div class="dropdown-menu dropdown-menu-right">
                         <button class="dropdown-item" type="button">Sign in</button>
                         <button class="dropdown-item" type="button">Sign up</button>
+                        <button class="dropdown-item" th:onclick="'window.location.href=\'' + @{/khachHang/donhang} + '\''" type="button">Đơn hàng của bạn</button>
                     </div>
+                    <a th:href="@{/logout}" class="nav-item nav-link active">Logout</a>
+                </div>
+                <div class="btn-group" th:if="${user.hoTen == null}">
+                    <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
                 </div>
             </div>
         </div>
