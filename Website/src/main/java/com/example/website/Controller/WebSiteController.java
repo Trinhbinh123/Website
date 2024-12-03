@@ -2,6 +2,7 @@ package com.example.website.Controller;
 
 import com.example.website.Enity.*;
 import com.example.website.Respository.*;
+import com.example.website.Service.UserService;
 import com.google.zxing.WriterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -11,6 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.common.BitMatrix;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -36,28 +44,35 @@ public class WebSiteController {
     private final GioHangRepo gioHangRepo;
     private final HoaDonRepo hoaDonRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
-    private final ChatLieuRepo  chatLieuRepo;
-    private final LoaiDeRepo  loaiDeRepo;
+    private final ChatLieuRepo chatLieuRepo;
+    private final LoaiDeRepo loaiDeRepo;
+    private final UserService userService;
 
     @GetMapping("/website")
-    public String getAdmin(Model model) {
+    public String getAdmin(Model model, Authentication authentication) {
+        int soLuong = 0;
+        KhachHang khachHang = new KhachHang();
+        if (authentication != null) {
+            khachHang = userService.currentKhachHang(authentication);
+            soLuong = gioHangRepo.findByKhachHang(khachHang).size();
+        }
+        model.addAttribute("user", khachHang);
+        model.addAttribute("soLuongGioHang", soLuong);
         org.springframework.data.domain.Pageable top10 = org.springframework.data.domain.PageRequest.of(0, 12);
         List<SanPham> sanPhams = sanPhamRepo.findTop10ByOrderByCreatedAtDesc(top10).getContent();
         model.addAttribute("sanPhams", sanPhams);
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
-        Integer soLuong = gioHangRepo.findByKhachHang(khachHang).size();
-        model.addAttribute("soLuongGioHang", soLuong);
+
         return "src/website/WebSite";
     }
 
 
     @GetMapping("/detail/{idSanPham}")
     public String details(Model model, @PathVariable Integer idSanPham
-                          ) {
+    ) {
         List<ChatLieu> chatLieu = chatLieuRepo.findAll();
-        model.addAttribute("chatlieu",chatLieu);
+        model.addAttribute("chatlieu", chatLieu);
         List<LoaiDe> loaiDe = loaiDeRepo.findAll();
-        model.addAttribute("loaide",loaiDe);
+        model.addAttribute("loaide", loaiDe);
         KhachHang khachHang = khachHangRepo.getReferenceById(1);
         model.addAttribute("khachHang", khachHang);
         SanPham sanPham = sanPhamRepo.getReferenceById(idSanPham);
@@ -80,6 +95,7 @@ public class WebSiteController {
         model.addAttribute("giaMacDinh", giaMacDinh);
         return "src/website/detail";
     }
+
     @GetMapping("/get-price")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getPrice(
@@ -100,12 +116,20 @@ public class WebSiteController {
     }
 
     @GetMapping("/shop")
-    public String shop() {
+    public String shop(Authentication authentication, Model model) {
+        int soLuong = 0;
+        KhachHang khachHang = new KhachHang();
+        if (authentication != null) {
+            khachHang = userService.currentKhachHang(authentication);
+            soLuong = gioHangRepo.findByKhachHang(khachHang).size();
+        }
+        model.addAttribute("user", khachHang);
+        model.addAttribute("soLuongGioHang", soLuong);
         return "src/website/shop"; // Trả về trang about.html
     }
 
     @PostMapping("/checkout") //3
-    public String checkout(Model model, @RequestParam List<Integer> integers) {
+    public String checkout(Model model, @RequestParam List<Integer> integers, Authentication authentication) {
         List<GioHang> gioHangs = new ArrayList<>();
         for (Integer i : integers) {
             gioHangs.add(gioHangRepo.getReferenceById(i));
@@ -119,9 +143,12 @@ public class WebSiteController {
         }
         model.addAttribute("tongTien", tongTien);
 
-
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
-        model.addAttribute("KH", khachHang);
+        if (authentication != null) {
+            KhachHang khachHang = userService.currentKhachHang(authentication);
+            model.addAttribute("KH", khachHang);
+        } else {
+            return "src/Login/login";
+        }
         return "src/website/checkout"; // Trả về trang about.html
     }
 
@@ -176,7 +203,7 @@ public class WebSiteController {
         saveHoaDon.setTongTien(tongTien);
         hoaDonRepo.save(saveHoaDon);
 
-        return "src/website/WebSite"; // Trả về trang about.html
+        return "redirect:/website"; // Trả về trang about.html
     }
 
     private String[] getProvinceDetails(String provinceCode) {
@@ -214,7 +241,16 @@ public class WebSiteController {
     }
 
     @GetMapping("/cart") //2
-    public String cart(Model model) {
+    public String cart(Model model, Authentication authentication) {
+        if (authentication == null) {
+            return "src/Login/login";
+        }
+        int soLuong = 0;
+        KhachHang khachHang = new KhachHang();
+        khachHang = userService.currentKhachHang(authentication);
+        soLuong = gioHangRepo.findByKhachHang(khachHang).size();
+        model.addAttribute("user", khachHang);
+        model.addAttribute("soLuongGioHang", soLuong);
         return "src/website/cart"; // Trả về trang about.html
     }
 
@@ -249,12 +285,29 @@ public class WebSiteController {
                     .body(qrCodeImage);
         } catch (WriterException | IOException e) {
             return ResponseEntity.badRequest().build();
-
-
         }
 
-        }
     }
-
+    @GetMapping("/quenMk/{email}")
+    public String quenMk(@PathVariable String email, Model model){
+        if(email != null){
+            KhachHang khachHang = khachHangRepo.findByEmail(email);
+            model.addAttribute("id", khachHang.getId());
+        }
+        return "/src/Login/quenMatKhau";
+    }
+    @GetMapping("/quenMk/changePassword/{id}/{newPassword}")
+    public String changePass(
+            @PathVariable Integer id,
+            @PathVariable String newPassword
+    ){
+        System.out.println(newPassword);
+        System.out.println(id);
+        KhachHang khachHang = khachHangRepo.getReferenceById(id);
+        khachHang.setMatKhau(newPassword);
+        khachHangRepo.save(khachHang);
+        return "redirect:/login";
+    }
 }
+
 

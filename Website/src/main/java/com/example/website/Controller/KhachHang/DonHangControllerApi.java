@@ -7,7 +7,9 @@ import com.example.website.Respository.DonHangRepo;
 import com.example.website.Respository.HoaDonChiTietRepo;
 import com.example.website.Respository.HoaDonRepo;
 import com.example.website.Respository.KhachHangRepo;
+import com.example.website.Service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,17 +23,18 @@ public class DonHangControllerApi {
     private final HoaDonRepo hoaDonRepo;
     private final KhachHangRepo khachHangRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
+    private final UserService userService;
 
     @GetMapping("/checkBillByStatus")
-    public List<HoaDon> checkHDByStatus(@RequestParam String status){
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
+    public List<HoaDon> checkHDByStatus(@RequestParam String status, Authentication authentication){
+        KhachHang khachHang = userService.currentKhachHang(authentication);
         List<HoaDon> hoaDons = hoaDonRepo.findByKhachHang(khachHang);
         hoaDons = hoaDons.stream().filter(hoaDon -> hoaDon.getTrangThai().equals(status)).toList();
         return hoaDons;
     }
     @GetMapping("/getQuantityStatusOfBill")
-    public List<Integer> soLuongTrangThaiHoaDon(){
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
+    public List<Integer> soLuongTrangThaiHoaDon(Authentication authentication){
+        KhachHang khachHang = userService.currentKhachHang(authentication);
         List<HoaDon> hoaDons = hoaDonRepo.findByKhachHang(khachHang);
         int choXacNhan = 0;
         int daXacNhan = 0;
@@ -79,7 +82,7 @@ public class DonHangControllerApi {
     }
 
     @PutMapping("/huydon/{idBill}")
-    public void huyDonHang(@PathVariable Integer idBill, @RequestParam String message){
+    public void huyDonHang(@PathVariable Integer idBill, @RequestParam String message, Authentication authentication){
         HoaDon hoaDon = hoaDonRepo.getReferenceById(idBill);
         hoaDon.setGhiChu(message + " - Huỷ bởi khách hàng");
         hoaDon.setTrangThai("Đơn bị hủy");
