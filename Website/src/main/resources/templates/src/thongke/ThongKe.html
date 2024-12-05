@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"></head>
+<head th:replace="~{src/partials/_head :: _head}">
+    <script th:src="@{https://cdn.jsdelivr.net/npm/chart.js}"></script>
+</head>
 <body>
 <div class="container-scroller">
     <!--_navbar -->
@@ -12,44 +14,37 @@
         <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
         <!--_sidebar-->
         <div class="main-panel">
-            <div class="content-wrapper">
-                <!-- header : phần này là ghi code listAll-->
-                <h2>Vận chuyển</h2>
-                <hr>
-                <br>
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <td>ID</td>
-                        <td>Mã đơn hàng</td>
-                        <td>Phương thức vận chuyển</td>
-                        <td>Ngày giao hàng</td>
-                        <td>Chức năng</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="th : ${vc}">
-                        <td th:text="${th.id}"></td>
-                        <td th:text="${th.donHang.ma_donhang}"></td>
-                        <td th:text="${th.phuongthucvanchuyen}"></td>
-                        <td th:text="${th.ngaygiaohang}"></td>
-                        <td>
-
-                            <!--                            <a th:href="@{/admin/van-chuyen/edit/{id}(id=${th.id})}" class="btn btn-info">Chi tiết</a>-->
-                            <!--                            <a th:href="@{/admin/van-chuyen/delete/{id}(id=${th.id})}" class="btn btn-danger" onclick="return confirm('Xác nhận xóa')">Xóa</a>-->
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="mt-3">
-                    <a th:href="@{/admin/van-chuyen(p=0)}" class="btn btn-secondary" th:disabled="${page.number == 0}">First</a>
-                    <a th:href="@{/admin/van-chuyen(p=${page.number - 1})}" class="btn btn-secondary" th:disabled="${page.number == 0}">Prev</a>
-                    <a th:href="@{/admin/van-chuyen(p=${page.number + 1})}" class="btn btn-secondary" th:disabled="${page.number + 1 >= page.totalPages}">Next</a>
-                    <a th:href="@{/admin/van-chuyen(p=${page.totalPages - 1})}" class="btn btn-secondary" th:disabled="${page.number + 1 >= page.totalPages}">Last</a>
+            <h1 class="my-4 text-center">Sales Statistics</h1>
+            <form id="filterForm" class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="year" class="form-label">Year</label>
+                    <input type="number" class="form-control" id="year" placeholder="Enter year (e.g., 2024)">
                 </div>
-                <div class="mt-2">
-                    Trang số <span th:text="${page.number + 1}"></span>/<span th:text="${page.totalPages}"></span> trang</div>
-                <!-- header-->
+                <div class="col-md-6">
+                    <label for="month" class="form-label">Month</label>
+                    <select class="form-select" id="month">
+                        <option selected disabled>Select month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-12 text-center">
+                    <button type="button" id="loadStatistics" class="btn btn-primary">Load Statistics</button>
+                </div>
+            </form>
+            <div class="mt-4">
+                <canvas id="salesChart" width="400" height="200"></canvas>
+            </div>
             </div>
             <!--footer-->
             <div th:replace="~{src/partials/_footer :: _footer}"></div>

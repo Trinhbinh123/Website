@@ -23,8 +23,6 @@ public class WebSiteController {
     private final SanPhamChiTietRepo sanPhamChiTietRepo;
     private final KhachHangRepo khachHangRepo;
     private final GioHangRepo gioHangRepo;
-    private final HoaDonRepo hoaDonRepo;
-    private final HoaDonChiTietRepo hoaDonChiTietRepo;
     private final ChatLieuRepo  chatLieuRepo;
     private final LoaiDeRepo  loaiDeRepo;
 
@@ -93,79 +91,79 @@ public class WebSiteController {
         return "src/website/shop"; // Trả về trang about.html
     }
 
-    @PostMapping("/checkout")
-    public String checkout(Model model, @RequestParam List<Integer> integers) {
-        List<GioHang> gioHangs = new ArrayList<>();
-        for (Integer i : integers) {
-            gioHangs.add(gioHangRepo.getReferenceById(i));
-        }
-        model.addAttribute("productDetail", gioHangs);
-        model.addAttribute("list", integers);
-
-        int tongTien = 0;
-        for (GioHang gioHang : gioHangs) {
-            tongTien += gioHang.getTongTien();
-        }
-        model.addAttribute("tongTien", tongTien);
-
-
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
-        model.addAttribute("KH", khachHang);
-        return "src/website/checkout"; // Trả về trang about.html
-    }
-
-    @PostMapping("/checkout/success")
-    public String checkoutSuccess(
-            Model model,
-            @RequestParam List<Integer> integers,
-            KhachHang khachHang,
-            @RequestParam String payment
-    ) {
-        KhachHang currentKhachHang = khachHangRepo.getReferenceById(khachHang.getId());
-
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
-
-
-        HoaDon hoaDon = new HoaDon();
-        hoaDon.setKhachHang(khachHang);
-        hoaDon.setDiaChi(provinceName + ", " + districtName + ", " + wardName + ", " + khachHang.getDiaChi());
-        hoaDon.setMaDonHang(UUID.randomUUID().toString().replace("-", "").substring(10));
-        hoaDon.setTenKhachHang(khachHang.getHoTen());
-        hoaDon.setEmail(khachHang.getEmail());
-        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
-        hoaDon.setNgayDatHang(new Date());
-        hoaDon.setTrangThai("Chờ xác nhận");
-        if (payment.equals("1")) {
-            hoaDon.setHinhThuc("Thanh toán khi nhận hàng");
-        } else {
-            hoaDon.setHinhThuc("Thanh toán bằng VN Pay");
-        }
-        HoaDon saveHoaDon = hoaDonRepo.save(hoaDon);
-
-        int tongTien = 0;
-
-        for (Integer i : integers) {
-            GioHang gioHang = gioHangRepo.getReferenceById(i);
-
-            HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
-            hoaDonChiTiet.setHoaDon(saveHoaDon);
-            hoaDonChiTiet.setSanPhamChiTiet(gioHang.getSanPhamChiTiet());
-            hoaDonChiTiet.setSoLuong(gioHang.getSoLuong());
-            hoaDonChiTiet.setDonGia(gioHang.getTongTien());
-            tongTien += gioHang.getTongTien();
-            hoaDonChiTietRepo.save(hoaDonChiTiet);
-        }
-
-        saveHoaDon.setTongTien(tongTien);
-        hoaDonRepo.save(saveHoaDon);
-
-        return "src/website/WebSite"; // Trả về trang about.html
-    }
+//    @PostMapping("/checkout")
+//    public String checkout(Model model, @RequestParam List<Integer> integers) {
+//        List<GioHang> gioHangs = new ArrayList<>();
+//        for (Integer i : integers) {
+//            gioHangs.add(gioHangRepo.getReferenceById(i));
+//        }
+//        model.addAttribute("productDetail", gioHangs);
+//        model.addAttribute("list", integers);
+//
+//        int tongTien = 0;
+//        for (GioHang gioHang : gioHangs) {
+//            tongTien += gioHang.getTongTien();
+//        }
+//        model.addAttribute("tongTien", tongTien);
+//
+//
+//        KhachHang khachHang = khachHangRepo.getReferenceById(1);
+//        model.addAttribute("KH", khachHang);
+//        return "src/website/checkout"; // Trả về trang about.html
+//    }
+//
+//    @PostMapping("/checkout/success")
+//    public String checkoutSuccess(
+//            Model model,
+//            @RequestParam List<Integer> integers,
+//            KhachHang khachHang,
+//            @RequestParam String payment
+//    ) {
+//        KhachHang currentKhachHang = khachHangRepo.getReferenceById(khachHang.getId());
+//
+//        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
+//        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
+//        String[] wardDetails = getWardDetails(khachHang.getXa());
+//        String provinceName = provinceDetails[1];
+//        String districtName = districtDetails[1];
+//        String wardName = wardDetails[1];
+//
+//
+//        HoaDon hoaDon = new HoaDon();
+//        hoaDon.setKhachHang(khachHang);
+//        hoaDon.setDiaChi(provinceName + ", " + districtName + ", " + wardName + ", " + khachHang.getDiaChi());
+//        hoaDon.setMaDonHang(UUID.randomUUID().toString().replace("-", "").substring(10));
+//        hoaDon.setTenKhachHang(khachHang.getHoTen());
+//        hoaDon.setEmail(khachHang.getEmail());
+//        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());z
+//        hoaDon.setNgayDatHang(new Date());
+//        hoaDon.setTrangThai("Chờ xác nhận");
+//        if (payment.equals("1")) {
+//            hoaDon.setHinhThuc("Thanh toán khi nhận hàng");
+//        } else {
+//            hoaDon.setHinhThuc("Thanh toán bằng VN Pay");
+//        }
+//        HoaDon saveHoaDon = hoaDonRepo.save(hoaDon);
+//
+//        int tongTien = 0;
+//
+//        for (Integer i : integers) {
+//            GioHang gioHang = gioHangRepo.getReferenceById(i);
+//
+//            HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
+//            hoaDonChiTiet.setHoaDon(saveHoaDon);
+//            hoaDonChiTiet.setSanPhamChiTiet(gioHang.getSanPhamChiTiet());
+//            hoaDonChiTiet.setSoLuong(gioHang.getSoLuong());
+//            hoaDonChiTiet.setDonGia(gioHang.getTongTien());
+//            tongTien += gioHang.getTongTien();
+//            hoaDonChiTietRepo.save(hoaDonChiTiet);
+//        }
+//
+//        saveHoaDon.setTongTien(tongTien);
+//        hoaDonRepo.save(saveHoaDon);
+//
+//        return "src/website/WebSite"; // Trả về trang about.html
+//    }
 
     private String[] getProvinceDetails(String provinceCode) {
         String url = "https://provinces.open-api.vn/api/p/" + provinceCode;
