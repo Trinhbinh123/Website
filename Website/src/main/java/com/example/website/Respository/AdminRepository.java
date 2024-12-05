@@ -1,11 +1,10 @@
 package com.example.website.Respository;
 
-import com.example.website.Enity.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import com.example.website.Enity.Ad;
 
 @Repository
-public interface SizeRepo extends JpaRepository<Size, Integer> {
+public interface AdminRepository extends JpaRepository<Ad, Integer> {
+    Ad findByEmail(String email);
 }
