@@ -38,11 +38,15 @@
         });
         function load() {
             let listCart = document.getElementById("listCart");
+            const message = sessionStorage.getItem("message");
+            if(message !== null){
+                showToast(message, "info");
+                sessionStorage.removeItem("message");
+            }
             $.ajax({
                 url: "cart/cartPage",
                 method: "GET",
                 success: function (data) {
-                    console.log(data)
                     listCart.innerHTML = "";
                     data.forEach(item => {
                         const row = renderCart(item);
@@ -67,7 +71,7 @@
                                         <i class="fa fa-minus"></i>
                                         </button>
                                     </div>
-                                    <input type="text" id="quantity-${item.id}" class="form-control form-control-sm bg-secondary border-0 text-center" value="${item.soLuong}">
+                                    <input type="text" id="quantity-${item.id}" onchange="checkQuantity(${item.id})" class="form-control form-control-sm bg-secondary border-0 text-center" value="${item.soLuong}">
                                     <div class="input-group-btn">
                                         <button onclick="quantity(${item.id} , 'cong', event)" class="btn btn-sm btn-primary btn-plus">
                                             <i class="fa fa-plus"></i>
@@ -76,9 +80,44 @@
                                 </div>
                             </td>
                             <td class="align-middle" id="tongTien-${item.id}">${item.tongTien}</td>
-                            <td class="align-middle"><button onclick="removeCart(${item.id})" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button></td>
+                            <td class="align-middle"><button onclick="removeCart(${item.id}, event)" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></button></td>
                         `;
             return row;
+        }
+
+        function checkQuantity(idCart){
+            const quantity = document.getElementById("quantity-"+idCart)
+            const tongTien = document.getElementById("tongTien-" + idCart);
+            if(quantity.value > 10){
+                $.ajax({
+                    url: "/cart/checkQuantityIfMax/" + idCart ,
+                    method: "GET",
+                    success: function (data) {
+                        console.log(data)
+                        if(data.id === -1){
+                            showToast("Số lượng phải nhỏ hơn " + data.soLuong, "error");
+                        }else {
+                            showToast("Số lượng từ 1-10", "error");
+                        }
+                        quantity.value = data.soLuong;
+                        tongTien.innerText = data.tongTien;
+                    }
+                })
+            }else {
+                $.ajax({
+                    url: "/cart/checkQuantityCauseChange/" + idCart +"?quantity=" + quantity.value.trim(),
+                    method: "GET",
+                    success: function (data) {
+                        if(data.id === -1){
+                            showToast("Số lượng phải nhỏ hơn " + data.soLuong, "error");
+                        }else if(data.id === -2){
+                            showToast("Số lượng phải lớn hơn 1", "error");
+                        }
+                        quantity.value = data.soLuong;
+                        tongTien.innerText = data.tongTien;
+                    }
+                })
+            }
         }
 
         function quantity(idCart, status, e) {
@@ -87,15 +126,26 @@
             const quantity = document.getElementById("quantity-" + idCart);
             const tongTien = document.getElementById("tongTien-" + idCart);
             $.ajax({
-                url: "/cart/quantity/" + idCart + "?status=" + status,
-                method: "PUT",
-                success: function (data) {
-                    if (data !== "") {
-                        quantity.value = data.soLuong;
-                        tongTien.innerText = data.tongTien;
-                        chooseCheckbox();
-                    } else {
-                        showToast("Không thể giảm số lượng sản phẩm", "error");
+                url: "/cart/checkQuantity/" + idCart + "?status=" + status,
+                method: "GET",
+                success: function (message) {
+                    console.log(message)
+                    if(message !== ""){
+                        showToast(message, "error");
+                    }else {
+                        $.ajax({
+                            url: "/cart/quantity/" + idCart + "?status=" + status,
+                            method: "PUT",
+                            success: function (data) {
+                                if (data !== "") {
+                                    quantity.value = data.soLuong;
+                                    tongTien.innerText = data.tongTien;
+                                    chooseCheckbox();
+                                } else {
+                                    showToast("Số lượng từ 1-10", "error");
+                                }
+                            }
+                        })
                     }
                 }
             })
@@ -128,7 +178,8 @@
             });
         }
 
-        function removeCart(idCart) {
+        function removeCart(idCart, e) {
+            e.preventDefault();
             $.ajax({
                 url: "/cart/deleteCart/" + idCart,
                 method: "DELETE",
@@ -139,6 +190,23 @@
                 }
             })
         }
+
+        // function checkout(){
+        //     const data = checkbox();
+        //     $.ajax({
+        //         url: "/cart/checkOut",
+        //         method: "POST",
+        //         contentType: "application/json",
+        //         data: JSON.stringify({ idGioHang: data }),
+        //         success: function(data) {
+        //             sessionStorage.setItem("productCart", JSON.stringify(data));
+        //             window.location.href = "/checkout";
+        //         },
+        //         error: function(error) {
+        //             console.error("Lỗi:", error);
+        //         }
+        //     });
+        // }
 
         function showToast(message, status) {
             const Toast = Swal.mixin({
@@ -183,13 +251,17 @@
             </form>
         </div>
         <div class="d-inline-flex align-items-center">
-            <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account
-                </button>
+            <div class="btn-group" th:if="${user.hoTen != null}">
+                <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" th:text="${user.hoTen}"></button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <button class="dropdown-item" type="button">Sign in</button>
                     <button class="dropdown-item" type="button">Sign up</button>
+                    <button class="dropdown-item" th:onclick="'window.location.href=\'' + @{/khachHang/donhang} + '\''" type="button">Đơn hàng của bạn</button>
                 </div>
+                <a th:href="@{/logout}" class="nav-item nav-link active">Logout</a>
+            </div>
+            <div class="btn-group" th:if="${user.hoTen == null}">
+                <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
             </div>
         </div>
     </div>

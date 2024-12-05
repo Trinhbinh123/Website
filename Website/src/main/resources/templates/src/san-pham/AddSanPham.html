@@ -12,40 +12,92 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/san-pham/save}" method="post">
-                    <h5>Thông tin sản phẩm</h5>
-                    <div class="mb-3">
-                        <label for="ma" class="form-label">Mã sản phẩm</label>
-                        <input type="text" id="ma" name="ma_sanpham" class="form-control" required>
+                <form th:action="@{/san-pham/save}" method="post" onsubmit="return validateForm()">
+                    <h4>Thông tin sản phẩm</h4>
+                    <hr>
+                    <br>
+                    <div th:if="${errorMessage}" class="alert alert-danger">
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+                    <div class="row">
+                        <!-- Phần thông tin bên trái -->
+                        <div class="col-md-6">
+                            <div class="rounded-box">
+                                <div class="mb-3">
+                                    <label for="ma" class="form-label">Mã sản phẩm</label>
+                                    <input type="text" id="ma" name="ma_sanpham" class="form-control" th:value="${maSanPhamMoi}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tensanpham" class="form-label">Tên sản phẩm</label>
+                                    <input type="text" id="tensanpham" name="tensanpham" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="url_anh" class="form-label">URL ảnh</label>
+                                    <input type="text" id="url_anh" name="url_anh" class="form-control" required readonly>
+                                    <button type="button" class="btn btn-info mt-2" onclick="openFileDialog()">Chọn ảnh</button>
+                                </div>
+                                <div class="mb-3">
+                                    <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phần thông tin bên phải -->
+                        <div class="col-md-6">
+                            <div class="rounded-box">
+                                <div class="mb-3">
+                                    <label for="thuonghieu" class="form-label">Thương hiệu</label>
+                                    <select id="thuonghieu" name="thuongHieu.id" class="form-select" required>
+                                        <option th:each="th : ${thuongHieus}" th:value="${th.id}" th:text="${th.tenThuongHieu}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loaiDe" class="form-label">Loại đế</label>
+                                    <select id="loaiDe" name="loaiDe" class="form-control" required>
+                                        <option th:each="ld : ${listLD}" th:value="${ld.id}" th:text="${ld.tenloaide}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="chatLieu" class="form-label">Chất liệu</label>
+                                    <select id="chatLieu" name="chatLieu" class="form-control" required>
+                                        <option th:each="cl : ${listCL}" th:value="${cl.id}" th:text="${cl.tenchatlieu}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="tensanpham" class="form-label">Tên sản phẩm</label>
-                        <input type="text" id="tensanpham" name="tensanpham" class="form-control" required>
+                        <label class="form-label">Size</label>
+                        <div th:each="size : ${listSize}">
+                            <input type="checkbox" th:id="${'size_' + size.id}" th:value="${size.id}" name="sizes" th:text="${size.ten_size}" onchange="updatePreview()">
+                            <label th:for="${'size_' + size.id}"></label>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <label for="thuonghieu" class="form-label">Thương hiệu</label>
-                        <select id="thuonghieu" name="thuongHieu.id" class="form-select" required>
-                            <option th:each="th : ${thuongHieus}" th:value="${th.id}" th:text="${th.tenThuongHieu}"></option>
-                        </select>
+                        <label class="form-label">Màu sắc</label>
+                        <div th:each="mauSac : ${listMauSac}">
+                            <input type="checkbox" th:id="${'mauSac_' + mauSac.id}" th:value="${mauSac.id}" name="mauSacs" th:text="${mauSac.tenmausac}" onchange="updatePreview()">
+                            <label th:for="${'mauSac_' + mauSac.id}"></label>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="loaiDe" class="form-label">Loại đế</label>
-                        <select id="loaiDe" name="loaiDe" class="form-control" required>
-                            <option th:each="ld : ${listLD}" th:value="${ld.id}" th:text="${ld.tenloaide}"></option>
-                        </select>
-                    </div>
-<!--                    <div class="mb-3">-->
-<!--                        <label for="giaban" class="form-label">Giá bán</label>-->
-<!--                        <input type="number" id="giaban" name="giaban" class="form-control" required>-->
-<!--                    </div>-->
-                    <div class="mb-3">
-                        <label for="url_anh" class="form-label">URL ảnh</label>
-                        <input type="text" id="url_anh" name="url_anh" class="form-control" required readonly>
-                        <button type="button" class="btn btn-info mt-2" onclick="openFileDialog()">Chọn ảnh từ ổ D</button>
-                    </div>
-                    <div class="mb-3">
-                        <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>
-                    </div>
+                    <h4>Dự kiến sản phẩm chi tiết sẽ thêm</h4>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Size</th>
+                            <th>Màu Sắc</th>
+                            <th>Số lượng</th>
+                            <th>Giá bán</th>
+<!--                            <th>Hành động</th>-->
+                        </tr>
+                        </thead>
+                        <tbody id="preview-table">
+                        <!-- Hàng dữ liệu sẽ được thêm ở đây bởi JavaScript -->
+                        </tbody>
+                    </table>
+
                     <button type="submit" class="btn btn-success">Lưu</button>
                     <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
                 </form>
@@ -76,6 +128,88 @@
         };
         fileInput.click();
     }
+    function validateForm() {
+        var tenSanPham = document.getElementById("tensanpham").value.trim();
+        if (tenSanPham === "") {
+            alert("Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
+            return false; // Ngừng gửi form
+        }
+        return true; // Cho phép gửi form
+    }
+    function updatePreview() {
+        // Lấy danh sách size và màu sắc được chọn
+        const sizes = Array.from(document.querySelectorAll("input[name='sizes']:checked")).map(cb => ({
+            id: cb.value,
+            name: cb.nextSibling.textContent.trim()
+        }));
+        const colors = Array.from(document.querySelectorAll("input[name='mauSacs']:checked")).map(cb => ({
+            id: cb.value,
+            name: cb.nextSibling.textContent.trim()
+        }));
+
+        // Xóa dữ liệu cũ trong bảng
+        const previewTable = document.getElementById("preview-table");
+        previewTable.innerHTML = "";
+
+        // Tạo các dòng dựa trên tổ hợp size và màu sắc
+        let index = 1;
+        sizes.forEach(size => {
+            colors.forEach(color => {
+                const row = document.createElement("tr");
+
+                // Cột STT
+                const sttCell = document.createElement("td");
+                sttCell.textContent = index++;
+                row.appendChild(sttCell);
+
+                // Cột Size
+                const sizeCell = document.createElement("td");
+                sizeCell.textContent = size.name;
+                row.appendChild(sizeCell);
+
+                // Cột Màu Sắc
+                const colorCell = document.createElement("td");
+                colorCell.textContent = color.name;
+                row.appendChild(colorCell);
+
+                // Cột Số lượng
+                const quantityCell = document.createElement("td");
+                const quantityInput = document.createElement("input");
+                quantityInput.type = "number";
+                quantityInput.name = "quantities";
+                quantityInput.min = "1";
+                quantityInput.value = "1"; // Giá trị mặc định
+                quantityInput.classList.add("form-control");
+                quantityCell.appendChild(quantityInput);
+                row.appendChild(quantityCell);
+
+                // Cột Giá bán
+                const priceCell = document.createElement("td");
+                const priceInput = document.createElement("input");
+                priceInput.type = "number";
+                priceInput.name = "prices"; // Gửi danh sách giá bán
+                priceInput.min = "0";
+                priceInput.step = "1"; // Bước tăng/giảm là 1000
+                priceInput.value = "0"; // Giá trị mặc định
+                priceInput.classList.add("form-control");
+                priceCell.appendChild(priceInput);
+                row.appendChild(priceCell);
+
+                // Cột Hành động
+                // const actionCell = document.createElement("td");
+                // const deleteButton = document.createElement("button");
+                // deleteButton.type = "button";
+                // deleteButton.classList.add("btn", "btn-danger");
+                // deleteButton.textContent = "Xóa";
+                // deleteButton.onclick = () => row.remove(); // Xóa dòng hiện tại
+                // actionCell.appendChild(deleteButton);
+                // row.appendChild(actionCell);
+
+                previewTable.appendChild(row);
+            });
+        });
+    }
+
 </script>
 </body>
 </html>

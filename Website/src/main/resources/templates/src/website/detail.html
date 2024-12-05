@@ -14,7 +14,7 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
@@ -61,25 +61,51 @@
             };
             console.log("Dữ liệu sản phẩm:", item);
 
-            fetch('/cart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(item),
+            $.ajax({
+                url : `/cart/${productId}/${mauSac.value}/${size.value}/${soLuong}`,
+                method : "POST",
+                success : function (data) {
+                   showToast("Thêm vào giỏ hàng thành công", "success")
+
+                }
             })
-                .then((response) => {
-                    if (response.ok) {
-                        alert("Sản phẩm đã được lưu vào giỏ hàng!");
-                        window.location.href = "/cart";
-                    } else {
-                        alert("Có lỗi xảy ra khi lưu giỏ hàng!");
-                    }
-                })
-                .catch((error) => {
-                    console.error('Lỗi:', error);
-                    alert("Không thể kết nối đến server!");
-                });
+
+            // fetch('/cart', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(item),
+            // })
+            //     .then((response) => {
+            //         if (response.ok) {
+            //             alert("Sản phẩm đã được lưu vào giỏ hàng!");
+            //             window.location.href = "/cart";
+            //         } else {
+            //             alert("Có lỗi xảy ra khi lưu giỏ hàng!");
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.error('Lỗi:', error);
+            //         alert("Không thể kết nối đến server!");
+            //     });
 
     }
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
+        }
     </script>
 </head>
 
@@ -107,11 +133,7 @@
         </div>
         <div class="d-inline-flex align-items-center">
             <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <button class="dropdown-item" type="button">Sign in</button>
-                    <button class="dropdown-item" type="button">Sign up</button>
-                </div>
+                <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
             </div>
         </div>
     </div>

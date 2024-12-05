@@ -50,12 +50,21 @@
                 </form>
             </div>
             <div class="d-inline-flex align-items-center">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">My Account</button>
+
+                <div class="btn-group" th:if="${user.hoTen != null}">
+                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown" th:text="${user.hoTen}"></button>
                     <div class="dropdown-menu dropdown-menu-right">
                         <button class="dropdown-item" type="button">Sign in</button>
                         <button class="dropdown-item" type="button">Sign up</button>
+                        <button class="dropdown-item" th:onclick="'window.location.href=\'' + @{/khachHang/donhang} + '\''" type="button">Đơn hàng của bạn</button>
                     </div>
+                    <a th:href="@{/logout}" class="nav-item nav-link active">Logout</a>
+                </div>
+                <div class="btn-group" th:if="${user.hoTen == null}">
+
+                <div class="btn-group">
+
+                    <a th:href="@{/login}" class="nav-item nav-link active">Login</a>
                 </div>
             </div>
         </div>
@@ -106,7 +115,6 @@
                         <div class="navbar-nav mr-auto py-0">
                             <a th:href="@{/website}" class="nav-item nav-link active">Home</a>
                             <a th:href="@{/shop}" class="nav-item nav-link">Shop</a>
-                            <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
                                 <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
@@ -114,7 +122,6 @@
                                     <a th:href="@{/checkout}" class="dropdown-item">Checkout</a>
                                 </div>
                             </div>
-                            <a th:href="@{/contact}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
                             <a href="" class="btn px-0">
