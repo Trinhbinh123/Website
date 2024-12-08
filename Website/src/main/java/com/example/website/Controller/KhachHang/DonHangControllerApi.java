@@ -34,7 +34,7 @@ public class DonHangControllerApi {
     public List<HoaDon> checkHDByStatus(@RequestParam String status, Authentication authentication){
         KhachHang khachHang = userService.currentKhachHang(authentication);
         List<HoaDon> hoaDons = hoaDonRepo.findByKhachHang(khachHang);
-        hoaDons = hoaDons.stream().filter(hoaDon -> hoaDon.getTrangThai().trim().equals(status)).toList();
+        hoaDons = hoaDons.stream().filter(hoaDon -> hoaDon.getTrangThai().replace('Ð', 'Đ').equals(status)).toList();
         return hoaDons;
     }
     @GetMapping("/getQuantityStatusOfBill")
@@ -47,15 +47,16 @@ public class DonHangControllerApi {
         int daGiaoHang = 0;
         int donBiHuy = 0;
         int doiTra = 0;
-
+//        item.trangThai = item.trangThai.replace('Ð', 'Đ');
         for(HoaDon hoaDon : hoaDons){
+            String trangThai = hoaDon.getTrangThai().replace('Ð', 'Đ');
             if(hoaDon.getTrangThai().equals("Chờ xác nhận")){
                 choXacNhan++;
             }else if(hoaDon.getTrangThai().equals("Xác nhận")){
                 daXacNhan++;
             }else if(hoaDon.getTrangThai().equals("Ðang giao")){
                 dangGiaoHang++;
-            }else if(hoaDon.getTrangThai().equals("Ðã giao")){
+            }else if(trangThai.equals("Đã giao")){
                 daGiaoHang++;
             }else if(hoaDon.getTrangThai().equals("Đơn bị hủy")){
                 donBiHuy++;
@@ -91,7 +92,14 @@ public class DonHangControllerApi {
     }
 
     @PutMapping("/huydon/{idBill}")
-    public ResponseEntity<?> huyDonHang(@PathVariable Integer idBill, @RequestParam String message, Authentication authentication){
+    public void huyDonHang(@PathVariable Integer idBill, @RequestParam String message, Authentication authentication){
+        HoaDon hoaDon = hoaDonRepo.getReferenceById(idBill);
+        hoaDon.setGhiChu(message + " - Huỷ bởi khách hàng");
+        hoaDon.setTrangThai("Đơn bị hủy");
+        hoaDonRepo.save(hoaDon);
+    }
+    @PutMapping("/doitra/{idBill}")
+    public ResponseEntity<?> doiTra(@PathVariable Integer idBill, @RequestParam String message, Authentication authentication){
         try {
             HoaDon hoaDon = hoaDonRepo.getReferenceById(idBill);
             if (new Date().getTime() - hoaDon.getNgayDatHang().getTime() > 7L * 24 * 60 * 60 * 1000)
