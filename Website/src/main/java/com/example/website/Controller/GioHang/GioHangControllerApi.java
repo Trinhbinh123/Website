@@ -2,7 +2,10 @@ package com.example.website.Controller.GioHang;
 
 import com.example.website.Enity.*;
 import com.example.website.Respository.*;
+import com.example.website.Service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,21 +21,29 @@ public class GioHangControllerApi {
     private final SanPhamRepo sanPhamRepo;
     private final MauSacRepo mauSacRepo;
     private final SizeRepo sizeRepo;
+    private final UserService userService;
 
+    @GetMapping("/cart")
+    public String cart() {
+        return "src/website/cart";
+    }
     @PostMapping("/{idSanPham}/{idMauSac}/{idSize}/{soLuong}")
     public String addToCart(
             @PathVariable Integer idSanPham,
             @PathVariable Integer idMauSac,
             @PathVariable Integer idSize,
-            @PathVariable Integer soLuong
+            @PathVariable Integer soLuong, Authentication authentication
     ){
-        KhachHang khachHang = khachHangRepo.getReferenceById(1); // sau lấy từ authen rồi thế vào
+        if(authentication == null){
+            return "Vui lòng đăng nhập";
+        }
+        KhachHang khachHang = userService.currentKhachHang(authentication); // sau lấy từ authen rồi thế vào
         GioHang gioHang = new GioHang();
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.findBySanPhamAndMauSacAndSize(
                 sanPhamRepo.getReferenceById(idSanPham),
                 mauSacRepo.getReferenceById(idMauSac),
                 sizeRepo.getReferenceById(idSize)).get(0);
-        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
+//        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
 
         gioHang.setKhachHang(khachHang);
         boolean check = false;
@@ -57,8 +68,8 @@ public class GioHangControllerApi {
     }
 
     @GetMapping("/cartPage")
-    public List<GioHang> cartPage(){
-        KhachHang khachHang = khachHangRepo.getReferenceById(1);
+    public List<GioHang> cartPage(Authentication authentication){
+        KhachHang khachHang = userService.currentKhachHang(authentication);
         List<GioHang> gioHangs = gioHangRepo.findByKhachHang(khachHang);
         for(GioHang gioHang : gioHangs){
             SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();

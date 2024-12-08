@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Proxy;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Proxy(lazy = false)
 public class HoaDon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,5 +54,6 @@ public class HoaDon {
     @Column(name = "hinh_thuc")
     private String hinhThuc;
 
-
+    @Column(name = "ghi_chu")
+    private String ghiChu;
 }

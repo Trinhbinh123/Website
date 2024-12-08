@@ -14,7 +14,7 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
@@ -25,21 +25,86 @@
     <!-- Customized Bootstrap Stylesheet -->
     <link th:href="@{../static/src/website/css/style.css}" rel="stylesheet">
     <script defer>
-        function themVaoGioHang(id){
-            const mauSac = document.querySelector('input[name="color"]:checked').value;
-            const size = document.querySelector('input[name="size"]:checked').value;
-            const soLuong = document.getElementById("soLuong").value;
+        function addToCart() {
+        const productId = document.getElementById("product-id").value;
+            const tenSanPham = document.getElementById("tenSanPham").textContent;
+            const mauSac = document.querySelector('input[name="color"]:checked');
+            const tenMauSac = mauSac ? (mauSac.dataset.colorName || mauSac.value) : null;
+
+// Lấy kích thước đã chọn
+             const size = document.querySelector('input[name="size"]:checked');
+            const tenSize = size ? (size.dataset.sizeName || size.value) : null; // Lấy kích thước
+        const soLuong = document.getElementById("soLuong").value;           // Lấy số lượng
+        const price = document.getElementById("product-price").textContent.replace(" VND", ""); // Lấy giá bán
+
+        // Kiểm tra dữ liệu đầu vào
+        if (!mauSac || !size) {
+            alert("Vui lòng chọn màu sắc và kích thước.");
+            return;
+        }
+        if (!soLuong || isNaN(soLuong) || soLuong <= 0) {
+            alert("Vui lòng nhập số lượng hợp lệ.");
+            return;
+        }
+
+        // Dữ liệu sản phẩm
+            const item = {
+                id: `${productId}-${mauSac.value}-${size.value}`, // Tạo ID duy nhất
+                sanPhamChiTiet: {
+                    sanPham: { tensanpham: tenSanPham },
+                    mauSac: { tenmausac: tenMauSac },
+                    size: { ten_size: tenSize},
+                    gia_ban: price,
+                },
+                soLuong: soLuong,
+                tongTien: price * soLuong,
+            };
+            console.log("Dữ liệu sản phẩm:", item);
 
             $.ajax({
-                url : `/cart/${id}/${mauSac}/${size}/${soLuong}`,
+                url : `/cart/${productId}/${mauSac.value}/${size.value}/${soLuong}`,
                 method : "POST",
-                success : function (message){
-                    console.log("thanh cong")
-                },
-                error : function (error){
-                    console.log(error);
+                success : function (data) {
+                   showToast("Thêm vào giỏ hàng thành công", "success")
+
                 }
             })
+
+            // fetch('/cart', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify(item),
+            // })
+            //     .then((response) => {
+            //         if (response.ok) {
+            //             alert("Sản phẩm đã được lưu vào giỏ hàng!");
+            //             window.location.href = "/cart";
+            //         } else {
+            //             alert("Có lỗi xảy ra khi lưu giỏ hàng!");
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.error('Lỗi:', error);
+            //         alert("Không thể kết nối đến server!");
+            //     });
+
+    }
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
         }
     </script>
 </head>
@@ -163,22 +228,13 @@
 
 
 <!-- Shop Detail Start -->
-<div class="container-fluid pb-5">
+<div class="container-fluid pb-5" >
     <div class="row px-xl-5">
         <div class="col-lg-5 mb-30">
             <div id="product-carousel" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner bg-light">
                     <div class="carousel-item active">
-                        <img class="w-100 h-100" src="img/product-1.jpg" alt="Image">
-                    </div>
-                    <div class="carousel-item">
-                        <img class="w-100 h-100" src="img/product-2.jpg" alt="Image">
-                    </div>
-                    <div class="carousel-item">
-                        <img class="w-100 h-100" src="img/product-3.jpg" alt="Image">
-                    </div>
-                    <div class="carousel-item">
-                        <img class="w-100 h-100" src="img/product-4.jpg" alt="Image">
+                        <img class="w-100 h-100" th:src="${sanPham.getUrl_anh()}" alt="Image">
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#product-carousel" data-slide="prev">
@@ -190,9 +246,9 @@
             </div>
         </div>
 
-        <div class="col-lg-7 h-auto mb-30">
-            <div class="h-100 bg-light p-30">
-                <h3 th:text="${sanPham.tensanpham}"></h3>
+        <div class="col-lg-7 h-auto mb-30"  >
+            <div class="h-100 bg-light p-30" >
+                <h3 id="tenSanPham" th:text="${sanPham.tensanpham}">(<span th:text="${sanPham.loaiDe.tenloaide}"></span>,<span th:text="${sanPham.chatLieu.tenchatlieu}"></span>)</h3>
                 <div class="d-flex mb-3">
                     <div class="text-primary mr-2">
                         <small class="fas fa-star"></small>
@@ -203,27 +259,63 @@
                     </div>
                     <small class="pt-1">(99 Reviews)</small>
                 </div>
-                <h3 class="font-weight-semi-bold mb-4" th:text="${sanPham.giaban}"></h3>
+
                 <p class="mb-4">Volup erat ipsum diam elitr rebum et dolor. Est nonumy elitr erat diam stet sit
                     clita ea. Sanc ipsum et, labore clita lorem magna duo dolor no sea
                     Nonumy</p>
+
                 <div class="d-flex mb-3">
                     <strong class="text-dark mr-3">Sizes:</strong>
                     <form>
-                        <div th:each="list : ${sizes}" class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" th:value="${list.id}" th:id="${'s' + list.id}" name="size">
-                            <label class="custom-control-label" th:for="${'s' + list.id}" th:text="${list.ten_size}">XS</label>
+                        <div  class="custom-control custom-radio custom-control-inline" th:each="list : ${sizes}">
+                            <input type="radio" class="custom-control-input " th:id="${'m' + list.id}" th:value="${list.id}" name="size" onchange="updatePrice(this)">
+                            <label class="custom-control-label" th:for="${'m' + list.id}" th:text="${list.ten_size}"></label>
                         </div>
                     </form>
+                    <script>
+                        function updatePrice(sizeRadio) {
+                            const sizeId = sizeRadio.value; // ID của kích thước được chọn
+                            const productId = document.getElementById('product-id').value; // ID sản phẩm
+                            console.log(`Fetching price for productId=${productId} and sizeId=${sizeId}`);
+
+                            // Gửi yêu cầu đến API
+                            fetch(`/get-price?idSanPham=${productId}&sizeId=${sizeId}`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error("Không thể lấy giá sản phẩm");
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    console.log("Dữ liệu nhận được từ API:", data);
+                                    const priceElement = document.getElementById('product-price');
+                                    if (data && data.gia_ban !== undefined) {
+                                        if (priceElement) {
+                                            priceElement.textContent = data.gia_ban + " VND";
+                                        }
+                                    } else {
+                                        console.error("Trường 'gia_ban' không tồn tại trong dữ liệu trả về:", data);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error fetching price:", error);
+                                });
+                        }
+                    </script>
                 </div>
                 <div class="d-flex mb-4">
                     <strong class="text-dark mr-3">Colors:</strong>
-                    <form>
-                        <div th:each="list : ${mauSacs}" class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" th:id="${'m' + list.id}" th:value="${list.id}" name="color">
-                            <label class="custom-control-label" th:for="${'m' + list.id}" th:text="${list.tenmausac}"></label>
+                    <form >
+                        <div class="custom-control custom-radio custom-control-inline" th:each="list : ${mauSacs}">
+                            <input type="radio" class="custom-control-input" th:id="${'s' + list.id}" th:value="${list.id}" name="color">
+                            <label class="custom-control-label" th:for="${'s' + list.id}" th:text="${list.tenmausac}"></label>
                         </div>
                     </form>
+                </div>
+                <input type="hidden" id="product-id" th:value="${sanPham.id}">
+                <div th:each="giaMacDinh : ${giaMacDinh}">
+                    <h6>Thanh toán:</h6>
+                    <h3 id="product-price" class="font-weight-semi-bold mb-4" style="color: red" th:text="${giaMacDinh} + ' VND'"></h3>
                 </div>
                 <div class="d-flex align-items-center mb-4 pt-2">
                     <div class="input-group quantity mr-3" style="width: 130px;">
@@ -239,7 +331,7 @@
                             </button>
                         </div>
                     </div>
-                    <button th:onclick="'themVaoGioHang(' + ${sanPham.id} + ')'" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To
+                    <button th:onclick="addToCart()" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To
                         Cart</button>
                 </div>
                 <div class="d-flex pt-2">

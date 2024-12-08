@@ -4,6 +4,7 @@ import com.example.website.Enity.Ad;
 import com.example.website.Enity.KhachHang;
 import com.example.website.Respository.AdminRepository;
 import com.example.website.Respository.KhachHangRepo;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -35,19 +36,22 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .roles("ADMIN") // Gán quyền ADMIN
                     .build();
         }
-
         // Tìm khách hàng theo email
         KhachHang khachHang = khachHangRepository.findByEmail(username);
+        System.out.println(khachHang);
         if (khachHang != null) {
-            return User.builder()
-                    .username(khachHang.getEmail())
-                    .password(khachHang.getMatKhau()) // Mật khẩu plaintext từ cơ sở dữ liệu
-                    .roles("USER") // Gán quyền USER
-                    .build();
+            if(khachHang.getTrangThai().equals("Đang hoạt động")){
+                return User.builder()
+                        .username(khachHang.getEmail())
+                        .password(khachHang.getMatKhau()) // Mật khẩu plaintext từ cơ sở dữ liệu
+                        .roles("USER") // Gán quyền USER
+                        .build();
+            }else {
+                throw new UsernameNotFoundException("Tài khoản đã bik khoá: " + username);
+            }
         }
 
         throw new UsernameNotFoundException("Không tìm thấy tài khoản với email: " + username);
     }
-
 
 }

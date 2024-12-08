@@ -33,6 +33,8 @@ public class SanPhamChiTiet {
     Integer so_luong;
     @Column(name="gia_nhap")
     Double gia_nhap;
+    @Column(name="anh_spct")
+    Double anh_spct;
     @Column(name="gia_ban")
     Double gia_ban;
     @Column(name = "ngay_nhap")
@@ -44,5 +46,8 @@ public class SanPhamChiTiet {
     @JsonIgnore
     @JoinColumn(name = "id_san_pham_khuyen_mai")
     private KhuyenMaiChiTiet khuyenMaiChiTiet;
+
+    @Column(name = "anh_spct", insertable = false, updatable = false)
+    private String anotherField;
 
 }

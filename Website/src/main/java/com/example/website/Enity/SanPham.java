@@ -3,6 +3,8 @@ package com.example.website.Enity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -33,5 +35,4 @@ public class SanPham {
     @Column(name="gia_ban")
     Double giaban;
     String url_anh;
-
 }
