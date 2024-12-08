@@ -3,27 +3,362 @@
 <head th:replace="~{src/partials/_head :: _head}"></head>
 <body>
 <div class="container-scroller">
-    <!--_navbar -->
-    <div th:replace="~{src/partials/_navbar :: _navbar}">
-    </div>
-    <!-- _navbar -->
+
+    <!-- Navbar -->
+    <div th:replace="~{src/partials/_navbar :: _navbar}"></div>
+
     <div class="container-fluid page-body-wrapper">
-        <!--_sidebar-->
+        <!-- Sidebar -->
         <div th:replace="~{src/partials/_sidebar :: _sidebar}"></div>
-        <!--_sidebar-->
+
         <div class="main-panel">
-            <!-- header : phần này là ghi code listAll-->
             <div class="content-wrapper">
-                <h1>hóa đơn</h1>
-                <!-- header-->
+                <h3 class="fw-bold fs-4 mb-3">Hóa đơn</h3>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" id="hoaDonTab" role="tablist">
+                    <!-- Tab Danh sách hóa đơn -->
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="danh-sach-tab" data-bs-toggle="tab" 
+                                data-bs-target="#danh-sach" type="button" role="tab" aria-controls="danh-sach" 
+                                aria-selected="true">
+                            Danh sách hóa đơn
+                        </button>
+                    </li>
+                    <!-- Tab Hóa đơn -->
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="hoa-don-tab" data-bs-toggle="tab" 
+                                data-bs-target="#hoa-don" type="button" role="tab" aria-controls="hoa-don" 
+                                aria-selected="false">
+                            Hóa đơn
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab nội dung -->
+                <div class="tab-content" id="hoaDonTabContent">
+                    <!-- Nội dung Tab Danh sách hóa đơn -->
+                    <div class="tab-pane fade show active" id="danh-sach" role="tabpanel" 
+                         aria-labelledby="danh-sach-tab">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-bordered" id="multi-filter-select">
+                                <thead class="table-dark">
+                                <tr>
+                                    <th>Mã đơn hàng</th>
+                                    <th>Khách hàng</th>
+                                    <th>Ngày đặt hàng</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Hình thức thanh toán</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="dh : ${danhSachHoaDon}">
+                                    <td>
+                                        <a th:href="@{/hoadon/detail(idDonHang=${dh.id})}" th:text="${dh.maDonHang}"></a>
+                                    </td>
+                                    <td th:text="${dh.tenKhachHang}"></td>
+                                    <td th:text="${#dates.format(dh.ngayDatHang, 'dd-MM-yyyy')}"></td>
+                                    <td th:text="${dh.tongTien}"></td>
+                                    <td th:text="${dh.hinhThuc}"></td>
+                                    <td th:text="${dh.trangThai}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Nội dung Tab Hóa đơn -->
+                    <div class="tab-pane fade" id="hoa-don" role="tabpanel" aria-labelledby="hoa-don-tab">
+                        <form id="invoiceForm">
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-primary" id="btnChonSanPham" data-bs-toggle="modal"
+                                        data-bs-target="#popupChonSanPham">
+                                    Chọn sản phẩm
+                                </button>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tongTien" class="form-label">Tổng tiền</label>
+                                <input disabled type="number" class="form-control" id="tongTien" name="tongTien" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="hinhThuc" class="form-label">Hình thức thanh toán</label>
+                                <select class="form-select" id="hinhthucthanhtoan" name="hinhthucthanhtoan" required>
+                                    <option value="Thanh toán khi nhận hàng">Thanh toán khi nhận hàng</option>
+                                    <option value="Thanh toán bằng VN Pay">Thanh toán bằng VN Pay</option>
+                                </select>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="invoiceTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng</th>
+                                        <th>Màu sắc</th>
+                                        <th>Size</th>
+                                        <th>Tổng tiền</th>
+                                        <th>ID CTSP</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- Dữ liệu sản phẩm sẽ được thêm tại đây -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="hdctInputs" style="display: none;">
+                                <!-- Hidden inputs for each product -->
+                            </div>
+                            <button type="submit" class="btn btn-success">Lưu</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <!--footer-->
-            <div th:replace="~{src/partials/_footer :: _footer}"></div>
-            <!--footer-->
         </div>
+        <!-- Footer -->
+        <div th:replace="~{src/partials/_footer :: _footer}"></div>
     </div>
+
+    <!-- Popup Chọn Sản Phẩm -->
+    <div class="modal fade" id="popupChonSanPham" tabindex="-1" aria-labelledby="productModalLabel"
+    aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+       <div class="modal-content">
+           <div class="modal-header">
+               <h5 class="modal-title" id="productModalLabel">Chọn sản phẩm</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+           </div>
+           <div class="modal-body">
+               <div class="table-responsive">
+                   <table class="table table-bordered">
+                       <thead>
+                       <tr>
+                           <th>Chọn</th>
+                           <th>Tên sản phẩm</th>
+                           <th>Giá</th>
+                           <th>Màu sắc</th>
+                           <th>Size</th>
+                           <th>ID CTSP</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr th:each="sp : ${sanPhamOffices}">
+                           <td>
+                               <input type="checkbox" class="product-checkbox"
+                                      th:data-tensanpham="${sp.tensanpham}"
+                                      th:data-gia="${sp.gia}"
+                                      th:data-tenmausac="${sp.tenmausac}"
+                                      th:data-tensize="${sp.tensize}"
+                                      th:data-idchitietsanpham="${sp.idchitietsanpham}">
+                           </td>
+                           <td th:text="${sp.tensanpham}"></td>
+                           <td th:text="${sp.gia}"></td>
+                           <td th:text="${sp.tenmausac}"></td>
+                           <td th:text="${sp.tensize}"></td>
+                           <td th:text="${sp.idchitietsanpham}"></td>
+                       </tr>
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-primary" id="btn-select-products">Chọn</button>
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+           </div>
+       </div>
+   </div>
 </div>
-<!--script -->
-<div th:replace="~{src/partials/_script :: _script}"></div>
+<script>
+    document.getElementById("invoiceForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Ngừng gửi form để sử dụng AJAX
+
+        // Tạo mảng hdct chứa các sản phẩm
+        const hdctData = []; // Mảng lưu trữ tất cả các sản phẩm
+
+        const rows = document.querySelectorAll("#invoiceTable tbody tr");
+        
+        rows.forEach(row => {
+            const idchitietsanpham = parseInt(row.querySelector("td:nth-child(7)").textContent);
+            const quantity = parseInt(row.querySelector(".quantity").value);
+            const price = parseInt(row.querySelector("td:nth-child(2)").textContent);
+
+            // Thêm sản phẩm vào mảng
+            hdctData.push({
+                idchitietsanpham,
+                soluong: quantity,
+                dongia: price
+            });
+        });
+
+        // Tạo đối tượng JSON để gửi
+        const payload = {
+            hinhthucthanhtoan: document.getElementById("hinhthucthanhtoan").value, // Lấy giá trị từ select
+            tongtien: document.getElementById("tongTien").value, // Lấy giá trị từ select
+            hdct: hdctData // Mảng các sản phẩm
+        };
+
+        // Gửi yêu cầu AJAX (dùng fetch)
+        fetch("/hoadon/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json", // Đặt header là JSON
+            },
+            body: JSON.stringify(payload), // Chuyển đối tượng JavaScript thành chuỗi JSON
+        })
+        .then(response => {
+            console.log({response})
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    console.error('Error:', errorData);
+                    alert("Lỗi: " + errorData.message);
+                });
+            }
+        })
+        .then(data => {
+            // Xử lý kết quả trả về từ server (nếu có)
+            console.log("Success:", data);
+            alert("Hóa đơn đã được lưu!");
+            updateDanhSachHoaDon();
+            // Bạn có thể chuyển hướng hoặc làm gì đó sau khi lưu thành công
+        })
+        .catch(error => {
+            console.error('Request failed', error);
+            alert("Có lỗi xảy ra, vui lòng thử lại!");
+        });
+    });
+
+    function updateDanhSachHoaDon() {
+    fetch("/hoadon/fetch")
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector("#multi-filter-select tbody");
+            tbody.innerHTML = ""; // Xóa nội dung cũ
+            data.forEach(dh => {
+                const row = `
+                    <tr>
+                        <td><a href="/hoadon/detail?idDonHang=${dh.id}">${dh.maDonHang}</a></td>
+                        <td>${dh.tenKhachHang}</td>
+                        <td>${new Date(dh.ngayDatHang).toLocaleDateString('vi-VN')}</td>
+                        <td>${dh.tongTien}</td>
+                        <td>${dh.hinhThuc}</td>
+                        <td>${dh.trangThai}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML("beforeend", row);
+            });
+        })
+        .catch(error => {
+            console.error("Error updating danh sách hóa đơn:", error);
+            alert("Không thể cập nhật danh sách hóa đơn!");
+        });
+}
+
+
+    // Xử lý khi nhấn nút "Chọn" trong popup
+    document.getElementById("btn-select-products").addEventListener("click", function () {
+        const selectedProducts = document.querySelectorAll(".product-checkbox:checked");
+        selectedProducts.forEach(product => {
+            console.log({'product.dataset': product.dataset})
+            const tensanpham = product.dataset.tensanpham;
+            const gia = parseFloat(product.dataset.gia);
+            const tenmausac = product.dataset.tenmausac;
+            const tensize = product.dataset.tensize;
+            const idchitietsanpham = product.dataset.idchitietsanpham;
+
+            // Kiểm tra sản phẩm đã tồn tại trong bảng chưa
+            const existingRow = Array.from(document.querySelectorAll("#invoiceTable tbody tr"))
+                .find(row => 
+                    row.querySelector("td:nth-child(1)").textContent === tensanpham &&
+                    row.querySelector("td:nth-child(4)").textContent === tenmausac &&
+                    row.querySelector("td:nth-child(5)").textContent === tensize
+                );
+
+            if (existingRow) {
+                // Nếu sản phẩm đã tồn tại, tăng số lượng thêm 1
+                const quantityInput = existingRow.querySelector(".quantity");
+                const newQuantity = parseInt(quantityInput.value) + 1;
+                quantityInput.value = newQuantity;
+
+                // Cập nhật tổng tiền của sản phẩm
+                const totalPriceCell = existingRow.querySelector(".total-price");
+                const newTotal = gia * newQuantity;
+                totalPriceCell.textContent = newTotal.toFixed(2);
+            } else {
+                // Nếu sản phẩm chưa tồn tại, thêm mới vào bảng
+                const newRow = `
+                    <tr>
+                        <td>${tensanpham}</td>
+                        <td>${gia.toFixed(2)}</td>
+                        <td>
+                            <input type="number" class="form-control quantity" value="1" min="1" data-price="${gia}">
+                        </td>
+                        <td>${tenmausac}</td>
+                        <td>${tensize}</td>
+                        <td class="total-price">${gia.toFixed(2)}</td>
+                        <td>${idchitietsanpham}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-delete-product">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+                document.querySelector("#invoiceTable tbody").insertAdjacentHTML("beforeend", newRow);
+            }
+        });
+
+        // Ẩn popup sau khi chọn sản phẩm
+        const productModal = bootstrap.Modal.getInstance(document.getElementById("popupChonSanPham"));
+        productModal.hide();
+
+        // Cập nhật tổng tiền
+        updateTotal();
+    });
+
+    // Cập nhật tổng tiền khi thay đổi số lượng
+    document.addEventListener("input", function (event) {
+        if (event.target.classList.contains("quantity")) {
+            const row = event.target.closest("tr");
+            const price = parseFloat(row.querySelector("td:nth-child(2)").textContent);
+            const quantity = parseInt(event.target.value);
+            const totalPrice = price * quantity;
+
+            row.querySelector(".total-price").textContent = totalPrice.toFixed(2);
+            updateTotal();
+        }
+    });
+
+    // Xử lý khi nhấn nút "Xóa" sản phẩm
+    document.addEventListener("click", function (event) {
+        if (event.target.classList.contains("btn-delete-product")) {
+            const row = event.target.closest("tr");
+            row.remove();
+            updateTotal();
+        }
+    });
+
+    // Xóa tất cả checkbox khi mở popup chọn sản phẩm
+    document.getElementById("popupChonSanPham").addEventListener("show.bs.modal", function () {
+        const checkboxes = document.querySelectorAll(".product-checkbox");
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    });
+
+    // Hàm cập nhật tổng tiền
+    function updateTotal() {
+        let total = 0;
+        const rows = document.querySelectorAll(`#invoiceTable tbody tr`);
+        rows.forEach(row => {
+            const rowTotal = parseFloat(row.querySelector(".total-price").textContent);
+            total += rowTotal;
+        });
+        document.getElementById(`tongTien`).value = total.toFixed(0); // Cập nhật tổng tiền vào ô nhập tổng tiền
+    }
+</script>
+
+
+    <!-- Scripts -->
+    <div th:replace="~{src/partials/_script :: _script}"></div>
 </body>
 </html>
