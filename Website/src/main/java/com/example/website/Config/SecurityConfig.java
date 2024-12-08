@@ -91,41 +91,41 @@ public class SecurityConfig {
 //                        .permitAll()
 //                );
 //        return http.build();
-        http.csrf().disable() // Tắt CSRF protection (không khuyến khích cho môi trường sản xuất)
-                .authorizeRequests()
-                // Chỉ cho phép admin truy cập các endpoint bắt đầu bằng /admin/**
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                // Yêu cầu đăng nhập với các endpoint liên quan đến giỏ hàng
-                .requestMatchers("/cart").authenticated()
-                // Cho phép tất cả người dùng truy cập các endpoint liên quan đến website và chi tiết sản phẩm
-                .requestMatchers("/website", "/detail/**","http://www.thymeleaf.org","img/favicon.ico","/static/src/website/lib/animate/animate.min.css","/static/src/website/lib/owlcarousel/assets/owl.carousel.min.css","/static/src/website/css/style.css","https://fonts.gstatic.com","/static/src/website/js/main.js","/static/src/website/mail/contact.js","/static/src/website/mail/jqBootstrapValidation.min.js","/static/src/website/lib/owlcarousel/owl.carousel.min.js","/static/src/website/lib/easing/easing.min.js","https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js","https://code.jquery.com/jquery-3.4.1.min.js").permitAll()
-                // Cho phép không cần đăng nhập với các trang login và register
-                .requestMatchers("/login", "/register").permitAll()
-                // Yêu cầu đăng nhập cho tất cả các yêu cầu khác
-                .anyRequest().authenticated()
-                .and()
-                // Cấu hình trang đăng nhập
-                .formLogin(form -> form
-                        .loginPage("/login") // Đường dẫn đến trang login tùy chỉnh
-                        .usernameParameter("email") // Tên tham số cho trường email trong form đăng nhập
-                        .passwordParameter("matKhau") // Tên tham số cho trường mật khẩu trong form đăng nhập
-                        .defaultSuccessUrl("/website", true) // Trang đích sau khi đăng nhập thành công
-                        .failureUrl("/login?error") // Đường dẫn khi đăng nhập thất bại
-                        .permitAll() // Cho phép tất cả người dùng truy cập trang đăng nhập
-                        .successHandler((request, response, authentication) -> {
-                            // Kiểm tra quyền của người dùng sau khi đăng nhập thành công
-                            if (authentication.getAuthorities().stream()
-                                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
-                                // Nếu người dùng là admin, chuyển hướng đến trang dành cho admin
-                                response.sendRedirect("/admin");
-                            } else {
-                                // Nếu không phải admin, chuyển đến trang mặc định
-                                response.sendRedirect("/website");
-                            }
-                        })
-                );
-        // Trả về cấu hình SecurityFilterChain
-        return http.build();
+//        http.csrf().disable() // Tắt CSRF protection (không khuyến khích cho môi trường sản xuất)
+//                .authorizeRequests()
+//                // Chỉ cho phép admin truy cập các endpoint bắt đầu bằng /admin/**
+//                .requestMatchers("/admin/**").hasRole("ADMIN")
+//                // Yêu cầu đăng nhập với các endpoint liên quan đến giỏ hàng
+//                .requestMatchers("/cart").authenticated()
+//                // Cho phép tất cả người dùng truy cập các endpoint liên quan đến website và chi tiết sản phẩm
+//                .requestMatchers("/website", "/detail/**","http://www.thymeleaf.org","img/favicon.ico","/static/src/website/lib/animate/animate.min.css","/static/src/website/lib/owlcarousel/assets/owl.carousel.min.css","/static/src/website/css/style.css","https://fonts.gstatic.com","/static/src/website/js/main.js","/static/src/website/mail/contact.js","/static/src/website/mail/jqBootstrapValidation.min.js","/static/src/website/lib/owlcarousel/owl.carousel.min.js","/static/src/website/lib/easing/easing.min.js","https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js","https://code.jquery.com/jquery-3.4.1.min.js").permitAll()
+//                // Cho phép không cần đăng nhập với các trang login và register
+//                .requestMatchers("/login", "/register").permitAll()
+//                // Yêu cầu đăng nhập cho tất cả các yêu cầu khác
+//                .anyRequest().authenticated()
+//                .and()
+//                // Cấu hình trang đăng nhập
+//                .formLogin(form -> form
+//                        .loginPage("/login") // Đường dẫn đến trang login tùy chỉnh
+//                        .usernameParameter("email") // Tên tham số cho trường email trong form đăng nhập
+//                        .passwordParameter("matKhau") // Tên tham số cho trường mật khẩu trong form đăng nhập
+//                        .defaultSuccessUrl("/website", true) // Trang đích sau khi đăng nhập thành công
+//                        .failureUrl("/login?error") // Đường dẫn khi đăng nhập thất bại
+//                        .permitAll() // Cho phép tất cả người dùng truy cập trang đăng nhập
+//                        .successHandler((request, response, authentication) -> {
+//                            // Kiểm tra quyền của người dùng sau khi đăng nhập thành công
+//                            if (authentication.getAuthorities().stream()
+//                                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"))) {
+//                                // Nếu người dùng là admin, chuyển hướng đến trang dành cho admin
+//                                response.sendRedirect("/admin");
+//                            } else {
+//                                // Nếu không phải admin, chuyển đến trang mặc định
+//                                response.sendRedirect("/website");
+//                            }
+//                        })
+//                );
+//        // Trả về cấu hình SecurityFilterChain
+//        return http.build();
     }
 
 }
