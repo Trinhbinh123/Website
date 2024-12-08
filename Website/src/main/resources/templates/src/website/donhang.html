@@ -52,7 +52,11 @@
                 }
             })
         }
+        function normalizeText(text) {
+            return text.normalize('NFC'); // Sử dụng Normalization Form C để chuẩn hóa Unicode
+        }
         function renderBill(status){
+            status = status.replace(/Ð/g, 'Đ');
             $.ajax({
                 url : "/khachHang/checkBillByStatus?status=" + status,
                 method : "GET",
@@ -68,9 +72,21 @@
                         imgRow.append(rowImg);
 
                         const btnHuy = document.getElementById("btn-huy-"+ item.id);
+                        const btnDoiTra = document.getElementById("btn-doitra-"+ item.id);
                         console.log(item)
-                        if(item.trangThai === "Ðã giao"){
-                            btnHuy.style.display = "inline";
+                        item.trangThai = item.trangThai.replace(/Ð/g, 'Đ');
+
+                        console.log({
+                            trangthai: item.trangThai,
+                            temTrangThai: item.trangThai,
+                            input: "Ðã giao",
+                            compare: item.trangThai=== "Đã giao"
+                        });
+                        if(item.trangThai=== "Đã giao"){
+                            btnDoiTra.style.display = "inline";
+                        }
+                        if(item.trangThai === "Đang giao" || item.trangThai=== "Đã giao" || item.trangThai === "Đơn bị hủy"){
+                            btnHuy.style.display = 'none';
                         }
                     })
 
@@ -89,7 +105,8 @@
                     <button class="btn rounded-pill btn-outline-warning" type="button" data-bs-toggle="offcanvas"
                             data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onclick="renderBillDetail(${item.id})">Xem chi tiết
                     </button>
-                    <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="btn-huy-${item.id}" style="display: none" onclick="idBill(${item.id})">Đổi trả</button>
+                    <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="btn-huy-${item.id}" onclick="idBill(${item.id})">Huỷ</button>
+                    <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doitraModal" id="btn-doitra-${item.id}" style="display: none" onclick="idBillDoiTra(${item.id})">Đổi trả</button>
                 </td>`;
             return row;
         }
@@ -155,12 +172,30 @@
                 btnHuyDon.disabled = false
             }
         }
+        let idDoiTra = 0;
+        function idBillDoiTra(idBill){
+            idDoiTra = idBill;
+            const description = document.getElementById("descriptionDt");
+            const btnDoiTra = document.getElementById("btn-doitra");
+            if(description.value === ""){
+                btnDoiTra.disabled = true;
+            }else {
+                btnDoiTra.disabled = false
+            }
+        }
 
         function chooseReason(status){
             const description = document.getElementById("description");
             const btnHuyDon = document.getElementById("btn-huydon");
             description.value = status;
             btnHuyDon.disabled = false;
+        }
+
+        function chooseReasonDT(status){
+            const description = document.getElementById("descriptionDT");
+            const btnDT = document.getElementById("btn-doitra");
+            description.value = status;
+            btnDT.disabled = false;
         }
 
         function huydon(){
@@ -170,6 +205,24 @@
                 method : "PUT",
                 success : function (){
                     const row = document.getElementById(id);
+                    row.remove();
+                    renderStatusBill();
+                    showToast("Huỷ đơn thành công", "success");
+                },
+                error: function (xhr) {
+                    // Extract error message from the response
+                    const errorMessage = xhr.responseText || "Có lỗi xảy ra, vui lòng thử lại!";
+                    showToast(errorMessage, "error");
+                }
+            })
+        }
+        function doitra(){
+            const description = document.getElementById("descriptionDT").value;
+            $.ajax({
+                url : "/khachHang/doitra/" + idDoiTra + "?message=" + description,
+                method : "PUT",
+                success : function (){
+                    const row = document.getElementById(idDoiTra);
                     row.remove();
                     renderStatusBill();
                     showToast("Đổi trả thành công", "success");
@@ -336,7 +389,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lý do đổi trả</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lý do huỷ</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
@@ -352,6 +405,30 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="btn-huydon" data-bs-dismiss="modal" onclick="huydon()">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="doitraModal" tabindex="-1" aria-labelledby="doitraModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="doitraModalLabel">Lý do đổi trả</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="descriptionDT" aria-label="Text input with dropdown button" readonly>
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Lí do đổi trả</button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Chọn nhầm size hoặc màu')">Chọn nhầm size hoặc màu</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Muốn thay đổi địa chỉ mua hàng')">Muốn thay đổi địa chỉ mua hàng</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Không muốn mua nữa')">Không muốn mua nữa</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-doitra" data-bs-dismiss="modal" onclick="doitra()">Xác nhận</button>
                     </div>
                 </div>
             </div>
