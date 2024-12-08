@@ -47,6 +47,7 @@ public class SanPhamChiTiet {
     @JoinColumn(name = "id_san_pham_khuyen_mai")
     private KhuyenMaiChiTiet khuyenMaiChiTiet;
 
-    @Column(name = "anh_spct")
-    private String anh_spct;
+    @Column(name = "anh_spct", insertable = false, updatable = false)
+    private String anotherField;
+
 }

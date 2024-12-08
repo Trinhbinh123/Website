@@ -86,7 +86,7 @@ public class DonHangControllerApi {
         List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietRepo.findByHoaDon(hoaDon);
         List<String> strings = new ArrayList<>();
         for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTiets){
-            strings.add(hoaDonChiTiet.getSanPhamChiTiet().getAnh_spct());
+            strings.add(String.valueOf(hoaDonChiTiet.getSanPhamChiTiet().getAnh_spct()));
         }
         return strings;
     }
