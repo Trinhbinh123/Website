@@ -5,6 +5,7 @@
     import com.example.website.Enity.MauSac;
     import com.example.website.Respository.BinhLuanRepo;
     import lombok.RequiredArgsConstructor;
+    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.data.domain.Page;
     import org.springframework.data.domain.PageRequest;
     import org.springframework.data.domain.Pageable;
@@ -22,7 +23,7 @@
     @Controller
     @RequiredArgsConstructor
     public class BinhLuanController {
-
+        @Autowired
         private final BinhLuanRepo binhLuanRepo;
 
         @GetMapping("/admin/binhluan")

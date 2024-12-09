@@ -31,6 +31,7 @@ public class BinhLuan {
 
     @Column(name = "danh_gia")
     private Integer danhGia;
+
     @Column(name = "ngay_binh_luan")
     private LocalDate ngayBinhLuan;
 }
