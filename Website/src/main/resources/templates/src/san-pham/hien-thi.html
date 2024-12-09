@@ -30,7 +30,6 @@
                                 <th>Thương hiệu</th>
                                 <th>Loại Đế</th>
                                 <th>Chất Liệu</th>
-<!--                                <th>Giá bán</th>-->
                                 <th>Ảnh</th>
                                 <th>Trạng thái</th>
                                 <th>Hành động</th>
@@ -44,7 +43,6 @@
                                 <td th:text="${sp.thuongHieu.tenThuongHieu}"></td>
                                 <td th:text="${sp.loaiDe != null ? sp.loaiDe.tenloaide : 'N/A'}"></td>
                                 <td th:text="${sp.chatLieu != null ? sp.chatLieu.tenchatlieu : 'N/A'}"></td>
-<!--                                <td th:text="${sp.giaban}"></td>-->
                                 <td>
                                     <img th:src="${sp.url_anh}" alt="Ảnh sản phẩm" style="max-width: 50px; max-height: 50px;"/>
                                 </td>

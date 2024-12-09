@@ -43,10 +43,9 @@ public class SanPhamController {
         model.addAttribute("listSize", sizeRepo.findAll());
         model.addAttribute("listMauSac", mauSacRepo.findAll());
         model.addAttribute("listSanPhamChiTiet", sanPhamChiTietRepo.findAll());
-        // Tạo mã sản phẩm mới (mã SP tự động tăng)
-        String maSanPhamMoi = "SP" + String.format("%03d", sanPhamRepo.count() + 1);  // Giả sử mã sản phẩm tăng dần từ 001
+        String maSanPhamMoi = "SP" + String.format("%03d", sanPhamRepo.count() + 1);
         model.addAttribute("maSanPhamMoi", maSanPhamMoi);
-        return "src/san-pham/AddSanPham"; // Template thêm sản phẩm
+        return "src/san-pham/AddSanPham";
     }
 
     @PostMapping("/san-pham/delete")
@@ -56,7 +55,7 @@ public class SanPhamController {
             sanPham.setTrangthai(false); // Đặt trạng thái thành Inactive
             sanPhamRepo.save(sanPham); // Lưu thay đổi
         }
-        return "redirect:/admin/san-pham"; // Quay về danh sách sau khi xóa
+        return "redirect:/admin/san-pham";
     }
 
     @GetMapping("/san-pham/update")
