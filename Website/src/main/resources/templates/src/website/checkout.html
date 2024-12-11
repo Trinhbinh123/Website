@@ -315,15 +315,15 @@
                     <div class="navbar-nav mr-auto py-0">
                         <a th:href="@{/website}" class="nav-item nav-link active">Home</a>
                         <a th:href="@{/shop}" class="nav-item nav-link">Shop</a>
-                        <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a>
+                        <!-- <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a> -->
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
                             <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
                                 <a th:href="@{/cart}" class="dropdown-item">Shopping Cart</a>
-                                <a th:href="@{/checkout}" class="dropdown-item">Checkout</a>
+                                <!-- <a th:href="@{/checkout}" class="dropdown-item">Checkout</a> -->
                             </div>
                         </div>
-                        <a th:href="@{/contact}" class="nav-item nav-link">Contact</a>
+                        <!-- <a th:href="@{/contact}" class="nav-item nav-link">Contact</a> -->
                     </div>
                     <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
                         <a href="" class="btn px-0">
@@ -478,7 +478,7 @@
     <div class="row px-xl-5 pt-5">
         <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
             <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
-            <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor. Rebum tempor no vero est magna amet no</p>
+            <p class="mb-4"></p>
             <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
             <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
             <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
@@ -509,7 +509,7 @@
                 </div>
                 <div class="col-md-4 mb-5">
                     <h5 class="text-secondary text-uppercase mb-4">Newsletter</h5>
-                    <p>Duo stet tempor ipsum sit amet magna ipsum tempor est</p>
+                    <p>let text for us</p>
                     <form action="">
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Your Email Address">
@@ -532,15 +532,15 @@
     <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
         <div class="col-md-6 px-xl-0">
             <p class="mb-md-0 text-center text-md-left text-secondary">
-                &copy; <a class="text-primary" href="#">Domain</a>. All Rights Reserved. Designed
+                &copy; . All Rights Reserved. Designed
                 by
-                <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
+                KienNguyen
             </p>
         </div>
-        <div class="col-md-6 px-xl-0 text-center text-md-right">
-            <img class="img-fluid" src="img/payments.png" alt="">
+<!--        <div class="col-md-6 px-xl-0 text-center text-md-right">-->
+<!--            <img class="img-fluid" src="img/payments.png" alt="">-->
 
-        </div>
+<!--        </div>-->
     </div>
 </div>
 <!-- Footer End -->
@@ -563,29 +563,29 @@
 <!-- Template Javascript -->
 <script th:src="@{../static/src/website/js/main.js}"></script>
 <script>
-    document.getElementById('paypal').addEventListener('change', function() {
-        if (this.checked) {
-            const tongtien = document.getElementById('tongTien').innerText;
-            const idKh = document.getElementById('idKh').value;
-            const diaChi = document.getElementById('diaChi').value;
-            console.log({
-                tongtien, idKh, diaChi
-            })
-            // const paymentInfo = `${tongtien}${idKh}${diaChi}`;
-            const paymentInfo = `Bill's total: ${tongtien}`;
-            const qrImage = document.getElementById('qrImage');
-
-            qrImage.src = `/generate-qr?paymentInfo=${encodeURIComponent(paymentInfo)}`;
-            qrImage.style.display = 'block';
-            document.getElementById('btnConfirm').innerText = 'Xác nhận đã thanh toán QR';
-        }
-    });
-    document.getElementById('directcheck').addEventListener('change', function() {
-        if (this.checked) {
-            document.getElementById('qrImage').style.display = 'none';
-        }
-        document.getElementById('btnConfirm').innerText = 'Xác nhận';
-    });
+    // document.getElementById('paypal').addEventListener('change', function() {
+    //     if (this.checked) {
+    //         const tongtien = document.getElementById('tongTien').innerText;
+    //         const idKh = document.getElementById('idKh').value;
+    //         const diaChi = document.getElementById('diaChi').value;
+    //         console.log({
+    //             tongtien, idKh, diaChi
+    //         })
+    //         // const paymentInfo = `${tongtien}${idKh}${diaChi}`;
+    //         const paymentInfo = `Bill's total: ${tongtien}`;
+    //         const qrImage = document.getElementById('qrImage');
+    //
+    //         qrImage.src = `/generate-qr?paymentInfo=${encodeURIComponent(paymentInfo)}`;
+    //         qrImage.style.display = 'block';
+    //         document.getElementById('btnConfirm').innerText = 'Xác nhận đã thanh toán QR';
+    //     }
+    // });
+    // document.getElementById('directcheck').addEventListener('change', function() {
+    //     if (this.checked) {
+    //         document.getElementById('qrImage').style.display = 'none';
+    //     }
+    //     document.getElementById('btnConfirm').innerText = 'Xác nhận';
+    // });
 </script>
 </body>
 

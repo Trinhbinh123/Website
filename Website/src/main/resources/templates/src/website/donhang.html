@@ -47,12 +47,16 @@
             <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Xác nhận')">Đã xác nhận <sup>(${data[1]})</sup></button>
             <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Đang giao')">Đang giao hàng <sup>(${data[2]})</sup></button>
             <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Ðã giao')">Đã nhận hàng <sup>(${data[3]})</sup></button>
-            <button class="btn-outline-success btn rounded-pill">Trả hàng <sup>(99)</sup></button>
+            <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Đổi trả')">Đổi trả <sup>(${data[5]})</sup></button>
             <button class="btn-outline-success btn rounded-pill" onclick="renderBill('Đơn bị hủy')">Đã huỷ <sup>(${data[4]})</sup></button>`;
                 }
             })
         }
+        function normalizeText(text) {
+            return text.normalize('NFC'); // Sử dụng Normalization Form C để chuẩn hóa Unicode
+        }
         function renderBill(status){
+            status = status.replace(/Ð/g, 'Đ');
             $.ajax({
                 url : "/khachHang/checkBillByStatus?status=" + status,
                 method : "GET",
@@ -68,8 +72,20 @@
                         imgRow.append(rowImg);
 
                         const btnHuy = document.getElementById("btn-huy-"+ item.id);
+                        const btnDoiTra = document.getElementById("btn-doitra-"+ item.id);
                         console.log(item)
-                        if(item.trangThai === "Đang giao" || item.trangThai === "Ðã giao" || item.trangThai === "Đơn bị hủy"){
+                        item.trangThai = item.trangThai.replace(/Ð/g, 'Đ');
+
+                        console.log({
+                            trangthai: item.trangThai,
+                            temTrangThai: item.trangThai,
+                            input: "Ðã giao",
+                            compare: item.trangThai=== "Đã giao"
+                        });
+                        if(item.trangThai=== "Đã giao"){
+                            btnDoiTra.style.display = "inline";
+                        }
+                        if(item.trangThai === "Đang giao" || item.trangThai=== "Đã giao" || item.trangThai === "Đơn bị hủy"){
                             btnHuy.style.display = 'none';
                         }
                     })
@@ -90,6 +106,7 @@
                             data-bs-target="#offcanvasRight" aria-controls="offcanvasRight" onclick="renderBillDetail(${item.id})">Xem chi tiết
                     </button>
                     <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="btn-huy-${item.id}" onclick="idBill(${item.id})">Huỷ</button>
+                    <button class="btn-outline-warning btn rounded-pill" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#doitraModal" id="btn-doitra-${item.id}" style="display: none" onclick="idBillDoiTra(${item.id})">Đổi trả</button>
                 </td>`;
             return row;
         }
@@ -155,12 +172,30 @@
                 btnHuyDon.disabled = false
             }
         }
+        let idDoiTra = 0;
+        function idBillDoiTra(idBill){
+            idDoiTra = idBill;
+            const description = document.getElementById("descriptionDt");
+            const btnDoiTra = document.getElementById("btn-doitra");
+            if(description.value === ""){
+                btnDoiTra.disabled = true;
+            }else {
+                btnDoiTra.disabled = false
+            }
+        }
 
         function chooseReason(status){
             const description = document.getElementById("description");
             const btnHuyDon = document.getElementById("btn-huydon");
             description.value = status;
             btnHuyDon.disabled = false;
+        }
+
+        function chooseReasonDT(status){
+            const description = document.getElementById("descriptionDT");
+            const btnDT = document.getElementById("btn-doitra");
+            description.value = status;
+            btnDT.disabled = false;
         }
 
         function huydon(){
@@ -172,7 +207,30 @@
                     const row = document.getElementById(id);
                     row.remove();
                     renderStatusBill();
-                    showToast("Huỷ thành công", "success");
+                    showToast("Huỷ đơn thành công", "success");
+                },
+                error: function (xhr) {
+                    // Extract error message from the response
+                    const errorMessage = xhr.responseText || "Có lỗi xảy ra, vui lòng thử lại!";
+                    showToast(errorMessage, "error");
+                }
+            })
+        }
+        function doitra(){
+            const description = document.getElementById("descriptionDT").value;
+            $.ajax({
+                url : "/khachHang/doitra/" + idDoiTra + "?message=" + description,
+                method : "PUT",
+                success : function (){
+                    const row = document.getElementById(idDoiTra);
+                    row.remove();
+                    renderStatusBill();
+                    showToast("Đổi trả thành công", "success");
+                },
+                error: function (xhr) {
+                    // Extract error message from the response
+                    const errorMessage = xhr.responseText || "Có lỗi xảy ra, vui lòng thử lại!";
+                    showToast(errorMessage, "error");
                 }
             })
         }
@@ -225,8 +283,8 @@
                         Account
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <button class="dropdown-item" type="button">Sign in</button>
-                        <button class="dropdown-item" type="button">Sign up</button>
+                        <!-- <button class="dropdown-item" type="button">Sign in</button>
+                        <button class="dropdown-item" type="button">Sign up</button> -->
                         <button class="dropdown-item" type="button">Đơn hàng của bạn</button>
                     </div>
                 </div>
@@ -282,16 +340,16 @@
                         <div class="navbar-nav mr-auto py-0">
                             <a th:href="@{/website}" class="nav-item nav-link active">Home</a>
                             <a th:href="@{/shop}" class="nav-item nav-link">Shop</a>
-                            <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a>
+                            <!-- <a th:href="@{/detail}" class="nav-item nav-link">Shop Detail</a> -->
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i
                                         class="fa fa-angle-down mt-1"></i></a>
                                 <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
                                     <a th:href="@{/cart}" class="dropdown-item">Shopping Cart</a>
-                                    <a th:href="@{/checkout}" class="dropdown-item">Checkout</a>
+                                    <!-- <a th:href="@{/checkout}" class="dropdown-item">Checkout</a> -->
                                 </div>
                             </div>
-                            <a th:href="@{/contact}" class="nav-item nav-link">Contact</a>
+                            <!-- <a th:href="@{/contact}" class="nav-item nav-link">Contact</a> -->
                         </div>
                         <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
                             <a href="" class="btn px-0">
@@ -331,7 +389,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lý do huỷ đơn</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Lý do huỷ</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
@@ -347,6 +405,30 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" id="btn-huydon" data-bs-dismiss="modal" onclick="huydon()">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="doitraModal" tabindex="-1" aria-labelledby="doitraModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="doitraModalLabel">Lý do đổi trả</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="descriptionDT" aria-label="Text input with dropdown button" readonly>
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Lí do đổi trả</button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Chọn nhầm size hoặc màu')">Chọn nhầm size hoặc màu</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Muốn thay đổi địa chỉ mua hàng')">Muốn thay đổi địa chỉ mua hàng</a></li>
+                                <li><a class="dropdown-item" onclick="chooseReasonDT('Không muốn mua nữa')">Không muốn mua nữa</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btn-doitra" data-bs-dismiss="modal" onclick="doitra()">Xác nhận</button>
                     </div>
                 </div>
             </div>
@@ -373,8 +455,8 @@
         <div class="row px-xl-5 pt-5">
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
                 <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
-                <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor.
-                    Rebum tempor no vero est magna amet no</p>
+                <!-- <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor.
+                    Rebum tempor no vero est magna amet no</p> -->
                 <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
                 <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
                 <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
@@ -407,7 +489,7 @@
                     </div>
                     <div class="col-md-4 mb-5">
                         <h5 class="text-secondary text-uppercase mb-4">Newsletter</h5>
-                        <p>Duo stet tempor ipsum sit amet magna ipsum tempor est</p>
+                        <p>let text for us</p>
                         <form action="">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Your Email Address">
@@ -430,9 +512,9 @@
         <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
             <div class="col-md-6 px-xl-0">
                 <p class="mb-md-0 text-center text-md-left text-secondary">
-                    &copy; <a class="text-primary" href="#">Domain</a>. All Rights Reserved. Designed
+                    &copy; . All Rights Reserved. Designed
                     by
-                    <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
+                    KienNguyen
                 </p>
             </div>
             <div class="col-md-6 px-xl-0 text-center text-md-right">

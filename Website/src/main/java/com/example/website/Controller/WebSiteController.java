@@ -337,34 +337,34 @@ public class WebSiteController {
     }
 
 
-    @GetMapping("/generate-qr")
-    @ResponseBody
-    public ResponseEntity<byte[]> generateQRCode(@RequestParam("paymentInfo") String paymentInfo) {
-        try {
-            int width = 250;
-            int height = 250;
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(paymentInfo, BarcodeFormat.QR_CODE, width, height);
-
-            BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    bufferedImage.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
-                }
-            }
-
-            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "PNG", pngOutputStream);
-            byte[] qrCodeImage = pngOutputStream.toByteArray();
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=qr.png")
-                    .contentType(MediaType.IMAGE_PNG)
-                    .body(qrCodeImage);
-        } catch (WriterException | IOException e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-    }
+//    @GetMapping("/generate-qr")
+//    @ResponseBody
+//    public ResponseEntity<byte[]> generateQRCode(@RequestParam("paymentInfo") String paymentInfo) {
+//        try {
+//            int width = 250;
+//            int height = 250;
+//            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+//            BitMatrix bitMatrix = qrCodeWriter.encode(paymentInfo, BarcodeFormat.QR_CODE, width, height);
+//
+//            BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//            for (int x = 0; x < width; x++) {
+//                for (int y = 0; y < height; y++) {
+//                    bufferedImage.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+//                }
+//            }
+//
+//            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+//            ImageIO.write(bufferedImage, "PNG", pngOutputStream);
+//            byte[] qrCodeImage = pngOutputStream.toByteArray();
+//            return ResponseEntity.ok()
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=qr.png")
+//                    .contentType(MediaType.IMAGE_PNG)
+//                    .body(qrCodeImage);
+//        } catch (WriterException | IOException e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//    }
     @GetMapping("/quenMk/{email}")
     public String quenMk(@PathVariable String email, Model model){
         if(email != null){
