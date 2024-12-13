@@ -1,7 +1,11 @@
 package com.example.website.Controller;
 
+import com.example.website.Enity.HoaDonChiTiet;
+import com.example.website.Enity.SanPhamChiTiet;
+import com.example.website.Respository.HoaDonChiTietRepo;
 import com.example.website.Respository.HoaDonRepo;
 import com.example.website.Enity.HoaDon;
+import com.example.website.Respository.SanPhamChiTietRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DonHangController {
     private final HoaDonRepo hoaDonRepo;
+    private final HoaDonChiTietRepo hoaDonChiTietRepo;
+    private final SanPhamChiTietRepo sanPhamChiTietRepo;
 
     @GetMapping("/admin/donhang")
     public String getAdmin(@RequestParam(defaultValue = "") String trangThai, Model model) {
@@ -69,7 +75,22 @@ public class DonHangController {
                 case "Xác nhận":
                     // Chỉ có thể chuyển từ "Xác nhận" sang "Đang giao" hoặc "Đơn bị hủy"
                     if ("Đang giao".equals(trangThai)) {
-                        hoaDon.setTrangThai(trangThai);
+                        boolean check = false;
+                        for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                            SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                            if(sanPhamChiTiet.getSo_luong() < hoaDonChiTiet.getSoLuong()){
+                                check = true;
+                                break;
+                            }
+                        }
+                        if (!check){
+                            for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                                SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                                sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                                sanPhamChiTietRepo.save(sanPhamChiTiet);
+                            }
+                            hoaDon.setTrangThai(trangThai);
+                        }
                     }
                     break;
                 case "Đang giao":

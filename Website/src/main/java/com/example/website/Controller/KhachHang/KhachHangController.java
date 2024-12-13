@@ -37,10 +37,10 @@ public class KhachHangController {
     @GetMapping("/khachhang/delete")
     public String deleteKH(@RequestParam Integer id) {
         KhachHang khachHang = khachHangRepo.getReferenceById(id);
-        if (khachHang.getTrangThai().equals("Đang hoạt động")) {
+        if (khachHang.getTrangThai().equals("Hoạt động")) {
             khachHang.setTrangThai("Ngừng hoạt động");
         } else {
-            khachHang.setTrangThai("Đang hoạt động");
+            khachHang.setTrangThai("Hoạt động");
         }
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
@@ -55,7 +55,8 @@ public class KhachHangController {
 
     @PostMapping("/khachhang/updateData")
     public String update(@ModelAttribute KhachHang khachHang) {
-        System.out.println(khachHang);
+        KhachHang oldKhachHang = khachHangRepo.getReferenceById(khachHang.getId());
+
         String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
         String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
         String[] wardDetails = getWardDetails(khachHang.getXa());
@@ -65,8 +66,8 @@ public class KhachHangController {
         khachHang.setThanhPho(provinceName);
         khachHang.setHuyen(districtName);
         khachHang.setXa(wardName);
-        KhachHang kh = khachHangRepo.getReferenceById(khachHang.getId());
-        khachHang.setTrangThai(kh.getTrangThai());
+        khachHang.setTrangThai(oldKhachHang.getTrangThai());
+        khachHang.setMatKhau(oldKhachHang.getMatKhau());
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }

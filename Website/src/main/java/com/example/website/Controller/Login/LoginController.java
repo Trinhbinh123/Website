@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
-    @GetMapping("/login")
-    public String Login() {
-        return "src/Login/login";
-    }
+//    @GetMapping("/login")
+//    public String Login() {
+//        return "src/Web/login";
+//    }
 }
