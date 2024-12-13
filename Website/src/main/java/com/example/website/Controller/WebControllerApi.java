@@ -309,7 +309,7 @@ public class WebControllerApi {
         if(existingKhachHang != null){
             return "Tài khoản này đã có người đăng ký";
         }
-        khachHang.setTrangThai("Đang hoạt động");
+        khachHang.setTrangThai("Hoạt động");
         khachHang.setDiaChi("");
         khachHang.setXa("");
         khachHang.setHuyen("");
@@ -324,7 +324,7 @@ public class WebControllerApi {
         KhachHang existingKhachHang = khachHangRepo.findByEmail(khachHang.getEmail());
         Ad ad = adminRepository.findByEmail(khachHang.getEmail());
         if(existingKhachHang != null && existingKhachHang.getMatKhau().equals(khachHang.getMatKhau())){
-            if(existingKhachHang.getTrangThai().equals("Đang hoạt động")){
+            if(existingKhachHang.getTrangThai().equals("Hoạt động")){
                 return null;
             }
             return "Tài khoản của bạn đã bị khóa";

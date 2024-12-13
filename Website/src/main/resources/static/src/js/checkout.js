@@ -193,12 +193,16 @@ function checkout(e){
         const formSubmit = document.getElementById("formCheckOut");
         const inputs = document.querySelectorAll('.integers');
         const integers = Array.from(inputs).map(input => parseInt(input.value, 10));
+        let payment = 0;
+        if(document.getElementById("flexRadioDefault1").checked){
+            payment = 1
+        }
         let data = {
             gioHangs : listGioHang,
             khachHang : userData
         }
         $.ajax({
-            url : "/checkout/successCheckout?payment=" + 1,
+            url : "/checkout/successCheckout?payment=" + payment,
             method: "POST",
             contentType: "application/json",
             data: JSON.stringify(data),

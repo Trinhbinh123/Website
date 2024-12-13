@@ -2,10 +2,7 @@ package com.example.website.Controller.GioHang;
 
 import com.example.website.Enity.*;
 import com.example.website.Response.CheckOutResponse;
-import com.example.website.Respository.GioHangRepo;
-import com.example.website.Respository.HoaDonChiTietRepo;
-import com.example.website.Respository.HoaDonRepo;
-import com.example.website.Respository.KhachHangRepo;
+import com.example.website.Respository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +19,7 @@ public class CheckOutControllerApi {
     private final KhachHangRepo khachHangRepo;
     private final HoaDonRepo hoaDonRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
+    private final SanPhamChiTietRepo sanPhamChiTietRepo;
 
     @PostMapping("/checkSoLuongSP")
     public String checkSoLuong(@RequestBody List<Integer> integers){
@@ -67,10 +65,24 @@ public class CheckOutControllerApi {
     ){
         List<GioHang> gioHangs = checkOutResponse.getGioHangs();
         KhachHang khachHang = checkOutResponse.getKhachHang();
+        List<HoaDon> hoaDons = hoaDonRepo.findAll().stream()
+                .filter(hoaDon -> hoaDon.getTrangThai().equals("Chờ xác nhận") || hoaDon.getTrangThai().equals("Xác nhận"))
+                .toList();
         for(GioHang gioHang : gioHangs){
-            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-            if(sanPhamChiTiet.getSo_luong() < gioHang.getSoLuong()){
-                return "Số lượng của giày " + sanPhamChiTiet.getSanPham().getTensanpham() +" chỉ còn "+ sanPhamChiTiet.getSo_luong() +" . Vui lòng giảm số lượng để mua";
+            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.getReferenceById(gioHang.getSanPhamChiTiet().getId());
+            int soLuong = 0;
+            for (HoaDon hoaDon : hoaDons){
+                List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietRepo.findByHoaDon(hoaDon).stream()
+                        .filter(hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().equals(sanPhamChiTiet))
+                        .toList();
+                if(!hoaDonChiTiets.isEmpty()){
+                    HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
+                    soLuong += hoaDonChiTiet.getSoLuong();
+                }
+            }
+            int soLuongTonKho = sanPhamChiTiet.getSo_luong() - soLuong;
+            if(soLuongTonKho < gioHang.getSoLuong()){
+                return "Số lượng của giày " + sanPhamChiTiet.getSanPham().getTensanpham() +" chỉ còn "+ soLuongTonKho +" sản phẩm khả dụng . Vui lòng giảm số lượng để mua";
             }
         }
         String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
