@@ -33,7 +33,6 @@ public class SanPhamChiTiet {
     Integer so_luong;
     @Column(name="gia_nhap")
     Double gia_nhap;
-
     @Column(name="anh_spct")
     String anh_spct;
     @Column(name="gia_ban")
