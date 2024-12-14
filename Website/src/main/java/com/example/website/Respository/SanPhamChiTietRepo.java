@@ -20,4 +20,7 @@ public interface SanPhamChiTietRepo extends JpaRepository<SanPhamChiTiet,Integer
     SanPhamChiTiet findBySanPhamAndMauSacAndSize(SanPham sanPham, MauSac mauSac, Size size);
     SanPhamChiTiet findByKhuyenMaiChiTiet(KhuyenMaiChiTiet khuyenMaiChiTiet);
     Optional<SanPhamChiTiet> findBySanPhamAndSize_Id(SanPham sanPham, Integer sizeId);
+    @Query("SELECT sp FROM SanPhamChiTiet sp WHERE sp.sanPham.ma_sanpham = :maSanPham")
+    Optional<SanPhamChiTiet> findBySanPham_MaSanPham(@Param("maSanPham") String maSanPham);
+
 }

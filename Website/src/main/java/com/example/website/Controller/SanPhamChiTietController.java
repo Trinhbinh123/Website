@@ -41,6 +41,7 @@ public class SanPhamChiTietController {
     public String delete(@RequestParam Integer id) {
         SanPhamChiTiet spct = sanPhamChiTietRepo.getReferenceById(id);
         if (spct != null) {
+            spct.setSo_luong(0); // Đặt số lượng sản phẩm chi tiết thành 0
             spct.setTrang_thai(false); // Đặt trạng thái thành Inactive
             sanPhamChiTietRepo.save(spct); // Lưu thay đổi
         }
@@ -60,7 +61,16 @@ public class SanPhamChiTietController {
     }
 
     @PostMapping("/san-pham-chi-tiet/updateData")
-    public String update(@ModelAttribute SanPhamChiTiet spct) {
+    public String update(@ModelAttribute SanPhamChiTiet spct, Model model) {
+        // Kiểm tra số lượng và giá bán
+        if (spct.getSo_luong() <= 0 || spct.getGia_ban() <= 0) {
+            model.addAttribute("errorMessage", "Số lượng và giá bán phải lớn hơn 0");
+            model.addAttribute("spct", spct); // Truyền lại sản phẩm chi tiết để người dùng có thể sửa
+            model.addAttribute("listSP", sanPhamRepo.findAll());
+            model.addAttribute("listMS", mauSacRepo.findAll());
+            model.addAttribute("listSize", sizeRepo.findAll());
+            return "src/san-pham-chi-tiet/UpdateSPCT"; // Quay lại trang cập nhật nếu có lỗi
+        }
         spct.setTrang_thai(true); // Đặt trạng thái thành Active khi lưu
         sanPhamChiTietRepo.save(spct); // Lưu cập nhật
         return "redirect:/admin/san-pham-chi-tiet"; // Quay về danh sách sau khi cập nhật

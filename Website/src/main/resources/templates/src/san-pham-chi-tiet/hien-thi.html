@@ -23,7 +23,7 @@
                                     <th>ID</th>
                                     <th>Mã Sản Phẩm Chi Tiết</th>
                                     <th>Sản Phẩm</th>
-<!--                                    <th>Ảnh</th>-->
+                                    <th>Ảnh</th>
                                     <th>Màu Sắc</th>
                                     <th>Size</th>
                                     <th>Số lượng</th>
@@ -38,15 +38,15 @@
                                     <td th:text="${spct.id}"></td>
                                     <td th:text="${spct.ma_SPCT}"></td>
                                     <td th:text="${spct.sanPham != null ? spct.sanPham.tensanpham : 'N/A'}"></td>
-<!--                                    <td>-->
-<!--                                        <img th:src="${spct.anh_spct}" alt="Ảnh sản phẩm" style="max-width: 50px; max-height: 50px;"/>-->
-<!--                                    </td>-->
+                                    <td>
+                                        <img th:src="${spct.anh_spct}" alt="Ảnh sản phẩm" style="max-width: 50px; max-height: 50px;"/>
+                                    </td>
                                     <td th:text="${spct.mauSac != null ? spct.mauSac.tenmausac : 'N/A'}"></td>
                                     <td th:text="${spct.size != null ? spct.size.ten_size : 'N/A'}"></td>
                                     <td th:text="${spct.so_luong}"></td>
                                     <td th:text="${spct.gia_ban}"></td>
                                     <td th:text="${spct.ngay_nhap}"></td>
-                                    <td th:text="${spct.trang_thai ? 'Active' : 'Inactive'}"></td>
+                                    <td th:text="${spct.trang_thai ? 'Còn hàng' : 'Hết hàng'}"></td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center">
                                             <a class="btn btn-primary btn-sm me-1" th:href="@{/san-pham-chi-tiet/update(id=${spct.id})}">
