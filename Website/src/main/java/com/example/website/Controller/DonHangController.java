@@ -1,6 +1,7 @@
 package com.example.website.Controller;
 
 import com.example.website.Enity.DonHang;
+
 import com.example.website.Enity.HoaDonChiTiet;
 import com.example.website.Enity.SanPhamChiTiet;
 import com.example.website.Respository.HoaDonChiTietRepo;
@@ -21,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DonHangController {
     private final HoaDonRepo hoaDonRepo;
+
     private SanPhamChiTietRepo sanPhamChiTietRepo;
     private HoaDonChiTietRepo hoaDonChiTietRepo;
 
@@ -76,6 +78,24 @@ public class DonHangController {
                     break;
 
                 case "Xác nhận":
+                    // Chỉ có thể chuyển từ "Xác nhận" sang "Đang giao" hoặc "Đơn bị hủy"
+                    if ("Đang giao".equals(trangThai)) {
+                        boolean check = false;
+                        for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                            SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                            if(sanPhamChiTiet.getSo_luong() < hoaDonChiTiet.getSoLuong()){
+                                check = true;
+                                break;
+                            }
+                        }
+                        if (!check){
+                            for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                                SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                                sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                                sanPhamChiTietRepo.save(sanPhamChiTiet);
+                            }
+                            hoaDon.setTrangThai(trangThai);
+                        }
                     // Chuyển sang "Chờ xác nhận", "Đơn bị hủy" hoặc "Đang giao"
                     if ("Chờ xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai) || "Đang giao".equals(trangThai)) {
                         hoaDon.setTrangThai(trangThai);

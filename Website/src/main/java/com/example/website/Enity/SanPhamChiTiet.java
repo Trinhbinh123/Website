@@ -1,6 +1,7 @@
 package com.example.website.Enity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Table(name = "chi_tiet_san_pham")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SanPhamChiTiet {
     @Column(name="id")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +45,6 @@ public class SanPhamChiTiet {
     Boolean trang_thai;
 
     @OneToOne
-    @JsonIgnore
     @JoinColumn(name = "id_san_pham_khuyen_mai")
     private KhuyenMaiChiTiet khuyenMaiChiTiet;
 

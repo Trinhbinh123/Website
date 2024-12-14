@@ -1,5 +1,6 @@
 package com.example.website.Enity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import lombok.*;
 @Entity
 @Builder
 @Table(name = "size")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Size {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
