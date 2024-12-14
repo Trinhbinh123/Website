@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}"></head>
+<head th:replace="~{src/partials/_head :: _head}">
+<!--    <style>-->
+<!--    .MauSac{-->
+<!--        padding-bottom: 10px;-->
+<!--        display: flex;-->
+<!--    }-->
+<!--    </style>-->
+</head>
 <body>
 <div class="container-scroller">
     <!-- Navbar -->
@@ -66,19 +73,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Size</label>
-                        <div th:each="size : ${listSize}">
-                            <input type="checkbox" th:id="${'size_' + size.id}" th:value="${size.id}" name="sizes" th:text="${size.ten_size}" onchange="updatePreview()">
-                            <label th:for="${'size_' + size.id}"></label>
+                    <div class="mb-3 d-flex">
+                        <label class="form-label pe-5">Size :</label>
+                        <div class="px-2"  th:each="size : ${listSize}">
+                            <input class="me-1" type="checkbox" th:id="${'size_' + size.id}" th:style="pb-2" th:value="${size.id}" name="sizes"  th:text="${size.ten_size}" onchange="updatePreview()">
+                            <label class="px-1" th:for="${'size_' + size.id}"></label>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Màu sắc</label>
-                        <div th:each="mauSac : ${listMauSac}">
-                            <input type="checkbox" th:id="${'mauSac_' + mauSac.id}" th:value="${mauSac.id}" name="mauSacs" th:text="${mauSac.tenmausac}" onchange="updatePreview()">
-                            <label th:for="${'mauSac_' + mauSac.id}"></label>
+                    <div class="mb-3 d-flex">
+                        <label class="form-label pe-5">Màu sắc :</label>
+                        <div class="px-2" th:each="mauSac : ${listMauSac}">
+                            <input class="me-1" type="checkbox" th:id="${'mauSac_' + mauSac.id}" th:value="${mauSac.id}" name="mauSacs" th:text="${mauSac.tenmausac}" onchange="updatePreview()">
+                            <label class="px-1" th:for="${'mauSac_' + mauSac.id}"></label>
                         </div>
                     </div>
                     <h4>Dự kiến sản phẩm chi tiết sẽ thêm</h4>
