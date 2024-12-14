@@ -21,8 +21,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DonHangController {
     private final HoaDonRepo hoaDonRepo;
-    private SanPhamChiTietRepo sanPhamChiTietRepo;
-    private HoaDonChiTietRepo hoaDonChiTietRepo;
+    private final SanPhamChiTietRepo sanPhamChiTietRepo;
+    private final HoaDonChiTietRepo hoaDonChiTietRepo;
 
     @GetMapping("/admin/donhang")
     public String getAdmin(@RequestParam(defaultValue = "") String trangThai, Model model) {
@@ -57,8 +57,15 @@ public class DonHangController {
 
     @GetMapping("/donhang/detail")
     public String getDonHangDetail(@RequestParam Integer id, Model model) {
+        // Lấy hóa đơn dựa trên ID
         HoaDon hoaDon = hoaDonRepo.findById(id).orElse(new HoaDon());
+
+        // Lấy danh sách chi tiết hóa đơn
+        List<HoaDonChiTiet> chiTietList = hoaDonChiTietRepo.findByHoaDon(hoaDon);
+
+        // Thêm dữ liệu vào model
         model.addAttribute("dh", hoaDon);
+        model.addAttribute("chiTietList", chiTietList); // Danh sách chi tiết hóa đơn
         return "src/donhang/DonHangDetail";
     }
 
@@ -80,13 +87,22 @@ public class DonHangController {
                     if ("Chờ xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai) || "Đang giao".equals(trangThai)) {
                         hoaDon.setTrangThai(trangThai);
                     }else if ("Đang giao".equals(trangThai)) {
-                        hoaDon.setTrangThai(trangThai);
+                        boolean check = false;
                         for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
                             SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
-                            sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
-                            sanPhamChiTietRepo.save(sanPhamChiTiet);
+                            if(sanPhamChiTiet.getSo_luong() < hoaDonChiTiet.getSoLuong()){
+                                check = true;
+                                break;
+                            }
                         }
-                        // Gọi hàm trừ số lượng sản phẩm chi tiết
+                        if (!check){
+                            for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                                SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                                sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                                sanPhamChiTietRepo.save(sanPhamChiTiet);
+                            }
+                            hoaDon.setTrangThai(trangThai);
+                        }
                     }
                     break;
 
