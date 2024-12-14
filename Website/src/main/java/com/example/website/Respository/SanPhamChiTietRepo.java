@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface SanPhamChiTietRepo extends JpaRepository<SanPhamChiTiet,Integer> {
     List<SanPhamChiTiet> findBySanPham(SanPham sanPham);
-    List<SanPhamChiTiet> findBySanPhamAndMauSacAndSize(SanPham sanPham, MauSac mauSac, Size size);
+    SanPhamChiTiet findBySanPhamAndMauSacAndSize(SanPham sanPham, MauSac mauSac, Size size);
     SanPhamChiTiet findByKhuyenMaiChiTiet(KhuyenMaiChiTiet khuyenMaiChiTiet);
     Optional<SanPhamChiTiet> findBySanPhamAndSize_Id(SanPham sanPham, Integer sizeId);
     @Query("SELECT sp FROM SanPhamChiTiet sp WHERE sp.sanPham.ma_sanpham = :maSanPham")

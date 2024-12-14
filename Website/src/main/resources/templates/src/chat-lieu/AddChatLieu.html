@@ -12,7 +12,7 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/chat-lieu/save}" method="post">
+                <form th:action="@{/chat-lieu/save}" method="post" id="myForm">
                     <h5>Thông tin</h5>
                     <div class="mb-3">
                         <label for="ma" class="form-label">Mã</label>
@@ -22,7 +22,7 @@
                         <label for="customerCode" class="form-label">Tên</label>
                         <input type="text" id="customerCode" name="tenchatlieu" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button onclick="submitForm(event)" type="submit" class="btn btn-success">Lưu</button>
                     <a href="/admin/chat-lieu" class="btn btn-secondary">Hủy</a>
                 </form>
             </div>
@@ -30,6 +30,23 @@
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+    <script>
+        function submitForm(e){
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận thêm chất liệu',
+                html: 'Bạn có chắc chắn muốn tạo chất liệu không?',
+                icon: 'warning',
+                showCancelButton: true,       // Hiển thị nút "Hủy"
+                confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                cancelButtonText: 'Hủy'        // Nút hủy
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("myForm").submit();
+                }
+            });
+        }
+    </script>
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>
