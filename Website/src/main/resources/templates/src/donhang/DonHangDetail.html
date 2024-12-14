@@ -76,45 +76,43 @@
                         <div class="d-flex">
                             <select id="trangThai" name="trangThai" class="form-select">
                                 <!-- Trạng thái "Chờ xác nhận" -->
-                                <option value="Chờ xác nhận" th:selected="${dh.trangThai == 'Chờ xác nhận'}"
-                                        th:disabled="${dh.trangThai != 'Chờ xác nhận'}">Chờ xác nhận</option>
+                                <option value="Chờ xác nhận"
+                                        th:selected="${dh.trangThai == 'Chờ xác nhận'}"
+                                        th:disabled="${dh.trangThai != 'Xác nhận' && dh.trangThai != 'Đơn bị hủy'}">Chờ xác nhận</option>
 
                                 <!-- Trạng thái "Xác nhận" -->
-                                <option value="Xác nhận" th:selected="${dh.trangThai == 'Xác nhận'}"
+                                <option value="Xác nhận"
+                                        th:selected="${dh.trangThai == 'Xác nhận'}"
                                         th:disabled="${dh.trangThai != 'Chờ xác nhận'}">Xác nhận</option>
 
-                                <!-- Trạng thái "Đơn bị hủy" -->
-<!--                                <option value="Đơn bị hủy" th:selected="${dh.trangThai == 'Đơn bị hủy'}"-->
-<!--                                        th:disabled="${dh.trangThai == 'Đã giao' || dh.trangThai == 'Đổi trả'}">Đơn bị hủy</option>-->
-
                                 <!-- Trạng thái "Đang giao hàng" -->
-                                <option value="Đang giao" th:selected="${dh.trangThai == 'Đang giao'}"
+                                <option value="Đang giao"
+                                        th:selected="${dh.trangThai == 'Đang giao'}"
                                         th:disabled="${dh.trangThai != 'Xác nhận'}">Đang giao hàng</option>
 
                                 <!-- Trạng thái "Đã giao hàng" -->
-                                <option value="Đã giao" th:selected="${dh.trangThai == 'Đã giao'}"
+                                <option value="Đã giao"
+                                        th:selected="${dh.trangThai == 'Đã giao'}"
                                         th:disabled="${dh.trangThai != 'Đang giao'}">Đã giao hàng</option>
 
                                 <!-- Trạng thái "Đổi trả" -->
-                                <option value="Đổi trả" th:selected="${dh.trangThai == 'Đổi trả'}"
+                                <option value="Đổi trả"
+                                        th:selected="${dh.trangThai == 'Đổi trả'}"
                                         th:disabled="${dh.trangThai != 'Đã giao'}">Đổi trả</option>
+
+                                <!-- Trạng thái "Đơn bị hủy" -->
+                                <option value="Đơn bị hủy"
+                                        th:selected="${dh.trangThai == 'Đơn bị hủy'}"
+                                        th:disabled="${dh.trangThai != 'Chờ xác nhận' && dh.trangThai != 'Xác nhận'}">Hủy đơn</option>
+
                             </select>
 
                             <button type="submit" class="btn btn-success ms-3">Lưu</button>
-                            <a href="/admin/donhang" class="btn btn-secondary">Back</a>
+                            <a href="/admin/donhang" class="btn btn-secondary ms-5">Trở về</a>
                         </div>
                     </div>
                 </form>
 
-                <!-- Cancel Order Button -->
-                <div class="mt-3">
-                    <form th:action="@{/donhang/cancelOrder}" method="post">
-                        <input type="hidden" th:value="${dh.id}" name="id">
-                        <button type="submit" class="btn btn-danger" th:disabled="${dh.trangThai != 'Chờ xác nhận' && dh.trangThai != 'Xác nhận'}">
-                            Hủy đơn
-                        </button>
-                    </form>
-                </div>
             </div>
 
             <!-- Footer -->

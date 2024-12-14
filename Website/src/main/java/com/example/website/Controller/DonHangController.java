@@ -1,5 +1,7 @@
 package com.example.website.Controller;
 
+import com.example.website.Enity.DonHang;
+
 import com.example.website.Enity.HoaDonChiTiet;
 import com.example.website.Enity.SanPhamChiTiet;
 import com.example.website.Respository.HoaDonChiTietRepo;
@@ -14,13 +16,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class DonHangController {
     private final HoaDonRepo hoaDonRepo;
-    private final HoaDonChiTietRepo hoaDonChiTietRepo;
-    private final SanPhamChiTietRepo sanPhamChiTietRepo;
+
+    private SanPhamChiTietRepo sanPhamChiTietRepo;
+    private HoaDonChiTietRepo hoaDonChiTietRepo;
 
     @GetMapping("/admin/donhang")
     public String getAdmin(@RequestParam(defaultValue = "") String trangThai, Model model) {
@@ -67,11 +71,12 @@ public class DonHangController {
             // Kiểm tra logic cập nhật trạng thái
             switch (hoaDon.getTrangThai()) {
                 case "Chờ xác nhận":
-                    // Chỉ có thể chuyển từ "Chờ xác nhận" sang các trạng thái khác (bao gồm hủy)
+                    // Chuyển sang "Xác nhận" hoặc "Đơn bị hủy"
                     if ("Xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai)) {
                         hoaDon.setTrangThai(trangThai);
                     }
                     break;
+
                 case "Xác nhận":
                     // Chỉ có thể chuyển từ "Xác nhận" sang "Đang giao" hoặc "Đơn bị hủy"
                     if ("Đang giao".equals(trangThai)) {
@@ -91,26 +96,46 @@ public class DonHangController {
                             }
                             hoaDon.setTrangThai(trangThai);
                         }
+                    // Chuyển sang "Chờ xác nhận", "Đơn bị hủy" hoặc "Đang giao"
+                    if ("Chờ xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai) || "Đang giao".equals(trangThai)) {
+                        hoaDon.setTrangThai(trangThai);
+                    }else if ("Đang giao".equals(trangThai)) {
+                        hoaDon.setTrangThai(trangThai);
+                        for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
+                            SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                            sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                            sanPhamChiTietRepo.save(sanPhamChiTiet);
+                        }
+                        // Gọi hàm trừ số lượng sản phẩm chi tiết
                     }
                     break;
+
                 case "Đang giao":
-                    // Chỉ có thể chuyển từ "Đang giao" sang "Đã giao"
+                    // Chuyển sang "Đã giao"
                     if ("Đã giao".equals(trangThai)) {
                         hoaDon.setTrangThai(trangThai);
                     }
                     break;
+
                 case "Đã giao":
-                    // Chỉ có thể chuyển từ "Đã giao" sang "Đổi trả" (trả hàng)
+                    // Chuyển sang "Đổi trả"
                     if ("Đổi trả".equals(trangThai)) {
                         hoaDon.setTrangThai(trangThai);
                     }
                     break;
+
                 case "Đơn bị hủy":
-                    // Đơn bị hủy không thể thay đổi lại trạng thái
+                    // Chuyển sang "Chờ xác nhận"
+                    if ("Chờ xác nhận".equals(trangThai)) {
+                        hoaDon.setTrangThai(trangThai);
+                    }
                     break;
+
                 default:
-                    hoaDon.setTrangThai(trangThai);
+                    // Trạng thái không hợp lệ, giữ nguyên
+                    break;
             }
+
             hoaDonRepo.save(hoaDon);
         }
         return "redirect:/admin/donhang";
@@ -125,5 +150,7 @@ public class DonHangController {
         }
         return "redirect:/admin/donhang";
     }
+
+
 
 }
