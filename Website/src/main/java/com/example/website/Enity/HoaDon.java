@@ -8,6 +8,7 @@ import org.hibernate.annotations.Proxy;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "don_hang")
@@ -56,4 +57,6 @@ public class HoaDon {
 
     @Column(name = "ghi_chu")
     private String ghiChu;
+    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<HoaDonChiTiet> hoaDonChiTietList;
 }

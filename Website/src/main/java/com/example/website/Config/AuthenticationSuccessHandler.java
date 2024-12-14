@@ -34,9 +34,12 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
             System.out.println("toi la admin");
             setDefaultTargetUrl("/admin");
         } else if (isCustomer) {
-            setDefaultTargetUrl("/website");
+            setDefaultTargetUrl("/home");
             setAlwaysUseDefaultTargetUrl(true);
-        } // Buộc luôn chuyển đến URL mặc định
+        }
+
+        request.getSession().removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

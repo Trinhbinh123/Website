@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +43,18 @@ public class GioHangControllerApi {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.findBySanPhamAndMauSacAndSize(
                 sanPhamRepo.getReferenceById(idSanPham),
                 mauSacRepo.getReferenceById(idMauSac),
-                sizeRepo.getReferenceById(idSize)).get(0);
-//        sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - soLuong);
-
+                sizeRepo.getReferenceById(idSize));
+        if(sanPhamChiTiet.getSo_luong() < soLuong){
+            return "Sản phẩm không còn đủ hàng";
+        }
         gioHang.setKhachHang(khachHang);
         boolean check = false;
         List<GioHang> gioHangs = gioHangRepo.findByKhachHang(khachHang);
         for(GioHang gh : gioHangs){
             if(gh.getSanPhamChiTiet().equals(sanPhamChiTiet)){
+                if(gh.getSoLuong() + soLuong > 3){
+                    return "Đã có " + gh.getSoLuong() + " sản phẩm trong giỏ hàng (Tối đa 3 sản phẩm)";
+                }
                 gh.setSoLuong(gh.getSoLuong() + soLuong);
                 gh.setTongTien((int) (sanPhamChiTiet.getGia_ban() * gh.getSoLuong()));
                 gioHangRepo.save(gh);
@@ -67,19 +72,69 @@ public class GioHangControllerApi {
         return null;
     }
 
+    @PostMapping("/toCheckout/{idSanPham}/{idMauSac}/{idSize}/{soLuong}")
+    public List<GioHang> shopNow(
+            @PathVariable Integer idSanPham,
+            @PathVariable Integer idMauSac,
+            @PathVariable Integer idSize,
+            @PathVariable Integer soLuong, Authentication authentication
+    ){
+        KhachHang khachHang = new KhachHang();
+        List<GioHang> gioHangs = new ArrayList<>();
+        GioHang gioHang = new GioHang();
+        if(authentication == null){
+            gioHang.setId(-1);
+            gioHangs.add(gioHang);
+            return gioHangs;
+        }else {
+            khachHang = userService.currentKhachHang(authentication);
+        }
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.findBySanPhamAndMauSacAndSize(
+                sanPhamRepo.getReferenceById(idSanPham),
+                mauSacRepo.getReferenceById(idMauSac),
+                sizeRepo.getReferenceById(idSize));
+        if(sanPhamChiTiet.getSo_luong() < soLuong){
+            gioHang.setId(-2);
+            gioHangs.add(gioHang);
+            return gioHangs;
+        }
+        gioHang.setKhachHang(khachHang);
+        gioHang.setSanPhamChiTiet(sanPhamChiTiet);
+        gioHang.setSoLuong(soLuong);
+        getGia_ban(sanPhamChiTiet, gioHang);
+        gioHangs.add(gioHang);
+        return gioHangs;
+    }
+
+
+
     @GetMapping("/cartPage")
     public List<GioHang> cartPage(Authentication authentication){
-        KhachHang khachHang = userService.currentKhachHang(authentication);
-        List<GioHang> gioHangs = gioHangRepo.findByKhachHang(khachHang);
-        for(GioHang gioHang : gioHangs){
-            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-            if(gioHang.getSoLuong() > sanPhamChiTiet.getSo_luong()){
-                gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
+        try {
+            List<GioHang> errorGioHang = new ArrayList<>();
+            KhachHang khachHang = userService.currentKhachHang(authentication);
+            List<GioHang> gioHangs = gioHangRepo.findByKhachHang(khachHang);
+            for(GioHang gioHang : gioHangs){
+                SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
+                if(gioHang.getSoLuong() > sanPhamChiTiet.getSo_luong()){
+                    gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
+                }
+                getGia_ban(sanPhamChiTiet,gioHang);
+                gioHangRepo.save(gioHang);
+                if(gioHang.getSoLuong() <= 0){
+                    errorGioHang.add(gioHang);
+                }
             }
-            getGia_ban(sanPhamChiTiet,gioHang);
-            gioHangRepo.save(gioHang);
+            gioHangRepo.deleteAll(errorGioHang);
+            for(GioHang gioHang : gioHangs){
+                if(gioHang.getSanPhamChiTiet().getKhuyenMaiChiTiet() != null && !gioHang.getSanPhamChiTiet().getKhuyenMaiChiTiet().getKhuyenMai().getTinhTrang().equals("Đang diễn ra")){
+                    gioHang.getSanPhamChiTiet().setKhuyenMaiChiTiet(null);
+                }
+            }
+            return gioHangRepo.findByKhachHang(khachHang);
+        }catch (Exception e){
+            return null;
         }
-        return gioHangRepo.findByKhachHang(khachHang);
     }
 
     @PutMapping("/quantity/{idCart}")
@@ -89,7 +144,7 @@ public class GioHangControllerApi {
         if(status.equals("cong")){
             gioHang.setSoLuong(gioHang.getSoLuong() + 1);
             getGia_ban(sanPhamChiTiet, gioHang);
-            if(gioHang.getSoLuong() > 10){
+            if(gioHang.getSoLuong() > 3){
                 return null;
             }
         }else {
@@ -104,7 +159,7 @@ public class GioHangControllerApi {
         return gioHangRepo.save(gioHang);
     }
 
-    private static void getGia_ban(SanPhamChiTiet sanPhamChiTiet, GioHang gioHang) {
+    public static void getGia_ban(SanPhamChiTiet sanPhamChiTiet, GioHang gioHang) {
         if(sanPhamChiTiet.getKhuyenMaiChiTiet() == null){
             gioHang.setTongTien((int) (gioHang.getSanPhamChiTiet().getGia_ban() * gioHang.getSoLuong()));
         }else {
@@ -121,50 +176,62 @@ public class GioHangControllerApi {
 
     @GetMapping("/checkQuantity/{idCart}")
     public String checkQuantity(@PathVariable Integer idCart, @RequestParam String status){
-        GioHang gioHang = gioHangRepo.getReferenceById(idCart);
-        SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-        gioHang.setSoLuong(gioHang.getSoLuong() + 1);
-        if(gioHang.getSoLuong() > sanPhamChiTiet.getSo_luong() && status.equals("cong")){
-            return "Số lượng phải nhỏ hơn " + sanPhamChiTiet.getSo_luong();
+        try {
+            GioHang gioHang = gioHangRepo.getReferenceById(idCart);
+            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
+            gioHang.setSoLuong(gioHang.getSoLuong() + 1);
+            if(gioHang.getSoLuong() > sanPhamChiTiet.getSo_luong() && status.equals("cong")){
+                return "Số lượng phải nhỏ hơn " + sanPhamChiTiet.getSo_luong();
+            }
+            return null;
+        }catch (Exception e){
+            return "error";
         }
-        return null;
     }
 
     @GetMapping("/checkQuantityCauseChange/{idCart}")
     public GioHang checkQuantity1(@PathVariable Integer idCart, @RequestParam Integer quantity){
-        GioHang gioHang = gioHangRepo.getReferenceById(idCart);
-        SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-        if(quantity < 1){
-            gioHang.setId(-2);
-            gioHang.setSoLuong(1);
-            getGia_ban(sanPhamChiTiet, gioHang);
+        try {
+            GioHang gioHang = gioHangRepo.getReferenceById(idCart);
+            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
+            if(quantity < 1){
+                gioHang.setId(-2);
+                gioHang.setSoLuong(1);
+                getGia_ban(sanPhamChiTiet, gioHang);
+                return gioHang;
+            }
+            if(quantity > sanPhamChiTiet.getSo_luong()){
+                gioHang.setId(-1);
+                gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
+                getGia_ban(sanPhamChiTiet, gioHang);
+            } else {
+                gioHang.setSoLuong(quantity);
+                getGia_ban(sanPhamChiTiet, gioHang);
+                gioHangRepo.save(gioHang);
+            }
             return gioHang;
+        }catch (Exception e){
+            return null;
         }
-        if(quantity > sanPhamChiTiet.getSo_luong()){
-            gioHang.setId(-1);
-            gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
-            getGia_ban(sanPhamChiTiet, gioHang);
-        } else {
-            gioHang.setSoLuong(quantity);
-            getGia_ban(sanPhamChiTiet, gioHang);
-            gioHangRepo.save(gioHang);
-        }
-        return gioHang;
     }
     @GetMapping("/checkQuantityIfMax/{idCart}")
     public GioHang checkQuantityIfMax(@PathVariable Integer idCart){
-        GioHang gioHang = gioHangRepo.getReferenceById(idCart);
-        SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
-        if(sanPhamChiTiet.getSo_luong() > 10){
-            gioHang.setSoLuong(10);
-            getGia_ban(sanPhamChiTiet, gioHang);
-            return gioHangRepo.save(gioHang);
-        }else {
-            gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
-            getGia_ban(sanPhamChiTiet, gioHang);
-            GioHang saveGioHang = gioHangRepo.save(gioHang);
-            saveGioHang.setId(-1);
-            return saveGioHang;
+        try {
+            GioHang gioHang = gioHangRepo.getReferenceById(idCart);
+            SanPhamChiTiet sanPhamChiTiet = gioHang.getSanPhamChiTiet();
+            if(sanPhamChiTiet.getSo_luong() > 3){
+                gioHang.setSoLuong(3);
+                getGia_ban(sanPhamChiTiet, gioHang);
+                return gioHangRepo.save(gioHang);
+            }else {
+                gioHang.setSoLuong(sanPhamChiTiet.getSo_luong());
+                getGia_ban(sanPhamChiTiet, gioHang);
+                GioHang saveGioHang = gioHangRepo.save(gioHang);
+                saveGioHang.setId(-1);
+                return saveGioHang;
+            }
+        }catch (Exception e){
+            return null;
         }
     }
 

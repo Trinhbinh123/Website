@@ -46,17 +46,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/admin/**").hasRole("ADMIN");
                     registry.requestMatchers("/login", "/register").permitAll();
-                    registry.requestMatchers("/website",
-                            "/quenMk/**",
-                            "/api/**",
-                            "/detail/**",
-                            "/static/src/website/css/**",
-                            "/static/src/website/js/**",
-                            "/static/src/website/css/**",
-                            "/static/src/website/**",
-                            "/static/src/website/lib/**").permitAll();
+//                    registry.requestMatchers("/website",
+//                            "/cart/**",
+//                            "/home/**",
+//                            "/static/src/web/**",
+//                            "/static/src/js/**",
+//                            "/static/src/assets/**",
+//                            "/quenMk/**",
+//                            "/api/**",
+//                            "/detail/**",
+//                            "/static/src/website/css/**",
+//                            "/static/src/website/js/**",
+//                            "/static/src/website/css/**",
+//                            "/static/src/website/**",
+//                            "/static/src/website/lib/**").permitAll();
                     registry.requestMatchers("/cart").hasRole("USER");
-                    registry.anyRequest().authenticated();
+                    registry.anyRequest().permitAll();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
                     httpSecurityFormLoginConfigurer
