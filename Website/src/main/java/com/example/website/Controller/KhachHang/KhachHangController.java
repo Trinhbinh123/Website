@@ -85,7 +85,7 @@ public class KhachHangController {
         khachHang.setThanhPho(provinceName);
         khachHang.setHuyen(districtName);
         khachHang.setXa(wardName);
-        khachHang.setTrangThai("Đang hoạt động");
+        khachHang.setTrangThai("Hoạt động");
 
         khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 

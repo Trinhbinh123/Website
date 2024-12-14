@@ -12,7 +12,7 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/san-pham/save}" method="post" onsubmit="return validateForm()">
+                <form th:action="@{/san-pham/save}" method="post" onsubmit="return validateForm()" id="myForm">
                     <h4>Thông tin sản phẩm</h4>
                     <hr>
                     <br>
@@ -98,7 +98,7 @@
                         </tbody>
                     </table>
 
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="submit" class="btn btn-success" onclick="submitForm(event)">Lưu</button>
                     <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
                 </form>
             </div>
@@ -207,6 +207,22 @@
 
                 previewTable.appendChild(row);
             });
+        });
+    }
+
+    function submitForm(e){
+        e.preventDefault();
+        Swal.fire({
+            title: 'Xác nhận thêm sản phẩm',
+            html: 'Bạn có chắc chắn muốn thêm sản phẩm không?',
+            icon: 'success',
+            showCancelButton: true,       // Hiển thị nút "Hủy"
+            confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+            cancelButtonText: 'Hủy'        // Nút hủy
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("myForm").submit();
+            }
         });
     }
 

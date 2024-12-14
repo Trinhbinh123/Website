@@ -52,9 +52,9 @@
                                         <a class="btn btn-primary btn-sm me-1" th:href="@{/san-pham/update(id=${sp.id})}">
                                             <i class="lni lni-pencil"></i> Sửa
                                         </a>
-                                        <form th:action="@{/san-pham/delete}" method="post" style="display:inline;">
+                                        <form th:action="@{/san-pham/delete}" method="post" style="display:inline;" id="myForm">
                                             <input type="hidden" name="id" th:value="${sp.id}" />
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
                                         </form>
                                     </div>
                                 </td>
@@ -73,6 +73,22 @@
         function loading(){
             $("#multi-filter-select").DataTable({
                 pageLength: 5
+            });
+        }
+
+        function submitForm(e){
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận đổi trạng thái sản phẩm',
+                html: 'Bạn có chắc chắn muốn đổi trạng thái sản phẩm không?',
+                icon: 'error',
+                showCancelButton: true,       // Hiển thị nút "Hủy"
+                confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                cancelButtonText: 'Hủy'        // Nút hủy
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("myForm").submit();
+                }
             });
         }
     </script>
