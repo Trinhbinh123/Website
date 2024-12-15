@@ -107,6 +107,24 @@ public class WebControllerMap {
         return "/src/Web/thank";
     }
 
+    @GetMapping("/home/cart/checkoutError")
+    public String checkoutError(Authentication authentication, Model model
+    ){
+        model.addAttribute("user", getCurrentUser(authentication));
+        return "/src/Web/error";
+    }
+
+    @GetMapping("/home/cart/checkCheckout")
+    public String checkout(Authentication authentication, Model model, @RequestParam String vnp_ResponseCode
+    ){
+        model.addAttribute("user", getCurrentUser(authentication));
+        if(vnp_ResponseCode.equals("00")){
+            return "redirect:/home/cart/checkoutSuccess";
+        }else {
+            return "redirect:/home/cart/checkoutError";
+        }
+    }
+
     @GetMapping("/home/map")
     public String loadMap(Authentication authentication, Model model){
         model.addAttribute("user", getCurrentUser(authentication));

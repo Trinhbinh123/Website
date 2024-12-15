@@ -42,10 +42,17 @@
                                         <a class="btn btn-primary btn-sm me-1" th:href="@{/size/update(id=${sp.id})}">
                                             <i class="lni lni-pencil"></i> Sửa
                                         </a>
+<<<<<<< HEAD
+                                        <form th:action="@{/size/delete}" method="post" style="display:inline;" id="myForm">
+                                            <input type="hidden" name="id" th:value="${sp.id}" />
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
+                                        </form>
+=======
 <!--                                        <form th:action="@{/size/delete}" method="post" style="display:inline;">-->
 <!--                                            <input type="hidden" name="id" th:value="${sp.id}" />-->
 <!--                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>-->
 <!--                                        </form>-->
+>>>>>>> c4bcb49f2ac103b6b451e187798c6ecb075178d7
                                     </div>
                                 </td>
                             </tr>
@@ -65,7 +72,25 @@
                 pageLength: 5
             });
         }
+
+        function submitForm(e){
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận đổi trạng thái size',
+                html: 'Bạn có chắc chắn muốn đổi trạng thái size không?',
+                icon: 'error',
+                showCancelButton: true,       // Hiển thị nút "Hủy"
+                confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                cancelButtonText: 'Hủy'        // Nút hủy
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("myForm").submit();
+                }
+            });
+        }
     </script>
+
+
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

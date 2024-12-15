@@ -1,7 +1,7 @@
 package com.example.website.Controller;
 
-import com.example.website.Enity.DonHang;
 
+import com.example.website.Enity.DonHang;
 import com.example.website.Enity.HoaDonChiTiet;
 import com.example.website.Enity.SanPhamChiTiet;
 import com.example.website.Respository.HoaDonChiTietRepo;
@@ -25,12 +25,11 @@ public class DonHangController {
     private final SanPhamChiTietRepo sanPhamChiTietRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
 
-
     @GetMapping("/admin/donhang")
     public String getAdmin(@RequestParam(defaultValue = "") String trangThai, Model model) {
         List<HoaDon> danhSachHoaDon;
         if (trangThai.isEmpty()) {
-         danhSachHoaDon = hoaDonRepo.findAllOrderByNgayDatHangDesc();
+            danhSachHoaDon = hoaDonRepo.findAllOrderByNgayDatHangDesc();
         } else {
             danhSachHoaDon = hoaDonRepo.findByTrangThaiOrderByNgayDatHangDesc(trangThai);
         }
@@ -139,6 +138,8 @@ public class DonHangController {
         return "redirect:/admin/donhang";
     }
 
+
+
     @PostMapping("/donhang/cancelOrder")
     public String cancelOrder(@RequestParam Integer id) {
         HoaDon hoaDon = hoaDonRepo.findById(id).orElse(null);
@@ -148,7 +149,4 @@ public class DonHangController {
         }
         return "redirect:/admin/donhang";
     }
-
-
-
 }

@@ -57,6 +57,7 @@ public class HoaDon {
 
     @Column(name = "ghi_chu")
     private String ghiChu;
-    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<HoaDonChiTiet> hoaDonChiTietList;
+
+//    @OneToMany(mappedBy = "hoaDon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<HoaDonChiTiet> hoaDonChiTietList;
 }
