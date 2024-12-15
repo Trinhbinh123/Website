@@ -25,6 +25,7 @@ function showOrders(status, button) {
         url : "/api/v1/web/history/" + status,
         method : "GET",
         success: function (data){
+           console.log(data)
             const row = document.getElementById('listHoaDon');
             row.innerHTML = data.length > 0 ? `<h2>Đơn Hàng ${convertTex(status)}</h2>` : ``;
             data.forEach(item => {

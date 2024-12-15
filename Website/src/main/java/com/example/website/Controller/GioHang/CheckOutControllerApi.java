@@ -124,4 +124,44 @@ public class CheckOutControllerApi {
         hoaDonRepo.save(saveHoaDon);
         return null;
     }
+
+    @PostMapping("/checkoutWithVNPAY")
+    public void vnPay(
+            @RequestBody CheckOutResponse checkOutResponse
+    ){
+        List<GioHang> gioHangs = checkOutResponse.getGioHangs();
+        KhachHang khachHang = checkOutResponse.getKhachHang();
+        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
+        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
+        String[] wardDetails = getWardDetails(khachHang.getXa());
+        String provinceName = provinceDetails[1];
+        String districtName = districtDetails[1];
+        String wardName = wardDetails[1];
+
+        HoaDon hoaDon = new HoaDon();
+        hoaDon.setKhachHang(khachHang);
+        hoaDon.setDiaChi(provinceName + ", " + districtName + ", " + wardName + ", " + khachHang.getDiaChi());
+        hoaDon.setMaDonHang("#" + UUID.randomUUID().toString().replace("-", "").substring(10).toUpperCase(Locale.ROOT));
+        hoaDon.setTenKhachHang(khachHang.getHoTen());
+        hoaDon.setEmail(khachHang.getEmail());
+        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
+        hoaDon.setNgayDatHang(new Date());
+        hoaDon.setTrangThai("Xác nhận");
+        hoaDon.setHinhThuc("Thanh toán bằng VN Pay");
+        HoaDon saveHoaDon = hoaDonRepo.save(hoaDon);
+
+        int tongTien = 0;
+
+        for (GioHang gioHang : gioHangs) {
+            HoaDonChiTiet hoaDonChiTiet = new HoaDonChiTiet();
+            hoaDonChiTiet.setHoaDon(saveHoaDon);
+            hoaDonChiTiet.setSanPhamChiTiet(gioHang.getSanPhamChiTiet());
+            hoaDonChiTiet.setSoLuong(gioHang.getSoLuong());
+            hoaDonChiTiet.setDonGia(gioHang.getTongTien());
+            tongTien += gioHang.getTongTien();
+            hoaDonChiTietRepo.save(hoaDonChiTiet);
+        }
+        saveHoaDon.setTongTien(tongTien);
+        hoaDonRepo.save(saveHoaDon);
+    }
 }

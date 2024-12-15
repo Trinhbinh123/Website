@@ -1,7 +1,7 @@
 package com.example.website.Controller;
 
-import com.example.website.Enity.DonHang;
 
+import com.example.website.Enity.DonHang;
 import com.example.website.Enity.HoaDonChiTiet;
 import com.example.website.Enity.SanPhamChiTiet;
 import com.example.website.Respository.HoaDonChiTietRepo;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
-
 @Controller
 @RequiredArgsConstructor
 public class DonHangController {
@@ -25,130 +24,102 @@ public class DonHangController {
     private final SanPhamChiTietRepo sanPhamChiTietRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
 
-
     @GetMapping("/admin/donhang")
     public String getAdmin(@RequestParam(defaultValue = "") String trangThai, Model model) {
-        List<HoaDon> danhSachHoaDon;
-        if (trangThai.isEmpty()) {
-            danhSachHoaDon = hoaDonRepo.findAllOrderByNgayDatHangDesc();
-        } else {
-            danhSachHoaDon = hoaDonRepo.findByTrangThaiOrderByNgayDatHangDesc(trangThai);
-        }
+        List<HoaDon> danhSachHoaDon = trangThai.isEmpty()
+                ? hoaDonRepo.findAllOrderByNgayDatHangDesc()
+                : hoaDonRepo.findByTrangThaiOrderByNgayDatHangDesc(trangThai);
 
-        // Đếm số lượng đơn hàng theo từng trạng thái
-        long soDonChuaXacNhan = hoaDonRepo.countByTrangThai("Chờ xác nhận");
-        long soDonXacNhan = hoaDonRepo.countByTrangThai("Xác nhận");
-        long soDonDangGiao = hoaDonRepo.countByTrangThai("Đang giao");
-        long soDonDaGiao = hoaDonRepo.countByTrangThai("Đã giao");
-        long soDonDoiTra = hoaDonRepo.countByTrangThai("Đổi trả");
-        long soDonBiHuy = hoaDonRepo.countByTrangThai("Đơn bị hủy");
-
-        // Truyền dữ liệu đếm vào model
         model.addAttribute("danhSachHoaDon", danhSachHoaDon);
         model.addAttribute("trangThaiHienTai", trangThai);
-        model.addAttribute("soDonChuaXacNhan", soDonChuaXacNhan);
-        model.addAttribute("soDonXacNhan", soDonXacNhan);
-        model.addAttribute("soDonDangGiao", soDonDangGiao);
-        model.addAttribute("soDonDaGiao", soDonDaGiao);
-        model.addAttribute("soDonDoiTra", soDonDoiTra);
-        model.addAttribute("soDonBiHuy", soDonBiHuy);
+        model.addAttribute("soDonChuaXacNhan", hoaDonRepo.countByTrangThai("Chờ xác nhận"));
+        model.addAttribute("soDonXacNhan", hoaDonRepo.countByTrangThai("Xác nhận"));
+        model.addAttribute("soDonDangGiao", hoaDonRepo.countByTrangThai("Đang giao"));
+        model.addAttribute("soDonDaGiao", hoaDonRepo.countByTrangThai("Đã giao"));
+        model.addAttribute("soDonDoiTra", hoaDonRepo.countByTrangThai("Đổi trả"));
+        model.addAttribute("soDonBiHuy", hoaDonRepo.countByTrangThai("Đơn bị hủy"));
 
-        return "src/donhang/DonHang";
+        return "donhang/DonHang";
     }
-
 
     @GetMapping("/donhang/detail")
     public String getDonHangDetail(@RequestParam Integer id, Model model) {
-        // Lấy hóa đơn dựa trên ID
-        HoaDon hoaDon = hoaDonRepo.findById(id).orElse(new HoaDon());
-
-        // Lấy danh sách chi tiết hóa đơn
+        Optional<HoaDon> optionalHoaDon = hoaDonRepo.findById(id);
+        if (optionalHoaDon.isEmpty()) {
+            return "redirect:/admin/donhang?error=not_found";
+        }
+        HoaDon hoaDon = optionalHoaDon.get();
         List<HoaDonChiTiet> chiTietList = hoaDonChiTietRepo.findByHoaDon(hoaDon);
-
-        // Thêm dữ liệu vào model
         model.addAttribute("dh", hoaDon);
-        model.addAttribute("chiTietList", chiTietList); // Danh sách chi tiết hóa đơn
-        return "src/donhang/DonHangDetail";
+        model.addAttribute("chiTietList", chiTietList);
+        return "donhang/DonHangDetail";
     }
 
     @PostMapping("/donhang/updateData")
     public String updateTrangThaiDonHang(@RequestParam Integer id, @RequestParam String trangThai) {
-        HoaDon hoaDon = hoaDonRepo.findById(id).orElse(null);
-        if (hoaDon != null) {
-            // Kiểm tra logic cập nhật trạng thái
-            switch (hoaDon.getTrangThai()) {
-                case "Chờ xác nhận":
-                    // Chuyển sang "Xác nhận" hoặc "Đơn bị hủy"
-                    if ("Xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai)) {
-                        hoaDon.setTrangThai(trangThai);
-                    }
-                    break;
+        Optional<HoaDon> optionalHoaDon = hoaDonRepo.findById(id);
+        if (optionalHoaDon.isEmpty()) {
+            return "redirect:/admin/donhang?error=not_found";
+        }
+        HoaDon hoaDon = optionalHoaDon.get();
+        List<String> validTrangThai = List.of("Chờ xác nhận", "Xác nhận", "Đang giao", "Đã giao", "Đổi trả", "Đơn bị hủy");
 
-                case "Xác nhận":
-                    // Chuyển sang "Chờ xác nhận", "Đơn bị hủy" hoặc "Đang giao"
-                    if ("Chờ xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai) || "Đang giao".equals(trangThai)) {
-                        hoaDon.setTrangThai(trangThai);
-                    }else if ("Đang giao".equals(trangThai)) {
-                        boolean check = false;
-                        for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
-                            SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
-                            if(sanPhamChiTiet.getSo_luong() < hoaDonChiTiet.getSoLuong()){
-                                check = true;
-                                break;
-                            }
-                        }
-                        if (!check){
-                            for(HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietRepo.findByHoaDon(hoaDon)){
-                                SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
-                                sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
-                                sanPhamChiTietRepo.save(sanPhamChiTiet);
-                            }
-                            hoaDon.setTrangThai(trangThai);
-                        }
-                    }
-                    break;
-
-                        case "Đang giao":
-                            // Chuyển sang "Đã giao"
-                            if ("Đã giao".equals(trangThai)) {
-                                hoaDon.setTrangThai(trangThai);
-                            }
-                            break;
-
-                        case "Đã giao":
-                            // Chuyển sang "Đổi trả"
-                            if ("Đổi trả".equals(trangThai)) {
-                                hoaDon.setTrangThai(trangThai);
-                            }
-                            break;
-
-                        case "Đơn bị hủy":
-                            // Chuyển sang "Chờ xác nhận"
-                            if ("Chờ xác nhận".equals(trangThai)) {
-                                hoaDon.setTrangThai(trangThai);
-                            }
-                            break;
-
-                        default:
-                            // Trạng thái không hợp lệ, giữ nguyên
-                            break;
-                    }
-
-                    hoaDonRepo.save(hoaDon);
-            }
-            return "redirect:/admin/donhang";
+        if (!validTrangThai.contains(trangThai)) {
+            return "redirect:/admin/donhang?error=invalid_status";
         }
 
-        @PostMapping("/donhang/cancelOrder")
-        public String cancelOrder(@RequestParam Integer id) {
-            HoaDon hoaDon = hoaDonRepo.findById(id).orElse(null);
-            if (hoaDon != null && "Chờ xác nhận".equals(hoaDon.getTrangThai())|| "Xác nhận".equals(hoaDon.getTrangThai())) {
-                hoaDon.setTrangThai("Đơn bị hủy");
-                hoaDonRepo.save(hoaDon);
+        switch (hoaDon.getTrangThai()) {
+            case "Chờ xác nhận" -> {
+                if ("Xác nhận".equals(trangThai) || "Đơn bị hủy".equals(trangThai)) {
+                    hoaDon.setTrangThai(trangThai);
+                }
             }
-            return "redirect:/admin/donhang";
+            case "Xác nhận" -> {
+                if ("Đang giao".equals(trangThai)) {
+                    boolean check = hoaDonChiTietRepo.findByHoaDon(hoaDon).stream()
+                            .anyMatch(hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().getSo_luong() < hoaDonChiTiet.getSoLuong());
+                    if (check) {
+                        return "redirect:/admin/donhang?error=quantity_insufficient";
+                    }
+                    hoaDonChiTietRepo.findByHoaDon(hoaDon).forEach(hoaDonChiTiet -> {
+                        SanPhamChiTiet spChiTiet = hoaDonChiTiet.getSanPhamChiTiet();
+                        spChiTiet.setSo_luong(spChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                        sanPhamChiTietRepo.save(spChiTiet);
+                    });
+                }
+                hoaDon.setTrangThai(trangThai);
+            }
+            case "Đang giao" -> {
+                if ("Đã giao".equals(trangThai)) {
+                    hoaDon.setTrangThai(trangThai);
+                }
+            }
+            case "Đã giao" -> {
+                if ("Đổi trả".equals(trangThai)) {
+                    hoaDon.setTrangThai(trangThai);
+                }
+            }
+            case "Đơn bị hủy" -> {
+                if ("Chờ xác nhận".equals(trangThai)) {
+                    hoaDon.setTrangThai(trangThai);
+                }
+            }
         }
-
-
-
+        hoaDonRepo.save(hoaDon);
+        return "redirect:/admin/donhang";
     }
+
+    @PostMapping("/donhang/cancelOrder")
+    public String cancelOrder(@RequestParam Integer id) {
+        Optional<HoaDon> optionalHoaDon = hoaDonRepo.findById(id);
+        if (optionalHoaDon.isEmpty()) {
+            return "redirect:/admin/donhang?error=not_found";
+        }
+        HoaDon hoaDon = optionalHoaDon.get();
+        if ("Chờ xác nhận".equals(hoaDon.getTrangThai()) || "Xác nhận".equals(hoaDon.getTrangThai())) {
+            hoaDon.setTrangThai("Đơn bị hủy");
+            hoaDonRepo.save(hoaDon);
+        }
+        return "redirect:/admin/donhang";
+    }
+}

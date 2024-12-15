@@ -121,7 +121,9 @@ public class SecurityConfig {
 //                            }
 //                        })
 //                );
+
         // Trả về cấu hình SecurityFilterChain
+
 //        return http.build();
 //        http.csrf().disable() // Tắt CSRF protection (không khuyến khích cho môi trường sản xuất)
 //                .authorizeRequests()
