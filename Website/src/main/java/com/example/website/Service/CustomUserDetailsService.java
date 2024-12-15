@@ -40,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         KhachHang khachHang = khachHangRepository.findByEmail(username);
         System.out.println(khachHang);
         if (khachHang != null) {
-            if(khachHang.getTrangThai().equals("Đang hoạt động")){
+            if(khachHang.getTrangThai().equals("Hoạt động")){
                 return User.builder()
                         .username(khachHang.getEmail())
                         .password(khachHang.getMatKhau()) // Mật khẩu plaintext từ cơ sở dữ liệu
