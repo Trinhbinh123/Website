@@ -23,7 +23,7 @@
                         <label for="moTa" class="form-label">Mô Tả</label>
                         <textarea id="moTa" th:value="${thuongHieu.moTa}" name="moTa" class="form-control" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button  type="submit" class="btn btn-success">Lưu</button>
                     <a href="/admin/thuong-hieu" class="btn btn-secondary">Hủy</a>
                 </form>
             </div>
@@ -31,6 +31,7 @@
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

@@ -33,14 +33,14 @@
                                     <label for="ngayNhap" class="form-label">Ngày nhập</label>
                                     <input type="datetime-local" id="ngayNhap" name="ngay_nhap" class="form-control" required>
                                 </div>
-<!--                                <div class="mb-3">-->
-<!--                                    <label for="anh_spct" class="form-label">Ảnh</label>-->
-<!--                                    <input type="text" id="anh_spct" name="anh_spct" class="form-control" required readonly>-->
-<!--                                    <button type="button" class="btn btn-info mt-2" onclick="openFileDialog()">Chọn ảnh</button>-->
-<!--                                </div>-->
-<!--                                <div class="mb-3">-->
-<!--                                    <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>-->
-<!--                                </div>-->
+                                <div class="mb-3">
+                                    <label for="anh_spct" class="form-label">Ảnh</label>
+                                    <input type="text" id="anh_spct" name="anh_spct" class="form-control" required readonly>
+                                    <button type="button" class="btn btn-info mt-2" onclick="openFileDialog1()">Chọn ảnh</button>
+                                </div>
+                                <div class="mb-3">
+                                    <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>
+                                </div>
                             </div>
                         </div>
 
@@ -80,24 +80,24 @@
 </div>
 <div th:replace="~{src/partials/_script :: _script}"></div>
 <script>
-    // function openFileDialog() {
-    //     const fileInput = document.createElement('input');
-    //     fileInput.type = 'file';
-    //     fileInput.accept = 'image/*';
-    //     fileInput.onchange = event => {
-    //         const file = event.target.files[0];
-    //         if (file) {
-    //             const reader = new FileReader();
-    //             reader.onload = e => {
-    //                 document.getElementById('preview').src = e.target.result;
-    //                 document.getElementById('preview').style.display = 'block';
-    //                 document.getElementById('anh_spct').value = e.target.result; // Lưu URL vào input
-    //             };
-    //             reader.readAsDataURL(file);
-    //         }
-    //     };
-    //     fileInput.click();
-    // }
+    function openFileDialog1() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.onchange = event => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                    document.getElementById('anh_spct').value = e.target.result; // Lưu URL vào input
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        fileInput.click();
+    }
     function validateForm() {
         // Lấy giá trị từ các trường giá bán và số lượng
         var giaBan = document.getElementById("giaBan").value.trim();

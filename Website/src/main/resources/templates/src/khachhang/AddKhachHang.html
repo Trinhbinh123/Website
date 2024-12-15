@@ -72,7 +72,8 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="addressDetails" class="form-label">Địa chỉ chi tiết</label>
-                                    <input type="text" id="addressDetails" name="diaChi" class="form-control" placeholder="Số nhà, đường..." required>
+                                    <input type="text" id="addressDetails" name="diaChi" class="form-control"
+                                           placeholder="Số nhà, đường..." required>
                                 </div>
                                 <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
                                 <input type="hidden" id="provinceName" name="provinceName">
@@ -231,6 +232,19 @@
                         error.textContent = "Email đã được sử dụng";
                         return;
                     }
+                    Swal.fire({
+                        title: 'Xác nhận thêm chất liệu',
+                        html: 'Bạn có chắc chắn muốn tạo chất liệu không?',
+                        icon: 'warning',
+                        showCancelButton: true,       // Hiển thị nút "Hủy"
+                        confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                        cancelButtonText: 'Hủy'        // Nút hủy
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+
 
                     // Nếu không trùng lặp, submit form
                     form.submit();

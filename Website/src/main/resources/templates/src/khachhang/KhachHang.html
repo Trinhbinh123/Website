@@ -56,10 +56,12 @@
                                             <a class="btn btn-primary btn-sm me-1" th:href="@{/khachhang/update(id=${customer.id})}">
                                                 <i class="lni lni-pencil">Update</i>
                                             </a>
-                                            <a class="btn btn-danger btn-sm" th:href="@{/khachhang/delete(id=${customer.id})}"
-                                               onclick="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái của khách hàng này?')">
-                                                <i class="lni" th:classappend="${customer.trangThai.equals('Hoạt động') ? 'lni-ban' : 'lni-checkmark-circle'}">Delete</i>
-                                            </a>
+                                            <form action="" method="get" id="myForm">
+                                            <button th:id="${customer.id}" type="submit" class="btn btn-danger btn-sm"
+                                               onclick="submitForm(event, this.getAttribute('id'))">
+                                                <i class="lni" th:classappend="${customer.trangThai.equals('Hoạt động') ? 'lni-ban' : 'lni-checkmark-circle'}">Chuyển trạng thái</i>
+                                            </button>
+                                            </form>
                                         </div>
                                     </td>
 
@@ -80,6 +82,22 @@
         function loading(){
             $("#multi-filter-select").DataTable({
                 pageLength: 5
+            });
+        }
+        function submitForm(e, idKH) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận chuyển trạng thái',
+                html: 'Bạn có chắc muốn chuyển trạng thái không?',
+                icon: 'warning',
+                showCancelButton: true,       // Hiển thị nút "Hủy"
+                confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                cancelButtonText: 'Hủy'        // Nút hủy
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("myForm").submit();
+                    window.location.href = "/khachhang/delete?id=" + idKH;
+                }
             });
         }
     </script>
