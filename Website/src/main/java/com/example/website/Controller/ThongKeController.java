@@ -6,6 +6,7 @@ import com.example.website.Enity.ThongKe;
 import com.example.website.Respository.DonHangRepo;
 import com.example.website.Respository.HoaDonRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,15 +29,17 @@ public class ThongKeController {
         return "src/thongke/ThongKe";
     }
 
-    @GetMapping("/thong-ke-theo-thang")
-    public Map<String, Double> getThongKeTheoThang(@RequestParam String month) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
-        Date startDate = sdf.parse(month + "-01");
-        Date endDate = sdf.parse(month + "-31");
+//    @GetMapping("/theo-thang")
+//    public Map<String, Object> getRevenueStatistics(@RequestParam("year") int year, @RequestParam("month") int month) {
+//        return DonHangRepo.getTotalRevenueAndQuantityByYearAndMonth(year, month);
+//    }
 
-        List<HoaDon> donHangs = DonHangRepo.getDonHangsByMonth(startDate, endDate);
-
-        return DonHangRepo.getThongKeTheoThang(donHangs);
-    }
+@GetMapping("/thong-ke")
+public ResponseEntity<List<Map<String, Object>>> getMonthlyStatistics(
+        @RequestParam(required = false) Integer year,
+        @RequestParam(required = false) Integer month) {
+    List<Map<String, Object>> statistics = DonHangRepo.getMonthlyStatistics(year, month);
+    return ResponseEntity.ok(statistics);
+}
 }
 
