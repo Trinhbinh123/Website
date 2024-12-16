@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface HoaDonRepo extends JpaRepository<HoaDon, Integer> {
     // Thêm phương thức sắp xếp theo ngày đặt hàng giảm dần
@@ -35,5 +36,19 @@ public interface HoaDonRepo extends JpaRepository<HoaDon, Integer> {
             + "ORDER BY MONTH(ngay_dat_hang) ASC",
             nativeQuery = true)
     List<Object[]> findSalesByYear(@Param("year") int year);
-    List<HoaDon> findByNgayDatHangBetween(Date startDate, Date endDate);
+    @Query("SELECT SUM(dh.tongTien) FROM HoaDon dh WHERE YEAR(dh.ngayDatHang) = :year AND MONTH(dh.ngayDatHang) = :month")
+    double tinhTongTien(Integer year, Integer month);
+
+    @Query("SELECT MONTH(d.ngayDatHang) as month, " +
+            "SUM(d.tongTien) as totalAmount, " +
+            "SUM(d.soLuong) as totalQuantity " +
+            "FROM HoaDon d " +
+            "WHERE (:year IS NULL OR YEAR(d.ngayDatHang) = :year) " +
+            "AND (:month IS NULL OR MONTH(d.ngayDatHang) = :month) " +
+            "GROUP BY MONTH(d.ngayDatHang) " +
+            "ORDER BY MONTH(d.ngayDatHang)")
+    List<Object[]> findMonthlyStatistics(@Param("year") Integer year, @Param("month") Integer month);
+
+
+
 }
