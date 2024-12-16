@@ -49,7 +49,6 @@ public class HoaDonController {
         model.addAttribute("danhSachHoaDon", danhSachHoaDon);
         model.addAttribute("sanPhamOffices", sanPhamOffices);
 
-
         return "src/hoadon/HoaDon";
     }
 
@@ -99,7 +98,6 @@ public class HoaDonController {
                     hoaDonChiTiet.setSanPhamChiTiet(spct);
                     hoaDonChiTietRepo.save(hoaDonChiTiet);
                 }
-                
             }
             return ResponseEntity.ok().build();
         } catch(Exception ex) {
