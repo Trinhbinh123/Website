@@ -98,44 +98,51 @@
 }
 
     if (dataCheck.soDienThoai === "" || dataCheck.soDienThoai.length !== 10 || !/^\d{10}$/.test(dataCheck.soDienThoai)) {
-    console.log("Số điện thoại phải là 10 chữ số")
+    // console.log("Số điện thoại phải là 10 chữ số")
+        showToast("Số điện thoại phải là 10 số", "error")
     return;
 }
 
     if (dataCheck.ngaySinh === "") {
-    console.log("Không được bỏ trống ngày sinh")
+    // console.log("Không được bỏ trống ngày sinh")
+        showToast("Không được bỏ trống ngày sinh", "error")
     return;
 }
 
     const birthYear = new Date(dataCheck.ngaySinh).getFullYear();
     const currentYear = new Date().getFullYear();
     if (birthYear > currentYear - 16) {
-    console.log("Người dùng phải trên 16 tuổi")
+    // console.log("Người dùng phải trên 16 tuổi")
+        showToast("Người dùng phải trên 16 tuổi", "error")
     return;
 }
 
     if (dataCheck.email === "") {
     // error.textContent = "Không được bỏ trống email";
+        showToast("Không được bỏ trống email", "error")
     return;
 }
 
     if (!isValidEmail(dataCheck.email)) {
     // error.textContent = "Email không hợp lệ";
+        showToast("Email không hợp lệ", "error")
     return;
 }
     if (dataCheck.thanhPho === "") {
     // let error;
     // error.textContent = "Hãy chọn thành phố";
+        showToast("Hãy chọn thành phố", "error")
     return;
 }
 
     if (dataCheck.huyen === "") {
-    // error.textContent = "Hãy chọn huyện";
+        showToast("Hãy chọn huyện", "error")
     return;
 }
 
     if (dataCheck.xa === "") {
     // error.textContent = "Hãy chọn xã";
+        showToast("Hãy chọn xã", "error")
     return;
 }
 
@@ -148,21 +155,23 @@
     url: "/api/khachHang/data?id=" + id,
     method: "GET",
     success: function (data) {
+        console.log(id,data)
     const isPhoneDuplicate = data.some(item => item.soDienThoai === dataCheck.soDienThoai);
     const isEmailDuplicate = data.some(item => item.email === dataCheck.email);
 
     if (isPhoneDuplicate) {
     // error.textContent = "Số điện thoại đã được sử dụng";
+        showToast("Số điện thoại đã được sử dụng", "error")
     return;
 }
 
     if (isEmailDuplicate) {
-    // error.textContent = "Email đã được sử dụng";
+        showToast("Email đã được sử dụng", "error")
     return;
 }
     Swal.fire({
-    title: 'Xác nhận thêm chất liệu',
-    html: 'Bạn có chắc chắn muốn tạo chất liệu không?',
+    title: 'Xác nhận sửa khách hàng',
+    html: 'Bạn có chắc chắn muốn sửa khách hàng không?',
     icon: 'warning',
     showCancelButton: true,       // Hiển thị nút "Hủy"
     confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
