@@ -27,7 +27,7 @@
                                 <th>ID</th>
                                 <th>Mã</th>
                                 <th>Tên</th>
-<!--                                <th>Trạng thái</th>-->
+                                <!--                                <th>Trạng thái</th>-->
                                 <th>Hành động</th>
                             </tr>
                             </thead>
@@ -36,7 +36,7 @@
                                 <td th:text="${sp.id}"></td>
                                 <td th:text="${sp.ma_chatlieu}"></td>
                                 <td th:text="${sp.tenchatlieu}"></td>
-<!--                                <td th:text="${sp.trangthai == 1 ? 'Active' : 'Inactive'}"></td>-->
+                                <!--                                <td th:text="${sp.trangthai == 1 ? 'Active' : 'Inactive'}"></td>-->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
                                         <a class="btn btn-primary btn-sm me-1" th:href="@{/chat-lieu/update(id=${sp.id})}">
@@ -48,10 +48,6 @@
 <!--                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>-->
 <!--                                        </form>-->
 
-                                        <form th:action="@{/chat-lieu/delete}" method="post" style="display:inline;" id="myForm">
-                                            <input type="hidden" name="id" th:value="${sp.id}" />
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -74,9 +70,9 @@
         function submitForm(e){
             e.preventDefault();
             Swal.fire({
-                title: 'Xác nhận xóa chất liệu',
-                html: 'Bạn có chắc chắn muốn xóa chất liệu không?',
-                icon: 'warning',
+                title: 'Xác nhận đổi trạng thái chất liệu',
+                html: 'Bạn có chắc chắn muốn đổi trạng thái chất liệu không?',
+                icon: 'error',
                 showCancelButton: true,       // Hiển thị nút "Hủy"
                 confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
                 cancelButtonText: 'Hủy'        // Nút hủy

@@ -68,6 +68,7 @@ public class KhachHangController {
         khachHang.setXa(wardName);
         khachHang.setTrangThai(oldKhachHang.getTrangThai());
         khachHang.setMatKhau(oldKhachHang.getMatKhau());
+        khachHang.setId(oldKhachHang.getId());
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }
@@ -85,7 +86,7 @@ public class KhachHangController {
         khachHang.setThanhPho(provinceName);
         khachHang.setHuyen(districtName);
         khachHang.setXa(wardName);
-        khachHang.setTrangThai("Đang hoạt động");
+        khachHang.setTrangThai("Hoạt động");
 
         khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 

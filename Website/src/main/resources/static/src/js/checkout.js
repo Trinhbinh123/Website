@@ -193,28 +193,50 @@ function checkout(e){
         const formSubmit = document.getElementById("formCheckOut");
         const inputs = document.querySelectorAll('.integers');
         const integers = Array.from(inputs).map(input => parseInt(input.value, 10));
-        let payment = 0;
-        if(document.getElementById("flexRadioDefault1").checked){
-            payment = 1
-        }
         let data = {
             gioHangs : listGioHang,
             khachHang : userData
         }
-        $.ajax({
-            url : "/checkout/successCheckout?payment=" + payment,
-            method: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success : function (message){
-                if(message !== ""){
-                    sessionStorage.setItem("message", message);
-                    window.location.href = "/home/cart";
-                }else {
-                    formSubmit.submit();
+        const radio = document.getElementById("flexRadioDefault1");
+        if(radio.checked){
+            $.ajax({
+                url : "/checkout/successCheckout?payment=" + 1,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success : function (message){
+                    if(message !== ""){
+                        sessionStorage.setItem("message", message);
+                        window.location.href = "/home/cart";
+                    }else {
+                        formSubmit.submit();
+                    }
                 }
-            }
-        })
+            })
+        }else {
+            const tongTien = document.getElementById("tongTien").innerText;
+            const tongTienValue = parseInt(tongTien.replace(/\D/g, ''));
+            $.ajax({
+                url : "/api/v1/payment/createPayment?money=" + tongTienValue,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success : function (dto){
+                    console.log(dto)
+                    if(dto.message !== null){
+                        sessionStorage.setItem("message", dto.message);
+                        window.location.href = "/home/cart";
+                    }else {
+                        sessionStorage.setItem("data", JSON.stringify(data));
+                        window.location.href = dto.url;
+                    }
+                },
+                error: function (error){
+                    console.log(error)
+                }
+            })
+        }
+
     }
 
 }

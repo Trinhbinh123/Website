@@ -12,7 +12,7 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/thuong-hieu/save}" method="post">
+                <form th:action="@{/thuong-hieu/save}" method="post" id="myForm">
                     <h5>Thông tin</h5>
                     <div class="mb-3">
                         <label for="tenThuongHieu" class="form-label">Tên Thương Hiệu</label>
@@ -22,7 +22,7 @@
                         <label for="moTa" class="form-label">Mô Tả</label>
                         <textarea id="moTa" name="moTa" class="form-control" required></textarea>
                     </div>
-                    <button  type="submit" class="btn btn-success">Lưu</button>
+                    <button  type="submit" class="btn btn-success" onclick="submitForm(event)">Lưu</button>
                     <a href="/admin/thuong-hieu" class="btn btn-secondary">Hủy</a>
                 </form>
             </div>
@@ -30,6 +30,24 @@
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+    <script>
+
+        function submitForm(e){
+            e.preventDefault();
+            Swal.fire({
+                title: 'Xác nhận thêm thương hiệu',
+                html: 'Bạn có chắc chắn muốn thêm thương hiệu không?',
+                icon: 'success',
+                showCancelButton: true,       // Hiển thị nút "Hủy"
+                confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
+                cancelButtonText: 'Hủy'        // Nút hủy
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById("myForm").submit();
+                }
+            });
+        }
+    </script>
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>

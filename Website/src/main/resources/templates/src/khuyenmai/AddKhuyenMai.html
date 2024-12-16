@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{src/partials/_head :: _head}">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body onload="loading()">
 <div class="container-scroller">
@@ -217,21 +217,27 @@
             let startDate = new Date(dateStart);
             let endDate = new Date(dateEnd);
             if (name.trim() === "") {
-                error.innerText = "Tên không được để trống";
+                // error.innerText = "Tên không được để trống";
+                showToast("Tên không được để trống", "error")
             } else if (radioPercent.checked && (price.trim() === "" || price < 1 || price > 100)) {
-                error.innerText = "Giá trị giảm phải từ 1-100%";
+                // error.innerText = "Giá trị giảm phải từ 1-100%";
+                showToast("Giá trị giảm phải từ 1-100%", "error")
             } else if (radioVND.checked && (price.trim() === "" || price < 1000)) {
-                error.innerText = "Giá trị giảm phải lớn hơn 1.000 VND"
+                // error.innerText = "Giá trị giảm phải lớn hơn 1.000 VND"
+                showToast("Giá trị giảm phải lớn hơn 1000 VND", "error")
             }
                 // else if (quantity.trim() === "" || quantity < 1) {
                 //     error.innerText = "Số lượng phải lớn hơn 0"
             // }
             else if (dateStart.trim() === "" || startDate < currentDate) {
-                error.innerText = "Ngày bắt đầu phải lớn hơn ngày hiện tại"
+                // error.innerText = "Ngày bắt đầu phải lớn hơn ngày hiện tại"
+                showToast("Ngày bắt đầu phải lớn hơn ngày hiện tại", "error")
             } else if (dateEnd.trim() === "" || startDate > endDate) {
-                error.innerText ="Ngày bắt đầu lớn hơn ngày kết thúc"
+                // error.innerText ="Ngày bắt đầu lớn hơn ngày kết thúc"
+                showToast("Ngày bắt đầu lớn hơn ngày kết thúc", "error")
             } else if (selectedProduct.trim() === "") {
-                error.innerText = "Vui lòng chọn sản phẩm"
+                // error.innerText = "Vui lòng chọn sản phẩm"
+                showToast("Vui lòng chọn sản phẩm", "error")
             } else {
                 form.submit();
             }
@@ -304,6 +310,23 @@
         //           toastContainer.removeChild(newToast);
         //       };
         //   }
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
+        }
     </script>
 </div>
 </body>

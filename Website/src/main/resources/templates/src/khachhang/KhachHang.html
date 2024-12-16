@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{src/partials/_head :: _head}"
-></head>
+>
+</head>
 <body onload="loading()">
 <div class="container-scroller">
     <!--_navbar -->
@@ -47,7 +48,7 @@
                                     <td th:text="${customer.soDienThoai}"></td>
                                     <td th:text="${customer.ngaySinh}"></td>
                                     <td th:text="${customer.email}"></td>
-                                    <td th:text="${customer.diaChi}+ ', ' +${customer.xa} +', '+ ${customer.huyen} +', '+ ${customer.xa}">
+                                    <td th:text="${customer.diaChi}+ ', ' +${customer.thanhPho} +', '+ ${customer.huyen} +', '+ ${customer.xa}">
                                     </td>
                                     <td th:text="${customer.gioiTinh}"></td>
                                     <td th:text="${customer.trangThai}"></td>

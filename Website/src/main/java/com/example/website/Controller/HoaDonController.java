@@ -14,6 +14,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+import com.example.website.Respository.SanPhamChiTietRepo;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -41,8 +44,10 @@ public class HoaDonController {
     private final HoaDonRepo hoaDonRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
     private final SanPhamRepo sanPhamRepo;
+
     private final donhangService donhangService;
 
+    private final SanPhamChiTietRepo sanPhamChiTietRepo;
     // @GetMapping("/admin/hoadon")
     // public String getAdmin() {
     //     return "src/hoadon/HoaDon";
@@ -56,7 +61,6 @@ public class HoaDonController {
         // Truyền dữ liệu đếm vào model
         model.addAttribute("danhSachHoaDon", danhSachHoaDon);
         model.addAttribute("sanPhamOffices", sanPhamOffices);
-
 
         return "src/hoadon/HoaDon";
     }
@@ -91,7 +95,7 @@ public class HoaDonController {
             hoaDon.setHinhThuc(hinhthucthanhtoan);
             hoaDon.setTongTien(tongtien);
             hoaDon.setMaDonHang(UUID.randomUUID().toString().replace("-", "").substring(10));
-    
+
             hoaDon = hoaDonRepo.save(hoaDon);
             if (hoaDon != null && hdcts.size() > 0) {
                 for (hdct _hdct : hdcts) {
@@ -101,11 +105,12 @@ public class HoaDonController {
                     hoaDonChiTiet.setDonGia(_hdct.getDongia());
                     SanPhamChiTiet spct = new SanPhamChiTiet();
                     spct.setId(_hdct.getIdchitietsanpham());
+                    SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.getReferenceById(_hdct.getIdchitietsanpham());
+                    sanPhamChiTiet.setSo_luong(sanPhamChiTiet.getSo_luong() - hoaDonChiTiet.getSoLuong());
+                    sanPhamChiTietRepo.save(sanPhamChiTiet);
                     hoaDonChiTiet.setSanPhamChiTiet(spct);
-    
                     hoaDonChiTietRepo.save(hoaDonChiTiet);
                 }
-                
             }
             return ResponseEntity.ok().build();
         } catch(Exception ex) {
