@@ -54,9 +54,7 @@
                                             </a>
                                             <form th:action="@{/san-pham-chi-tiet/delete}" method="post" style="display:inline;" id="myForm">
                                                 <input type="hidden" name="id" th:value="${spct.id}" />
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">
-                                                    <i class="lni lni-trash"></i> Xóa
-                                                </button>
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
                                             </form>
                                         </div>
                                     </td>
@@ -76,13 +74,12 @@
                 pageLength: 5
             });
         }
-
         function submitForm(e){
             e.preventDefault();
             Swal.fire({
                 title: 'Xác nhận đổi trạng thái sản phẩm chi tiết',
                 html: 'Bạn có chắc chắn muốn đổi trạng thái sản phẩm chi tiết không?',
-                icon: 'error',
+                icon: 'warning',
                 showCancelButton: true,       // Hiển thị nút "Hủy"
                 confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
                 cancelButtonText: 'Hủy'        // Nút hủy

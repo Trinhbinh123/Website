@@ -68,6 +68,7 @@ public class KhachHangController {
         khachHang.setXa(wardName);
         khachHang.setTrangThai(oldKhachHang.getTrangThai());
         khachHang.setMatKhau(oldKhachHang.getMatKhau());
+        khachHang.setId(oldKhachHang.getId());
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }

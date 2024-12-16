@@ -25,11 +25,13 @@ function showTop20SP(btn) {
         url: `${api}/top?quantity=20`,
         method: "GET",
         success: function (data) {
+            console.log(data)
             listTopNewSP.innerHTML = ``;
             data.forEach(item => {
                 listTopNewSP.innerHTML += renderTopSP(item);
                 if(item.giamGia === 0){
                     document.getElementById("reduce-" + item.id).style.display = 'none';
+
                 }
             })
             btn.remove();
@@ -53,7 +55,7 @@ function renderTopSP(item) {
                                             <span class="badge-label badge-percentage rounded">${giamGia}</span>
                                         </div>`;
     if(item.giamGia === 0){
-        reduce = '';
+        reduce = `<div class="product-badge" id="reduce-${item.id}"></div>`;
     }
     const row = `<div class="col-lg-3 col-md-6 col-6" data-aos="fade-up" data-aos-duration="700">
                                 <div class="product-card">

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{src/partials/_head :: _head}">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body onload="loadingg()">
 <div class="container-scroller">
@@ -165,71 +165,83 @@
             });
 
             if (dataCheck.hoTen === "") {
-                error.textContent = "Không được bỏ trống tên";
+                // error.textContent = "Không được bỏ trống tên";
+                showToast("Không được bỏ trống tên", "error")
                 return;
             }
 
             if (dataCheck.soDienThoai === "" || dataCheck.soDienThoai.length !== 10 || !/^\d{10}$/.test(dataCheck.soDienThoai)) {
-                error.textContent = "Số điện thoại phải là 10 chữ số";
+                // error.textContent = "Số điện thoại phải là 10 chữ số";
+                showToast("Số điện thoại phải là 10 số", "error")
                 return;
             }
 
             if (dataCheck.ngaySinh === "") {
-                error.textContent = "Không được bỏ trống ngày sinh";
+                // error.textContent = "Không được bỏ trống ngày sinh";
+                showToast("Không được bỏ trống ngày sinh", "error")
                 return;
             }
 
             const birthYear = new Date(dataCheck.ngaySinh).getFullYear();
             const currentYear = new Date().getFullYear();
             if (birthYear > currentYear - 16) {
-                error.textContent = "Người dùng phải trên 16 tuổi";
+                // error.textContent = "Người dùng phải trên 16 tuổi";
+                showToast("Người dùng phải trên 16 tuổi", "error")
                 return;
             }
 
             if (dataCheck.email === "") {
-                error.textContent = "Không được bỏ trống email";
+                // error.textContent = "Không được bỏ trống email";
+                showToast("Không được bỏ trống email", "error")
                 return;
             }
 
             if (!isValidEmail(dataCheck.email)) {
-                error.textContent = "Email không hợp lệ";
+                // error.textContent = "Email không hợp lệ";
+                showToast("Email không hợp lệ", "error")
                 return;
             }
 
             if (dataCheck.thanhPho === "") {
-                error.textContent = "Hãy chọn thành phố";
+                // error.textContent = "Hãy chọn thành phố";
+                showToast("Hãy chọn thành phố", "error")
                 return;
             }
 
             if (dataCheck.huyen === "") {
-                error.textContent = "Hãy chọn huyện";
+                // error.textContent = "Hãy chọn huyện";
+                showToast("Hãy chọn huyện", "error")
                 return;
             }
 
             if (dataCheck.xa === "") {
-                error.textContent = "Hãy chọn xã";
+                // error.textContent = "Hãy chọn xã";
+                showToast("Hãy chọn xã", "error")
                 return;
             }
 
             if (dataCheck.diaChi === "") {
-                error.textContent = "Không được bỏ trống địa chỉ";
+                // error.textContent = "Không được bỏ trống địa chỉ";
+                showToast("Không được bỏ trống địa chỉ", "error")
                 return;
             }
 
             $.ajax({
-                url: "/api/khachHang/data",
+                url: "/api/khachHang/data?id=0",
                 method: "GET",
                 success: function (data) {
                     const isPhoneDuplicate = data.some(item => item.soDienThoai === dataCheck.soDienThoai);
                     const isEmailDuplicate = data.some(item => item.email === dataCheck.email);
 
                     if (isPhoneDuplicate) {
-                        error.textContent = "Số điện thoại đã được sử dụng";
+                        // error.textContent = "Số điện thoại đã được sử dụng";
+                        showToast("Số điện thoại đã được sử dụng", "error")
                         return;
                     }
 
                     if (isEmailDuplicate) {
-                        error.textContent = "Email đã được sử dụng";
+                        // error.textContent = "Email đã được sử dụng";
+                        showToast("Email đã được sử dụng", "error")
                         return;
                     }
                     Swal.fire({
@@ -244,10 +256,6 @@
                             form.submit();
                         }
                     });
-
-
-                    // Nếu không trùng lặp, submit form
-                    form.submit();
                 },
                 error: function (error) {
                     console.log(error);
@@ -260,7 +268,23 @@
             return emailRegex.test(email);
         }
 
-
+        function showToast(message, status) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: status,
+                title: message
+            });
+        }
     </script>
 </div>
 <!--script -->
