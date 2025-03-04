@@ -27,32 +27,6 @@ public class PaymentControllerApi {
 
     @PostMapping("/createPayment")
     public ResponseEntity<?> createPayment(@RequestBody CheckOutResponse checkOutResponse, @RequestParam int money) throws UnsupportedEncodingException {
-        List<GioHang> gioHangs = checkOutResponse.getGioHangs();
-        KhachHang khachHang = checkOutResponse.getKhachHang();
-        List<HoaDon> hoaDons = hoaDonRepo.findAll().stream()
-                .filter(hoaDon -> hoaDon.getTrangThai().equals("Chờ xác nhận") || hoaDon.getTrangThai().equals("Xác nhận"))
-                .toList();
-        for(GioHang gioHang : gioHangs){
-            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.getReferenceById(gioHang.getSanPhamChiTiet().getId());
-            int soLuong = 0;
-            for (HoaDon hoaDon : hoaDons){
-                List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietRepo.findByHoaDon(hoaDon).stream()
-                        .filter(hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().equals(sanPhamChiTiet))
-                        .toList();
-                if(!hoaDonChiTiets.isEmpty()){
-                    HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
-                    soLuong += hoaDonChiTiet.getSoLuong();
-                }
-            }
-            int soLuongTonKho = sanPhamChiTiet.getSo_luong() - soLuong;
-            if(soLuongTonKho < gioHang.getSoLuong()){
-                PaymentRestDTO paymentRestDTO = new PaymentRestDTO();
-                paymentRestDTO.setStatus("0");
-                paymentRestDTO.setMessage("Số lượng của giày " + sanPhamChiTiet.getSanPham().getTensanpham() +" chỉ còn "+ soLuongTonKho +" sản phẩm khả dụng . Vui lòng giảm số lượng để mua");
-
-                return ResponseEntity.ok(paymentRestDTO);
-            }
-        }
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";

@@ -27,7 +27,7 @@
                                 <th>ID</th>
                                 <th>Mã</th>
                                 <th>Tên</th>
-<!--                                <th>Trạng thái</th>-->
+                                <!--                                <th>Trạng thái</th>-->
                                 <th>Hành động</th>
                             </tr>
                             </thead>
@@ -36,23 +36,16 @@
                                 <td th:text="${sp.id}"></td>
                                 <td th:text="${sp.ma_mausac}"></td>
                                 <td th:text="${sp.tenmausac}"></td>
-<!--                                <td th:text="${sp.trangthai == 1 ? 'Active' : 'Inactive'}"></td>-->
+                                <!--                                <td th:text="${sp.trangthai == 1 ? 'Active' : 'Inactive'}"></td>-->
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center">
                                         <a class="btn btn-primary btn-sm me-1" th:href="@{/mau-sac/update(id=${sp.id})}">
                                             <i class="lni lni-pencil"></i> Sửa
                                         </a>
-<<<<<<< HEAD
-                                        <form th:action="@{/mau-sac/delete}" method="post" style="display:inline;" id="myForm">
-                                            <input type="hidden" name="id" th:value="${sp.id}" />
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
-                                        </form>
-=======
-<!--                                        <form th:action="@{/mau-sac/delete}" method="post" style="display:inline;">-->
-<!--                                            <input type="hidden" name="id" th:value="${sp.id}" />-->
-<!--                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>-->
-<!--                                        </form>-->
->>>>>>> c4bcb49f2ac103b6b451e187798c6ecb075178d7
+                                      <!--                                        <form th:action="@{/mau-sac/delete}" method="post" style="display:inline;">-->
+                                        <!--                                            <input type="hidden" name="id" th:value="${sp.id}" />-->
+                                        <!--                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</button>-->
+
                                     </div>
                                 </td>
                             </tr>
@@ -71,21 +64,6 @@
             $("#multi-filter-select").DataTable({
                 pageLength: 5
             });
-            function submitForm(e){
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Xác nhận đổi trạng thái màu sắc',
-                    html: 'Bạn có chắc chắn muốn đổi trạng thái màu xắc không?',
-                    icon: 'error',
-                    showCancelButton: true,       // Hiển thị nút "Hủy"
-                    confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
-                    cancelButtonText: 'Hủy'        // Nút hủy
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        document.getElementById("myForm").submit();
-                    }
-                });
-            }
         }
     </script>
 </div>

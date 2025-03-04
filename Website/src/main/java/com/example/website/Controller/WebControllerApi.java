@@ -286,17 +286,7 @@ public class WebControllerApi {
     @PostMapping("/editProfile/{idUser}")
     public String editProfile(@RequestBody KhachHang khachHang, @PathVariable Integer idUser){
         KhachHang oldKhachHang = khachHangRepo.getReferenceById(idUser);
-
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
         khachHang.setId(idUser);
-        khachHang.setThanhPho(provinceName);
-        khachHang.setHuyen(districtName);
-        khachHang.setXa(wardName);
         khachHang.setTrangThai(oldKhachHang.getTrangThai());
         khachHang.setMatKhau(oldKhachHang.getMatKhau());
         khachHangRepo.save(khachHang);

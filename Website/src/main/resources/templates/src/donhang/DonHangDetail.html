@@ -15,7 +15,7 @@
             <div class="content-wrapper">
                 <h3 class="fw-bold fs-4 mb-3">Chi tiết đơn hàng <span th:text="${dh.ghiChu == null ? '' : '( ' + dh.ghiChu + ' )'}"></span></h3>
 
-                <form th:action="@{/donhang/updateData}" method="post" class="row g-3">
+                <form th:action="@{/donhang/updateData}" method="post" class="row g-3" onsubmit="return confirmCancel()">
                     <!-- Hidden ID Field -->
                     <input type="hidden" th:value="${dh.id}" name="id">
 
@@ -36,18 +36,20 @@
                             <tr>
                                 <th>STT</th>
                                 <th>Tên sản phẩm chi tiết</th>
-                                <th>Số lượng</th>
+                                <th>Số lượng mua</th>
                                 <th>Đơn giá</th>
                                 <th>Thành tiền</th>
+                                <th>Số lượng kho</th>
                             </tr>
                             </thead>
                             <tbody>
                             <tr th:each="ct, iterStat : ${chiTietList}">
                                 <td th:text="${iterStat.index + 1}">1</td> <!-- Hiển thị số thứ tự -->
                                 <td th:text="${ct.sanPhamChiTiet.sanPham.tensanpham}">Tên sản phẩm</td> <!-- Thay 'tenSanPham' bằng thuộc tính tương ứng trong SanPhamChiTiet -->
-                                <td th:text="${ct.soLuong}">Số lượng</td>
-                                <td th:text="${ct.donGia}">Đơn giá</td>
-                                <td th:text="${ct.donGia*ct.soLuong}">Thành tiền</td>
+                                <td th:text="${ct.soLuong}">Số lượng hàng mua</td>
+                                <td th:text="${ct.donGia/ct.soLuong}">Đơn giá</td>
+                                <td th:text="${ct.donGia + ct.hoaDon.tienShip}  ">Thành tiền</td>
+                                <td th:text="${ct.sanPhamChiTiet.so_luong}">Số lượng trong kho</td>
                             </tr>
                             </tbody>
                         </table>
@@ -85,7 +87,7 @@
 
                     <div class="col-md-6 mb-3">
                         <label for="tongTien" class="form-label">Tổng tiền</label>
-                        <input type="text" id="tongTien" th:value="${dh.tongTien}" class="form-control" disabled>
+                        <input type="text" id="tongTien" th:value="${dh.tongTien } + ${dh.tienShip}" class="form-control" disabled>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -106,7 +108,7 @@
                                 <!-- Trạng thái "Xác nhận" -->
                                 <option value="Xác nhận"
                                         th:selected="${dh.trangThai == 'Xác nhận'}"
-                                        th:disabled="${dh.trangThai != 'Chờ xác nhận'}">Xác nhận</option>
+                                        th:disabled="${dh.trangThai != 'Chờ xác nhận'&& dh.trangThai != 'Đơn bị hủy'}">Xác nhận</option>
 
                                 <!-- Trạng thái "Đang giao hàng" -->
                                 <option value="Đang giao"
@@ -146,5 +148,14 @@
 
 <!-- Scripts -->
 <div th:replace="~{src/partials/_script :: _script}"></div>
+<script>
+    function confirmCancel() {
+        const statusSelect = document.getElementById('trangThai');
+        if (statusSelect.value === 'Đơn bị hủy') {
+            return confirm('Xác nhận hủy đơn?');
+        }
+        return true; // Allow form submission for other statuses
+    }
+</script>
 </body>
 </html>

@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{src/partials/_head :: _head}">
-<!--    <style>-->
-<!--    .MauSac{-->
-<!--        padding-bottom: 10px;-->
-<!--        display: flex;-->
-<!--    }-->
-<!--    </style>-->
-</head>
+<head th:replace="~{src/partials/_head :: _head}"></head>
 <body>
 <div class="container-scroller">
     <!-- Navbar -->
@@ -19,13 +12,10 @@
 
         <div class="main-panel">
             <div class="content-wrapper">
-                <form th:action="@{/san-pham/save}" method="post" onsubmit="return validateForm()" id="myForm">
+                <form th:action="@{/san-pham/save}" method="post" id="myForm" onsubmit="return validateForm()">
                     <h4>Thông tin sản phẩm</h4>
                     <hr>
                     <br>
-                    <div th:if="${errorMessage}" class="alert alert-danger">
-                        <span th:text="${errorMessage}"></span>
-                    </div>
                     <div class="row">
                         <!-- Phần thông tin bên trái -->
                         <div class="col-md-6">
@@ -37,6 +27,7 @@
                                 <div class="mb-3">
                                     <label for="tensanpham" class="form-label">Tên sản phẩm</label>
                                     <input type="text" id="tensanpham" name="tensanpham" class="form-control" required>
+                                    <span class="text-danger" id="error-tensanpham"></span>
                                 </div>
                                 <div class="mb-3">
                                     <label for="url_anh" class="form-label">URL ảnh</label>
@@ -75,11 +66,12 @@
                     </div>
                     <div class="mb-3 d-flex">
                         <label class="form-label pe-5">Size :</label>
-                        <div class="px-2"  th:each="size : ${listSize}">
-                            <input class="me-1" type="checkbox" th:id="${'size_' + size.id}" th:style="pb-2" th:value="${size.id}" name="sizes"  th:text="${size.ten_size}" onchange="updatePreview()">
+                        <div class="px-2" th:each="size : ${listSize}">
+                            <input class="me-1" type="checkbox" th:id="${'size_' + size.id}" th:style="pb-2" th:value="${size.id}" name="sizes" th:text="${size.ten_size}" onchange="updatePreview()">
                             <label class="px-1" th:for="${'size_' + size.id}"></label>
                         </div>
                     </div>
+                    <span class="text-danger" id="error-size"></span>
 
                     <div class="mb-3 d-flex">
                         <label class="form-label pe-5">Màu sắc :</label>
@@ -88,6 +80,8 @@
                             <label class="px-1" th:for="${'mauSac_' + mauSac.id}"></label>
                         </div>
                     </div>
+                    <span class="text-danger" id="error-mauSac"></span>
+
                     <h4>Dự kiến sản phẩm chi tiết sẽ thêm</h4>
                     <table class="table table-striped">
                         <thead>
@@ -97,7 +91,7 @@
                             <th>Màu Sắc</th>
                             <th>Số lượng</th>
                             <th>Giá bán</th>
-<!--                            <th>Hành động</th>-->
+                            <th>Hình ảnh</th>
                         </tr>
                         </thead>
                         <tbody id="preview-table">
@@ -105,7 +99,7 @@
                         </tbody>
                     </table>
 
-                    <button type="submit" class="btn btn-success" onclick="submitForm(event)">Lưu</button>
+                    <button type="submit" class="btn btn-success">Lưu</button>
                     <a href="/admin/san-pham" class="btn btn-secondary">Hủy</a>
                 </form>
             </div>
@@ -113,10 +107,32 @@
             <div th:replace="~{src/partials/_footer :: _footer}"></div>
         </div>
     </div>
+    <script>
+        // const fileInput = document.getElementById('fileInput');
+        // const preview = document.getElementById('preview-img');
+        //
+        // // Xử lý sự kiện khi người dùng chọn file
+        // fileInput.addEventListener('change', function(event) {
+        //     console.log("haha")
+        //     const file = event.target.files[0];
+        //     if (file) {
+        //         const reader = new FileReader();
+        //
+        //         // Khi đọc file xong, hiển thị ảnh
+        //         reader.onload = function(e) {
+        //             preview.src = e.target.result;
+        //         };
+        //
+        //         // Đọc file dưới dạng URL
+        //         reader.readAsDataURL(file);
+        //     }
+        // });
+    </script>
 </div>
 <!-- Script -->
 <div th:replace="~{src/partials/_script :: _script}"></div>
 <script>
+
     function openFileDialog() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -128,21 +144,50 @@
                 reader.onload = e => {
                     document.getElementById('preview').src = e.target.result;
                     document.getElementById('preview').style.display = 'block';
-                    document.getElementById('url_anh').value = e.target.result; // Lưu URL vào input
+                    document.getElementById('url_anh').value = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         };
         fileInput.click();
     }
+
     function validateForm() {
-        var tenSanPham = document.getElementById("tensanpham").value.trim();
-        if (tenSanPham === "") {
-            alert("Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
-            return false; // Ngừng gửi form
+        let isValid = true;
+
+        // Validate Tên sản phẩm
+        const tensanpham = document.getElementById('tensanpham');
+        const errorTenSanPham = document.getElementById('error-tensanpham');
+        if (!tensanpham.value.trim()) {
+            errorTenSanPham.textContent = "Tên sản phẩm không được để trống.";
+            isValid = false;
+        } else {
+            errorTenSanPham.textContent = "";
         }
-        return true; // Cho phép gửi form
+
+        // Validate Size
+        const sizes = document.querySelectorAll("input[name='sizes']:checked");
+        const errorSize = document.getElementById('error-size');
+        if (sizes.length === 0) {
+            errorSize.textContent = "Vui lòng chọn ít nhất một Size.";
+            isValid = false;
+        } else {
+            errorSize.textContent = "";
+        }
+
+        // Validate Màu sắc
+        const mauSacs = document.querySelectorAll("input[name='mauSacs']:checked");
+        const errorMauSac = document.getElementById('error-mauSac');
+        if (mauSacs.length === 0) {
+            errorMauSac.textContent = "Vui lòng chọn ít nhất một Màu sắc.";
+            isValid = false;
+        } else {
+            errorMauSac.textContent = "";
+        }
+
+        return isValid;
     }
+
     function updatePreview() {
         // Lấy danh sách size và màu sắc được chọn
         const sizes = Array.from(document.querySelectorAll("input[name='sizes']:checked")).map(cb => ({
@@ -185,7 +230,7 @@
                 quantityInput.type = "number";
                 quantityInput.name = "quantities";
                 quantityInput.min = "1";
-                quantityInput.value = "1"; // Giá trị mặc định
+                quantityInput.value = "1";
                 quantityInput.classList.add("form-control");
                 quantityCell.appendChild(quantityInput);
                 row.appendChild(quantityCell);
@@ -194,45 +239,57 @@
                 const priceCell = document.createElement("td");
                 const priceInput = document.createElement("input");
                 priceInput.type = "number";
-                priceInput.name = "prices"; // Gửi danh sách giá bán
-                priceInput.min = "0";
-                priceInput.step = "1"; // Bước tăng/giảm là 1000
-                priceInput.value = "0"; // Giá trị mặc định
+                priceInput.name = "prices";
+                priceInput.min = "1";
+                priceInput.value = "1";
                 priceInput.classList.add("form-control");
                 priceCell.appendChild(priceInput);
                 row.appendChild(priceCell);
 
-                // Cột Hành động
-                // const actionCell = document.createElement("td");
-                // const deleteButton = document.createElement("button");
-                // deleteButton.type = "button";
-                // deleteButton.classList.add("btn", "btn-danger");
-                // deleteButton.textContent = "Xóa";
-                // deleteButton.onclick = () => row.remove(); // Xóa dòng hiện tại
-                // actionCell.appendChild(deleteButton);
-                // row.appendChild(actionCell);
+
+                const imageCell = document.createElement("td");
+
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.id = "fileInput";
+                fileInput.accept = "image/*";
+                fileInput.style.maxWidth = "75px";
+
+                const previewImg = document.createElement("img");
+                previewImg.id = "preview-img";
+                previewImg.src = "";  // Khởi tạo ảnh trống
+                previewImg.alt = "Không có ảnh";
+                previewImg.style.maxWidth = "300px";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = "images";
+                input.style.display = "none";
+
+                fileInput.addEventListener("change", function(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            previewImg.src = e.target.result;
+                            input.value = e.target.result
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                imageCell.appendChild(fileInput);
+                imageCell.appendChild(previewImg);
+                imageCell.appendChild(input);
+
+                row.appendChild(imageCell);
+
 
                 previewTable.appendChild(row);
             });
         });
     }
-
-    function submitForm(e){
-        e.preventDefault();
-        Swal.fire({
-            title: 'Xác nhận thêm sản phẩm',
-            html: 'Bạn có chắc chắn muốn thêm sản phẩm không?',
-            icon: 'success',
-            showCancelButton: true,       // Hiển thị nút "Hủy"
-            confirmButtonText: 'Xác nhận', // Nút xác nhận đăng xuất
-            cancelButtonText: 'Hủy'        // Nút hủy
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById("myForm").submit();
-            }
-        });
-    }
-
 </script>
 </body>
 </html>

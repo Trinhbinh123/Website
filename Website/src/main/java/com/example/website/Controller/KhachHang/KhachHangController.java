@@ -57,17 +57,9 @@ public class KhachHangController {
     public String update(@ModelAttribute KhachHang khachHang) {
         KhachHang oldKhachHang = khachHangRepo.getReferenceById(khachHang.getId());
 
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
-        khachHang.setThanhPho(provinceName);
-        khachHang.setHuyen(districtName);
-        khachHang.setXa(wardName);
         khachHang.setTrangThai(oldKhachHang.getTrangThai());
         khachHang.setMatKhau(oldKhachHang.getMatKhau());
+        khachHang.setId(oldKhachHang.getId());
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }
@@ -75,23 +67,9 @@ public class KhachHangController {
     @PostMapping("/khachHang/save")
     public String save(
             @ModelAttribute KhachHang khachHang) throws MessagingException {
-
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
-        khachHang.setThanhPho(provinceName);
-        khachHang.setHuyen(districtName);
-        khachHang.setXa(wardName);
         khachHang.setTrangThai("Hoạt động");
-
         khachHang.setMatKhau(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
-
         mailService.sendEmail(khachHang.getEmail(), khachHang.getHoTen(), khachHang.getMatKhau(), "/src/mail");
-
-
         khachHangRepo.save(khachHang);
         return "redirect:/admin/khachhang";
     }

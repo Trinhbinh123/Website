@@ -1,10 +1,20 @@
 package com.example.website.Controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 
 import com.example.website.Respository.SanPhamChiTietRepo;
 import org.springframework.http.HttpStatusCode;
@@ -34,11 +44,11 @@ public class HoaDonController {
     private final HoaDonRepo hoaDonRepo;
     private final HoaDonChiTietRepo hoaDonChiTietRepo;
     private final SanPhamRepo sanPhamRepo;
+
+    private final donhangService donhangService;
+
     private final SanPhamChiTietRepo sanPhamChiTietRepo;
-    // @GetMapping("/admin/hoadon")
-    // public String getAdmin() {
-    //     return "src/hoadon/HoaDon";
-    // }
+
 
     @GetMapping("/admin/hoadon")
     public String getAdmin(Model model) {
@@ -104,5 +114,49 @@ public class HoaDonController {
             return ResponseEntity.status(HttpStatusCode.valueOf(500)).build();
         }
         
+    }
+    @GetMapping("/hoadon/export")
+    public void exportToExcel(HttpServletResponse response,
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "10") int size) throws IOException {
+
+        // Tạo đối tượng Pageable để phân trang
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Lấy danh sách hóa đơn từ service hoặc repository (dựa trên phân trang)
+        List<HoaDon> danhSachHoaDon = donhangService.getAllHoaDonexecl(pageable);
+
+        // Tạo workbook và sheet
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Danh Sách Hóa Đơn");
+
+        // Tạo tiêu đề cho các cột
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Mã Đơn Hàng");
+        headerRow.createCell(1).setCellValue("Tên Khách Hàng");
+        headerRow.createCell(2).setCellValue("Ngày Đặt Hàng");
+        headerRow.createCell(3).setCellValue("Tổng Tiền");
+        headerRow.createCell(4).setCellValue("Hình Thức");
+        headerRow.createCell(5).setCellValue("Trạng Thái");
+
+        // Thêm dữ liệu vào các dòng
+        int rowNum = 1;
+        for (HoaDon dh : danhSachHoaDon) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(dh.getMaDonHang());
+            row.createCell(1).setCellValue(dh.getTenKhachHang());
+            row.createCell(2).setCellValue(dh.getNgayDatHang().toString()); // Định dạng lại nếu cần
+            row.createCell(3).setCellValue(dh.getTongTien());
+            row.createCell(4).setCellValue(dh.getHinhThuc());
+            row.createCell(5).setCellValue(dh.getTrangThai());
+        }
+
+        // Set response headers để browser nhận dạng và tải file
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=danh_sach_hoa_don.xlsx");
+
+        // Ghi dữ liệu ra file và gửi đến client
+        workbook.write(response.getOutputStream());
+        workbook.close();
     }
 }

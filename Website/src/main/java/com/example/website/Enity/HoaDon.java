@@ -20,7 +20,6 @@ public class HoaDon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     @ManyToOne
     @JoinColumn(name = "id_khach_hang")
     private KhachHang khachHang;
@@ -54,6 +53,9 @@ public class HoaDon {
 
     @Column(name = "hinh_thuc")
     private String hinhThuc;
+
+    @Column(name = "tien_ship")
+    private int tienShip;
 
     @Column(name = "ghi_chu")
     private String ghiChu;

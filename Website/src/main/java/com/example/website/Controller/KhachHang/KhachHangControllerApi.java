@@ -18,6 +18,9 @@ public class KhachHangControllerApi {
 
     @GetMapping("/data")
     public List<KhachHang> khachHang(@RequestParam Integer id){
+        if(id == 0){
+            return khachHangRepo.findAll();
+        }
         List<KhachHang> khachHangs = khachHangRepo.findAll();
         khachHangs.remove(khachHangRepo.getReferenceById(id));
         return khachHangs;

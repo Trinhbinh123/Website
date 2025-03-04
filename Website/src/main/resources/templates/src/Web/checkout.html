@@ -155,24 +155,24 @@
                                                 <div class="col-lg-4 col-md-12 col-12">
                                                     <fieldset>
                                                         <label class="label">Tỉnh/Thành phố</label>
-                                                        <select id="province" name="thanhPho" class="form-select">
-                                                            <option value="">Chọn</option>
+                                                        <select id="province" onchange="loadDistricts('','')" name="thanhPho" class="form-select">
+
                                                         </select>
                                                     </fieldset>
                                                 </div>
                                                 <div class="col-lg-4 col-md-12 col-12">
                                                     <fieldset>
                                                         <label class="label">Quận/Huyện</label>
-                                                        <select id="district" name="huyen" class="form-select">
-                                                            <option value="">Chọn</option>
+                                                        <select id="district" onchange="loadWards('')" name="huyen" class="form-select">
+
                                                         </select>
                                                     </fieldset>
                                                 </div>
                                                 <div class="col-lg-4 col-md-12 col-12">
                                                     <fieldset>
                                                         <label class="label">Xã</label>
-                                                        <select id="ward" name="xa" class="form-select">
-                                                            <option value="">Chọn</option>
+                                                        <select id="ward" onchange="loadXa(this.value)" name="xa" class="form-select">
+
                                                         </select>
                                                     </fieldset>
                                                 </div>
@@ -203,7 +203,7 @@
                                         </div>
                                         <div class="subtotal-item shipping-box">
                                             <h4 class="subtotal-title">Tiền ship:</h4>
-                                            <p class="subtotal-value" id="shipping" th:text="${#numbers.formatDecimal('30000', 0, 'POINT', 0, 'POINT') + ' VND'}"></p>
+                                            <p class="subtotal-value" id="shipping"></p>
                                         </div>
                                         <hr />
                                         <div class="subtotal-item discount-box">

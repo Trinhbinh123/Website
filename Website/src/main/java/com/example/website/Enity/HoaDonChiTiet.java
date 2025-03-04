@@ -23,9 +23,13 @@ public class HoaDonChiTiet {
     @JoinColumn(name = "id_chi_tiet_san_pham")
     private SanPhamChiTiet sanPhamChiTiet;
 
+
     @Column(name = "so_luong")
     private int soLuong;
 
     @Column(name = "don_gia")
     private int donGia;
+
+    @Column(name = "gia_cu")
+    private int giaCu;
 }

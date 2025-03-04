@@ -25,11 +25,13 @@ function showTop20SP(btn) {
         url: `${api}/top?quantity=20`,
         method: "GET",
         success: function (data) {
+            console.log(data)
             listTopNewSP.innerHTML = ``;
             data.forEach(item => {
                 listTopNewSP.innerHTML += renderTopSP(item);
                 if(item.giamGia === 0){
                     document.getElementById("reduce-" + item.id).style.display = 'none';
+
                 }
             })
             btn.remove();
@@ -53,7 +55,7 @@ function renderTopSP(item) {
                                             <span class="badge-label badge-percentage rounded">${giamGia}</span>
                                         </div>`;
     if(item.giamGia === 0){
-        reduce = '';
+        reduce = `<div class="product-badge" id="reduce-${item.id}"></div>`;
     }
     const row = `<div class="col-lg-3 col-md-6 col-6" data-aos="fade-up" data-aos-duration="700">
                                 <div class="product-card">
@@ -204,7 +206,7 @@ function quickView(idSP) {
                                     <div class="misc d-flex align-items-end justify-content-between mt-4">
                                         <div class="quantity d-flex align-items-center justify-content-between">
                                             <button class="qty-btn dec-qty" onclick="dec()"><img src="/static/src/web/assets/img/icon/minus.svg" alt="minus"></button>
-                                            <input class="qty-input" type="number" id="qty" onchange="checkQty()" name="qty" value="1" min="0">
+                                            <input class="qty-input" type="number" id="qty" name="qty" value="1" min="0">
                                             <button class="qty-btn inc-qty" onclick="plus()"><img src="/static/src/web/assets/img/icon/plus.svg" alt="plus"></button>
                                         </div>
                                         <div class="message-popup d-flex align-items-center">
@@ -381,17 +383,17 @@ function quickView(idSP) {
 
             document.querySelectorAll('input[name="color"]').forEach(radio => {
                 radio.addEventListener('click', function () {
-                    const isSelected = this.getAttribute('data-selected') === 'true'; // Kiểm tra trạng thái đã được chọn
+                    const isSelected = this.getAttribute('data-selected') === 'true';
                     document.querySelectorAll('input[name="color"]').forEach(r => {
-                        r.checked = false; // Bỏ chọn tất cả radio
-                        r.setAttribute('data-selected', 'false'); // Reset trạng thái
-                        r.nextElementSibling.classList.remove('selected'); // Xóa lớp selected
+                        r.checked = false;
+                        r.setAttribute('data-selected', 'false');
+                        r.nextElementSibling.classList.remove('selected');
                     });
 
                     if (!isSelected) {
-                        this.checked = true; // Chỉ chọn radio hiện tại nếu chưa được chọn trước đó
-                        this.setAttribute('data-selected', 'true'); // Đánh dấu trạng thái đã được chọn
-                        this.nextElementSibling.classList.add('selected'); // Thêm lớp selected
+                        this.checked = true;
+                        this.setAttribute('data-selected', 'true');
+                        this.nextElementSibling.classList.add('selected');
                         reloadPrice(idSP);
                         reloadThuocTinh(idSP, "color");
                     }else {
@@ -465,23 +467,10 @@ function quickView(idSP) {
 function plus(){
     const qty = document.getElementById("qty");
     qty.value = parseInt(qty.value, 10) + 1;
-    checkQty();
 }
 function dec(){
     const qty = document.getElementById("qty");
     qty.value = parseInt(qty.value, 10) - 1;
-    checkQty();
-}
-
-function checkQty(){
-    const qty = document.getElementById("qty");
-    if(qty.value < 1){
-        showToast("Số lượng phải lớn hơn 0", "warning");
-        qty.value = 1;
-    }else if(qty.value > 3){
-        showToast("Tối đa 3 sản phẩm", "warning");
-        qty.value = 3;
-    }
 }
 
 function reloadPrice(idSP){
@@ -528,6 +517,12 @@ function addToCart(idSP){
     const idSize = checkRadio('size');
     const qty = document.getElementById("qty").value;
 
+    if(qty < 1){
+        showToast("Số lượng sản phẩm phải lớn hơn 0", "info");
+        return;
+    }
+    console.log(qty)
+
     $.ajax({
         url : `/cart/${idSP}/${idColor}/${idSize}/${qty}`,
         method : "POST",
@@ -549,6 +544,12 @@ function shopNow(idSP){
     const idColor = checkRadio('color');
     const idSize = checkRadio('size');
     const qty = document.getElementById("qty").value;
+
+    if(qty < 1){
+        showToast("Số lượng sản phẩm phải lớn hơn 0", "info");
+        return;
+    }
+    console.log(qty)
 
     $.ajax({
         url : `/cart/toCheckout/${idSP}/${idColor}/${idSize}/${qty}`,

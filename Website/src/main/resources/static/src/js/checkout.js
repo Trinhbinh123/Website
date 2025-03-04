@@ -1,3 +1,5 @@
+const weightOfProductDetail = 400;
+
 function loadCheckout(){
     loadCheckoutPage();
 
@@ -5,91 +7,193 @@ function loadCheckout(){
     const districtName = document.getElementById("districtName").value;
     const wardName = document.getElementById("wardName").value;
 
-    const host = "https://provinces.open-api.vn/api/";
+    loadProvinces(provinceName, districtName, wardName);
+}
 
-    const callAPI = (api) => {
-        return axios.get(api)
-            .then((response) => response.data)
-            .catch(error => {
-                console.error("Error loading data:", error);
-            });
-    };
+function loadProvinces(thanhPho, huyen, xa) {
+    $.ajax({
+        url: 'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+        },
+        success: function (data) {
+            console.log(data)
+            let provinceSelect = document.getElementById('province');
+            provinceSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
 
-    const renderData = (array, select) => {
-        let row = '<option value="">Chọn</option>';
-        array.forEach(element => {
-            row += `<option value="${element.code}" data-name="${element.name}">${element.name}</option>`;
-        });
-        document.querySelector("#" + select).innerHTML = row;
-    };
-
-    const selectOptionByName = (selectId, name) => {
-        const options = document.querySelectorAll(`#${selectId} option`);
-        options.forEach(option => {
-            if (option.getAttribute('data-name') === name) {
-                option.selected = true;
-            }
-        });
-    };
-
-    // Hàm xử lý khi tỉnh thay đổi
-    const handleProvinceChange = () => {
-        const provinceCode = document.querySelector("#province").value;
-        if (provinceCode) {
-            callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
-                renderData(provinceData.districts, "district");
-                document.querySelector("#ward").innerHTML = '<option value="">Chọn xã</option>'; // Xóa xã khi chọn tỉnh mới
-            });
-        }
-    };
-
-    // Hàm xử lý khi huyện thay đổi
-    const handleDistrictChange = () => {
-        const districtCode = document.querySelector("#district").value;
-        if (districtCode) {
-            callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
-                renderData(districtData.wards, "ward");
-            });
-        }
-    };
-
-    // Gọi API để lấy tỉnh
-    callAPI(host + "p").then(provinces => {
-        renderData(provinces, "province");
-        selectOptionByName("province", provinceName);
-
-        let provinceCode = document.querySelector("#province").value;
-        if (provinceCode) {
-            // Gọi API để lấy danh sách huyện
-            callAPI(host + "p/" + provinceCode + "?depth=2").then(provinceData => {
-                renderData(provinceData.districts, "district");
-                selectOptionByName("district", districtName);
-                let districtCode = document.querySelector("#district").value;
-                if (districtCode) {
-                    // Gọi API để lấy danh sách xã
-                    callAPI(host + "d/" + districtCode + "?depth=2").then(districtData => {
-                        renderData(districtData.wards, "ward");
-                        selectOptionByName("ward", wardName);
-                    });
+            data.data.forEach(function (province) {
+                let option = document.createElement('option');
+                option.value = province.ProvinceID;
+                option.text = province.ProvinceName;
+                if(thanhPho === province.ProvinceName){
+                    option.selected = true;
                 }
+                provinceSelect.add(option);
             });
+            if(huyen !== ""){
+                loadDistricts(huyen, xa);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching provinces:', error);
         }
     });
-
-    // Thêm sự kiện khi thay đổi tỉnh
-    document.querySelector("#province").addEventListener("change", handleProvinceChange);
-    // Thêm sự kiện khi thay đổi huyện
-    document.querySelector("#district").addEventListener("change", handleDistrictChange);
-
-
-    const tongTien = document.getElementById("tongTien").innerText;
-    const shipping = document.getElementById("shipping").innerText;
-    const totalPrice = document.getElementById("totalPrice");
-    const tongTienValue = parseInt(tongTien.replace(/\D/g, ''));
-    const shippingValue = parseInt(shipping.replace(/\D/g, ''));
-    const total = tongTienValue + shippingValue;
-    totalPrice.innerText = total.toLocaleString() + ' VND';
 }
+
+function loadDistricts(huyen, xa) {
+    let provinceId = document.getElementById('province').value;
+    let districtSelect = document.getElementById('district');
+    districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+    document.getElementById('ward').innerHTML = '<option value="">Chọn phường/xã</option>';
+    if (provinceId) {
+        return fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+            },
+            body: JSON.stringify({"province_id": parseInt(provinceId)})
+        })
+            .then(response => response.json())
+            .then(data => {
+                data.data.forEach(district => {
+                    let option = document.createElement('option');
+                    option.value = district.DistrictID;
+                    option.text = district.DistrictName;
+                    if(huyen === district.DistrictName){
+                        option.selected = true;
+                    }
+                    districtSelect.add(option);
+                });
+                if(xa !== ""){
+                    loadWards(xa)
+                }
+            })
+            .catch(error => console.error('Error fetching districts:', error));
+    } else {
+        return Promise.resolve();
+    }
+}
+
+function loadWards(xa) {
+    let districtId = document.getElementById('district').value;
+    let wardSelect = document.getElementById('ward');
+    wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+
+    if (districtId) {
+        return fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+            },
+            body: JSON.stringify({"district_id": parseInt(districtId)})
+        })
+            .then(response => response.json())
+            .then(data => {
+                data.data.forEach(ward => {
+                    let option = document.createElement('option');
+                    option.value = ward.WardCode;
+                    option.text = ward.WardName;
+                    if(xa === ward.WardName){
+                        option.selected = true;
+                        let qty = 0;
+                        listGioHang.forEach(item => {
+                            qty += item.soLuong;
+                        })
+                        console.log(qty)
+                        const weight = Math.min(qty * weightOfProductDetail, 4999);
+                        ship(districtId, weight);
+                    }
+                    wardSelect.add(option);
+                });
+            })
+            .catch(error => console.error('Error fetching wards:', error));
+    } else {
+        return Promise.resolve();
+    }
+}
+
+function loadXa(value){
+    let xa = document.querySelector(`select option[value="${value}"]`).innerText;
+    loadWards(xa);
+}
+
+function ship(toDistrictId, weight){
+    const fromDistrictId = 3440;
+    getServiceId(parseInt(fromDistrictId), parseInt(toDistrictId), weight)
+        .then(serviceId => {
+            if (!serviceId) {
+                showToast('Không tìm thấy mã dịch vụ phù hợp.', "info");
+                return;
+            }
+            return fetch('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                },
+                body: JSON.stringify({
+                    "from_district_id": parseInt(fromDistrictId),
+                    "service_id": serviceId,
+                    "to_district_id": parseInt(toDistrictId),
+                    "weight": weight,
+                    "length": 20,
+                    "width": 15,
+                    "height": 5
+                })
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.code === 200) {
+                console.log(data.data.total)
+                const ship = document.getElementById("shipping");
+                ship.innerText = data.data.total.toLocaleString() + " VND";
+                const tongTien = document.getElementById("tongTien").innerText;
+                const shipping = document.getElementById("shipping").innerText;
+                const totalPrice = document.getElementById("totalPrice");
+                const tongTienValue = parseInt(tongTien.replace(/\D/g, ''));
+                const shippingValue = parseInt(shipping.replace(/\D/g, ''));
+                const total = tongTienValue + shippingValue;
+                totalPrice.innerText = total.toLocaleString() + ' VND';
+            } else {
+                console.error('Lỗi tính phí ship:', data.message);
+            }
+        })
+}
+
+function getServiceId(fromDistrictId, toDistrictId, weight) {
+    return fetch('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+        },
+        body: JSON.stringify({
+            "shop_id": 5445966,
+            "from_district": fromDistrictId,
+            "to_district": toDistrictId
+        })
+
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200 && data.data.length > 0) {
+                console.log(data.data)
+                const service = data.data.find(s => (weight < 5000 && s.short_name === "Hàng nhẹ") || (weight >= 5000 && s.short_name === "Hàng nặng"));
+                return service ? service.service_id : null;
+            } else {
+                throw new Error('Không có dịch vụ nào khả dụng hoặc lỗi khi lấy service_id');
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi khi lấy service_id:', error);
+        });
+}
+
 const listGioHang = JSON.parse(sessionStorage.getItem('listGioHang'));
 
 function loadCheckoutPage(){
@@ -171,6 +275,9 @@ function validateForm() {
         showToast("Vui lòng chọn Phường/Xã.", "info");
         return false;
     }
+    let province = document.querySelector(`select option[value="${thanhPho}"]`).innerText;
+    let district = document.querySelector(`select option[value="${huyen}"]`).innerText;
+    let ward = document.querySelector(`select option[value="${xa}"]`).innerText;
 
     // Tạo mảng hoặc đối tượng khachHang với các thông tin từ form
     userData = {
@@ -179,9 +286,9 @@ function validateForm() {
         email: email,
         soDienThoai: soDienThoai,
         diaChi: diaChi,
-        thanhPho: thanhPho,
-        huyen: huyen,
-        xa: xa
+        thanhPho: province,
+        huyen: district,
+        xa: ward
     };
     return true;
 }
@@ -193,14 +300,17 @@ function checkout(e){
         const formSubmit = document.getElementById("formCheckOut");
         const inputs = document.querySelectorAll('.integers');
         const integers = Array.from(inputs).map(input => parseInt(input.value, 10));
+        const ship = document.getElementById("shipping").innerText;
+        const shipValue = parseInt(ship.replace(/\D/g, ''));
         let data = {
             gioHangs : listGioHang,
-            khachHang : userData
+            khachHang : userData,
+            ship: shipValue
         }
         const radio = document.getElementById("flexRadioDefault1");
         if(radio.checked){
             $.ajax({
-                url : "/checkout/successCheckout?payment=" + 1,
+                url : `/checkout/successCheckout?payment=1&ship=${shipValue}`,
                 method: "POST",
                 contentType: "application/json",
                 data: JSON.stringify(data),
@@ -214,7 +324,7 @@ function checkout(e){
                 }
             })
         }else {
-            const tongTien = document.getElementById("tongTien").innerText;
+            const tongTien = document.getElementById("totalPrice").innerText;
             const tongTienValue = parseInt(tongTien.replace(/\D/g, ''));
             $.ajax({
                 url : "/api/v1/payment/createPayment?money=" + tongTienValue,
