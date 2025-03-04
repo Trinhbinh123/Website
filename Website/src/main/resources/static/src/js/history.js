@@ -64,7 +64,7 @@ function renderHoaDon(item){
                             <img src="${hd.sanPhamChiTiet.anh_spct}" alt="Sản phẩm 3">
                             <p style="font-size: 18px">${hd.sanPhamChiTiet.sanPham.tensanpham} <sup>x${hd.soLuong}</sup></p>
                             <p>${hd.sanPhamChiTiet.size.ten_size} / ${hd.sanPhamChiTiet.mauSac.tenmausac}</p>  
-                            <p>Giá: <span class="price">${hd.donGia}</span></p>
+                            <p>Giá: <span class="price">${hd.donGia  }</span></p>
                         </div>`;
     })
     item.hoaDon.trangThai = convertTex(item.hoaDon.trangThai);

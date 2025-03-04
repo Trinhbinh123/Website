@@ -37,9 +37,10 @@ public class SanPhamChiTietController {
         return "src/san-pham-chi-tiet/AddSPCT"; // Template thêm sản phẩm
     }
 
-    @PostMapping("/san-pham-chi-tiet/delete")
-    public String delete(@RequestParam Integer id) {
+    @GetMapping("/san-pham-chi-tiet/delete")
+    public String delete(@RequestParam("id")  Integer id) {
         SanPhamChiTiet spct = sanPhamChiTietRepo.getReferenceById(id);
+        System.out.println(id);
         if (spct != null) {
             spct.setSo_luong(0); // Đặt số lượng sản phẩm chi tiết thành 0
             spct.setTrang_thai(false); // Đặt trạng thái thành Inactive

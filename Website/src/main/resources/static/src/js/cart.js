@@ -138,43 +138,23 @@ function renderCartPage(item){
 function checkQuantity(idCart){
     const quantity = document.getElementById("quantity-"+idCart)
     const tongTien = document.getElementById("tongTien-" + idCart);
-    if(quantity.value > 3){
-        $.ajax({
-            url: "/cart/checkQuantityIfMax/" + idCart ,
-            method: "GET",
-            success: function (data) {
-                if (data === ""){
-                    document.getElementById(idCart).remove();
-                    return;
-                }
-                if(data.id === -1){
-                    showToast("Số lượng phải nhỏ hơn " + data.soLuong, "error");
-                }else {
-                    showToast("Số lượng từ 1-3", "error");
-                }
-                quantity.value = data.soLuong;
-                tongTien.innerText = data.tongTien.toLocaleString() + " VND";
+    $.ajax({
+        url: "/cart/checkQuantityCauseChange/" + idCart +"?quantity=" + quantity.value.trim(),
+        method: "GET",
+        success: function (data) {
+            if (data === ""){
+                document.getElementById(idCart).remove();
+                return
             }
-        })
-    }else {
-        $.ajax({
-            url: "/cart/checkQuantityCauseChange/" + idCart +"?quantity=" + quantity.value.trim(),
-            method: "GET",
-            success: function (data) {
-                if (data === ""){
-                    document.getElementById(idCart).remove();
-                    return
-                }
-                if(data.id === -1){
-                    showToast("Số lượng phải nhỏ hơn " + data.soLuong, "error");
-                }else if(data.id === -2){
-                    showToast("Số lượng phải lớn hơn 1", "error");
-                }
-                quantity.value = data.soLuong;
-                tongTien.innerText = data.tongTien;
+            if(data.id === -1){
+                showToast("Số lượng phải nhỏ hơn " + data.soLuong, "error");
+            }else if(data.id === -2){
+                showToast("Số lượng phải lớn hơn 1", "error");
             }
-        })
-    }
+            quantity.value = data.soLuong;
+            tongTien.innerText = data.tongTien.toLocaleString() + " VND";
+        }
+    })
 }
 
 function quantity(idCart, status, e) {
@@ -203,7 +183,7 @@ function quantity(idCart, status, e) {
                             tongTien.innerText = data.tongTien.toLocaleString() + " VND";
                             chooseCheckbox();
                         } else {
-                            showToast("Số lượng từ 1-3", "error");
+                            showToast("Số lượng phải lớn hơn 1", "error");
                         }
                     }
                 })

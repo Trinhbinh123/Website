@@ -55,30 +55,29 @@
                                 <h5>Thông tin địa chỉ</h5>
                                 <div class="mb-3">
                                     <label for="province" class="form-label">Tỉnh/ Thành phố</label>
-                                    <select id="province" name="thanhPho" class="form-select" required>
+                                    <select id="province" onchange="loadDistricts('','')" name="province" class="form-select" required>
                                         <option value="">Chọn</option>
                                     </select>
+                                    <input type="text" th:value="${KH.thanhPho}" style="display: none" name="thanhPho" id="thanhPho">
                                 </div>
                                 <div class="mb-3">
                                     <label for="district" class="form-label">Quận/ Huyện</label>
-                                    <select id="district" name="huyen" class="form-select" required>
+                                    <select id="district" onchange="loadWards('')" name="district" class="form-select" required>
                                         <option value="">Chọn</option>
                                     </select>
+                                    <input type="text" th:value="${KH.huyen}" style="display: none" name="huyen" id="huyen">
                                 </div>
                                 <div class="mb-3">
                                     <label for="ward" class="form-label">Phường/ Xã</label>
-                                    <select id="ward" name="xa" class="form-select" required>
+                                    <select id="ward" onchange="getAddress()" name="ward" class="form-select" required>
                                         <option value="">Chọn</option>
                                     </select>
+                                    <input type="text" th:value="${KH.xa}" style="display: none" name="xa" id="xa">
                                 </div>
                                 <div class="mb-3">
                                     <label for="addressDetails" class="form-label">Địa chỉ chi tiết</label>
                                     <input type="text" id="addressDetails" name="diaChi" class="form-control" placeholder="Số nhà, đường..." required>
                                 </div>
-                                <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
-                                <input type="hidden" th:value="${KH.thanhPho}" id="provinceName" name="1">
-                                <input type="hidden" th:value="${KH.huyen}" id="districtName" name="2">
-                                <input type="hidden" th:value="${KH.xa}" id="wardName" name="3">
                             </div>
                         </div>
                     </div>

@@ -14,4 +14,5 @@ import java.util.List;
 public class CheckOutResponse {
     private List<GioHang> gioHangs;
     private KhachHang khachHang;
+    private int ship;
 }

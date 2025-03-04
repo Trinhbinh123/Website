@@ -81,12 +81,13 @@ public class SanPhamController {
                        @RequestParam(value = "sizes", required = false) List<Integer> sizeIds,
                        @RequestParam(value = "mauSacs", required = false) List<Integer> mauSacIds,
                        @RequestParam(value = "quantities", required = false) List<Integer> quantities,
-                       @RequestParam(value = "prices", required = false) List<Double> prices) {
+                       @RequestParam(value = "prices", required = false) List<Double> prices,
+                       @RequestParam(value = "images", required = false) List<String> images) {
         // Kiểm tra nếu tên sản phẩm trống hoặc chỉ chứa khoảng trắng
-        if (sanPham.getTensanpham().trim().isEmpty()) {
-            model.addAttribute("errorMessage", "Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
-            return "src/san-pham/AddSanPham"; // Trả lại trang thêm sản phẩm với thông báo lỗi
-        }
+//        if (sanPham.getTensanpham().trim().isEmpty()) {
+//            model.addAttribute("errorMessage", "Tên sản phẩm không thể để trống hoặc chỉ chứa khoảng trắng.");
+//            return "src/san-pham/AddSanPham"; // Trả lại trang thêm sản phẩm với thông báo lỗi
+//        }
         if (sanPham.getMa_sanpham() == null || sanPham.getMa_sanpham().isEmpty()) {
             sanPham.setMa_sanpham(generateProductCode());
         }
@@ -109,7 +110,8 @@ public class SanPhamController {
                         spct.setGia_ban(prices.get(index));// Lấy số lượng tương ứng
                         spct.setTrang_thai(true);
                         spct.setNgay_nhap(LocalDateTime.now()); // Ngày hiện tại
-                        spct.setMa_SPCT(a1());
+                        spct.setMa_SPCT("aaa");
+                        spct.setAnh_spct(images.get(index));
                         sanPhamChiTietRepo.save(spct);
                     }
                     index++;

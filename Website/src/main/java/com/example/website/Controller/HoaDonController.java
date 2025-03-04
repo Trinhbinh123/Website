@@ -48,10 +48,7 @@ public class HoaDonController {
     private final donhangService donhangService;
 
     private final SanPhamChiTietRepo sanPhamChiTietRepo;
-    // @GetMapping("/admin/hoadon")
-    // public String getAdmin() {
-    //     return "src/hoadon/HoaDon";
-    // }
+
 
     @GetMapping("/admin/hoadon")
     public String getAdmin(Model model) {

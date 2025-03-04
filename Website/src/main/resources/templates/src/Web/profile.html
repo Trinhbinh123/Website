@@ -293,7 +293,7 @@
                         <div class="col-lg-3 col-md-12 col-12">
                             <fieldset>
                                 <label class="label">Tỉnh/Thành phố</label>
-                                <select id="province" name="thanhPho" class="form-select">
+                                <select id="province" onchange="loadDistricts('','')" name="thanhPho" class="form-select">
                                     <option value="">Chọn</option>
                                 </select>
                             </fieldset>
@@ -301,7 +301,7 @@
                         <div class="col-lg-3 col-md-12 col-12">
                             <fieldset>
                                 <label class="label">Quận/Huyện</label>
-                                <select id="district" name="huyen" class="form-select">
+                                <select id="district" onchange="loadWards('')" name="huyen" class="form-select">
                                     <option value="">Chọn</option>
                                 </select>
                             </fieldset>

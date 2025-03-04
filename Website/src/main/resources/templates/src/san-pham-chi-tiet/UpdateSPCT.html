@@ -35,9 +35,10 @@
                                     <input type="datetime-local" id="ngayNhap" th:value="${spct.ngay_nhap}" name="ngay_nhap" class="form-control" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="anh_spct" class="form-label">Ảnh</label>
-                                    <input type="text" id="anh_spct" name="anh_spct" class="form-control" required readonly>
-                                    <button type="button" class="btn btn-info mt-2" onclick="openFileDialog1()">Chọn ảnh</button>
+                                    <label for="fileInput" class="form-label">Ảnh</label>
+                                    <input type="file" id="fileInput" name="fileInput" class="form-control">
+                                    <img id="preview-img" th:src="@{${spct.anh_spct}}" alt="Không có ảnh" style="max-width: 300px;">
+                                    <input type="text" style="display: none" name="anh_spct" id="image">
                                 </div>
                                 <div class="mb-3">
                                     <img id="preview" src="#" alt="Ảnh sản phẩm" style="display:none; max-width: 200px; max-height: 200px;"/>
@@ -81,6 +82,24 @@
 </div>
 <div th:replace="~{src/partials/_script :: _script}"></div>
 <script>
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview-img');
+    const image = document.getElementById("image");
+
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                image.value = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+
     function openFileDialog1() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';

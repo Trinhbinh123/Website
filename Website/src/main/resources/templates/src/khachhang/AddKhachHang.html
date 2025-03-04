@@ -54,13 +54,13 @@
                                 <h5>Thông tin địa chỉ</h5>
                                 <div class="mb-3">
                                     <label for="province" class="form-label">Tỉnh/ Thành phố</label>
-                                    <select id="province" name="thanhPho" class="form-select" required>
+                                    <select id="province" onchange="loadDistricts(this.value)" name="thanhPho" class="form-select" required>
                                         <option value="">Chọn</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="district" class="form-label">Quận/ Huyện</label>
-                                    <select id="district" name="huyen" class="form-select" required>
+                                    <select id="district" onchange="loadWards(this.value)" name="huyen" class="form-select" required>
                                         <option value="">Chọn</option>
                                     </select>
                                 </div>
@@ -75,10 +75,7 @@
                                     <input type="text" id="addressDetails" name="diaChi" class="form-control"
                                            placeholder="Số nhà, đường..." required>
                                 </div>
-                                <!-- Các trường ẩn chứa tên tỉnh/huyện/xã -->
-                                <input type="hidden" id="provinceName" name="provinceName">
-                                <input type="hidden" id="districtName" name="districtName">
-                                <input type="hidden" id="wardName" name="wardName">
+
                             </div>
                         </div>
                     </div>
@@ -95,61 +92,94 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         function loadingg() {
-            const host = "https://provinces.open-api.vn/api/";
-
-            const callAPI = (api) => {
-                return axios.get(api)
-                    .then((response) => {
-                        renderData(response.data, "province");
-                    })
-                    .catch(error => {
-                        console.error("Error loading provinces:", error);
-                    });
-            };
-
-            const renderData = (array, select) => {
-                let row = '<option value="">Chọn</option>';
-                array.forEach(element => {
-                    row += `<option value="${element.code}" data-name="${element.name}">${element.name}</option>`;
-                });
-                document.querySelector("#" + select).innerHTML = row;
-            };
-
-            document.querySelector("#province").addEventListener("change", () => {
-                let provinceCode = document.querySelector("#province").value;
-                if (provinceCode) {
-                    axios.get(host + "p/" + provinceCode + "?depth=2")
-                        .then(response => renderData(response.data.districts, "district"))
-                        .catch(error => console.error("Error loading districts:", error));
-                }
-            });
-
-            document.querySelector("#district").addEventListener("change", () => {
-                let districtCode = document.querySelector("#district").value;
-                if (districtCode) {
-                    axios.get(host + "d/" + districtCode + "?depth=2")
-                        .then(response => renderData(response.data.wards, "ward"))
-                        .catch(error => console.error("Error loading wards:", error));
-                }
-            });
-
-            callAPI(host + "p");
+            loadProvinces();
         }
 
-        function collectAddressNames() {
-            const provinceSelect = document.querySelector("#province");
-            const districtSelect = document.querySelector("#district");
-            const wardSelect = document.querySelector("#ward");
+        function loadProvinces() {
+            $.ajax({
+                url: 'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                },
+                success: function (data) {
+                    console.log(data)
+                    let provinceSelect = document.getElementById('province');
+                    provinceSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
 
-            const provinceName = provinceSelect.options[provinceSelect.selectedIndex].getAttribute("data-name");
-            const districtName = districtSelect.options[districtSelect.selectedIndex].getAttribute("data-name");
-            const wardName = wardSelect.options[wardSelect.selectedIndex].getAttribute("data-name");
+                    data.data.forEach(function (province) {
+                        let option = document.createElement('option');
+                        option.value = province.ProvinceName;
+                        option.setAttribute("data-id", province.ProvinceID)
+                        option.text = province.ProvinceName;
+                        provinceSelect.add(option);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching provinces:', error);
+                }
+            });
+        }
 
-            document.querySelector("#provinceName").value = provinceName;
-            document.querySelector("#districtName").value = districtName;
-            document.querySelector("#wardName").value = wardName;
+        function loadDistricts(province) {
+            let option = document.querySelector(`#province option[value="${province}"]`).getAttribute("data-id");
+            let districtSelect = document.getElementById('district');
+            districtSelect.innerHTML = '<option value="">Chọn quận/huyện</option>';
+            document.getElementById('ward').innerHTML = '<option value="">Chọn phường/xã</option>';
+            if (option) {
+                return fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                    },
+                    body: JSON.stringify({"province_id": parseInt(option)})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        data.data.forEach(district => {
+                            let option = document.createElement('option');
+                            option.value = district.DistrictName;
+                            option.setAttribute("data-id", district.DistrictID)
+                            option.text = district.DistrictName;
+                            districtSelect.add(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching districts:', error));
+            } else {
+                return Promise.resolve();
+            }
+        }
 
-            return true;
+        function loadWards(district) {
+            let option = document.querySelector(`#district option[value="${district}"]`).getAttribute("data-id");
+            let wardSelect = document.getElementById('ward');
+            wardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+
+            if (option) {
+                return fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/ward', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                    },
+                    body: JSON.stringify({"district_id": parseInt(option)})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        data.data.forEach(ward => {
+                            let option = document.createElement('option');
+                            option.value = ward.WardName;
+                            option.setAttribute("data-id", ward.WardCode)
+                            option.text = ward.WardName;
+                            wardSelect.add(option);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching wards:', error));
+            } else {
+                return Promise.resolve();
+            }
         }
 
         function checkValidate(e) {
@@ -220,6 +250,8 @@
                 return;
             }
 
+
+
             if (dataCheck.diaChi === "") {
                 // error.textContent = "Không được bỏ trống địa chỉ";
                 showToast("Không được bỏ trống địa chỉ", "error")
@@ -253,6 +285,7 @@
                         cancelButtonText: 'Hủy'        // Nút hủy
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            console.log(dataCheck)
                             form.submit();
                         }
                     });
@@ -260,6 +293,78 @@
                 error: function (error) {
                     console.log(error);
                 }
+            });
+        }
+
+        function getProvinceName(provinceId) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    url: 'https://online-gateway.ghn.vn/shiip/public-api/master-data/province',
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                    },
+                    success: function (data) {
+                        let province = data.data.find(item => item.ProvinceID == provinceId);
+                        if (province) {
+                            resolve(province.ProvinceName);  // Trả về tên tỉnh khi thành công
+                        } else {
+                            reject('Province not found');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        reject('Error fetching province: ' + error);  // Nếu có lỗi xảy ra
+                    }
+                });
+            });
+        }
+        function getDistrictName(districtId, provinceId) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    url: 'https://online-gateway.ghn.vn/shiip/public-api/master-data/district',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                    },
+                    data: JSON.stringify({"province_id": parseInt(provinceId)}),
+                    success: function (data) {
+                        let district = data.data.find(item => item.DistrictID == districtId);
+                        if (district) {
+                            resolve(district.DistrictName);  // Trả về tên quận/huyện khi tìm thấy
+                        } else {
+                            reject('District not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        reject('Error fetching district: ' + error);  // Trả về lỗi nếu có sự cố
+                    }
+                });
+            });
+        }
+        function getWardName(wardId, districtId) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    url: 'https://online-gateway.ghn.vn/shiip/public-api/master-data/ward',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Token': 'e72e960b-9e77-11ef-a35f-3e447ea83dcd'
+                    },
+                    data: JSON.stringify({"district_id": parseInt(districtId)}),
+                    success: function (data) {
+                        let ward = data.data.find(item => item.WardCode == wardId);
+                        if (ward) {
+                            resolve(ward.WardName);  // Trả về tên phường/xã khi tìm thấy
+                        } else {
+                            reject('Ward not found');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        reject('Error fetching ward: ' + error);  // Trả về lỗi nếu có sự cố
+                    }
+                });
             });
         }
 

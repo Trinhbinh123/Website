@@ -54,7 +54,7 @@
                                             </a>
                                             <form th:action="@{/san-pham-chi-tiet/delete}" method="post" style="display:inline;" id="myForm">
                                                 <input type="hidden" name="id" th:value="${spct.id}" />
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="submitForm(event)">Xóa</button>
+                                                <button type="submit" th:id="${spct.id}"  class="btn btn-danger btn-sm" onclick="submitForm(event, this.getAttribute('id'))">Xóa</button>
                                             </form>
                                         </div>
                                     </td>
@@ -74,7 +74,7 @@
                 pageLength: 5
             });
         }
-        function submitForm(e){
+        function submitForm(e, id){
             e.preventDefault();
             Swal.fire({
                 title: 'Xác nhận đổi trạng thái sản phẩm chi tiết',
@@ -85,7 +85,7 @@
                 cancelButtonText: 'Hủy'        // Nút hủy
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById("myForm").submit();
+                    window.location.href = `/san-pham-chi-tiet/delete?id=${id}`;
                 }
             });
         }

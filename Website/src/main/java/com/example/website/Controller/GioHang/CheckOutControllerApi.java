@@ -65,42 +65,33 @@ public class CheckOutControllerApi {
     ){
         List<GioHang> gioHangs = checkOutResponse.getGioHangs();
         KhachHang khachHang = checkOutResponse.getKhachHang();
-        List<HoaDon> hoaDons = hoaDonRepo.findAll().stream()
-                .filter(hoaDon -> hoaDon.getTrangThai().equals("Chờ xác nhận") || hoaDon.getTrangThai().equals("Xác nhận"))
-                .toList();
-        for(GioHang gioHang : gioHangs){
-            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.getReferenceById(gioHang.getSanPhamChiTiet().getId());
-            int soLuong = 0;
-            for (HoaDon hoaDon : hoaDons){
-                List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietRepo.findByHoaDon(hoaDon).stream()
-                        .filter(hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().equals(sanPhamChiTiet))
-                        .toList();
-                if(!hoaDonChiTiets.isEmpty()){
-                    HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
-                    soLuong += hoaDonChiTiet.getSoLuong();
-                }
-            }
-            int soLuongTonKho = sanPhamChiTiet.getSo_luong() - soLuong;
-            if(soLuongTonKho < gioHang.getSoLuong()){
-                return "Số lượng của giày " + sanPhamChiTiet.getSanPham().getTensanpham() +" chỉ còn "+ soLuongTonKho +" sản phẩm khả dụng . Vui lòng giảm số lượng để mua";
-            }
-        }
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
-
+        int ship = checkOutResponse.getShip();
+//        List<HoaDon> hoaDons = hoaDonRepo.findAll().stream()
+//                .filter(hoaDon -> hoaDon.getTrangThai().equals("Chờ xác nhận") || hoaDon.getTrangThai().equals("Xác nhận"))
+//                .toList();
+//        for(GioHang gioHang : gioHangs){
+//            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepo.getReferenceById(gioHang.getSanPhamChiTiet().getId());
+//            int soLuong = 0;
+//            for (HoaDon hoaDon : hoaDons){
+//                List<HoaDonChiTiet> hoaDonChiTiets = hoaDonChiTietRepo.findByHoaDon(hoaDon).stream()
+//                        .filter(hoaDonChiTiet -> hoaDonChiTiet.getSanPhamChiTiet().equals(sanPhamChiTiet))
+//                        .toList();
+//                if(!hoaDonChiTiets.isEmpty()){
+//                    HoaDonChiTiet hoaDonChiTiet = hoaDonChiTiets.get(0);
+//                    soLuong += hoaDonChiTiet.getSoLuong();
+//                }
+//            }
+//            int soLuongTonKho = sanPhamChiTiet.getSo_luong() - soLuong;
+//            if(soLuongTonKho < gioHang.getSoLuong()){
+//                return "Số lượng của giày " + sanPhamChiTiet.getSanPham().getTensanpham() +" chỉ còn "+ soLuongTonKho +" sản phẩm khả dụng . Vui lòng giảm số lượng để mua";
+//            }
+//        }
 
         HoaDon hoaDon = new HoaDon();
-        hoaDon.setKhachHang(khachHang);
-        hoaDon.setDiaChi(provinceName + ", " + districtName + ", " + wardName + ", " + khachHang.getDiaChi());
-        hoaDon.setMaDonHang("#" + UUID.randomUUID().toString().replace("-", "").substring(10).toUpperCase(Locale.ROOT));
-        hoaDon.setTenKhachHang(khachHang.getHoTen());
-        hoaDon.setEmail(khachHang.getEmail());
-        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
-        hoaDon.setNgayDatHang(new Date());
+        hoaDon.setKhachHang(khachHangRepo.getReferenceById(khachHang.getId()));
+        hoaDon.setDiaChi(khachHang.getDiaChi() + ", " + khachHang.getXa() + ", " + khachHang.getHuyen() + ", " + khachHang.getThanhPho());
+        hoaDon.setTienShip(ship);
+        updateBillToSuccess(khachHang, hoaDon);
         hoaDon.setTrangThai("Chờ xác nhận");
         if (payment.equals("1")) {
             hoaDon.setHinhThuc("Thanh toán khi nhận hàng");
@@ -125,28 +116,28 @@ public class CheckOutControllerApi {
         return null;
     }
 
+    private void updateBillToSuccess(KhachHang khachHang, HoaDon hoaDon) {
+        hoaDon.setMaDonHang("#" + UUID.randomUUID().toString().replace("-", "").substring(10).toUpperCase(Locale.ROOT));
+        hoaDon.setTenKhachHang(khachHang.getHoTen());
+        hoaDon.setEmail(khachHang.getEmail());
+        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
+        hoaDon.setNgayDatHang(new Date());
+    }
+
     @PostMapping("/checkoutWithVNPAY")
     public void vnPay(
             @RequestBody CheckOutResponse checkOutResponse
     ){
         List<GioHang> gioHangs = checkOutResponse.getGioHangs();
         KhachHang khachHang = checkOutResponse.getKhachHang();
-        String[] provinceDetails = getProvinceDetails(khachHang.getThanhPho());
-        String[] districtDetails = getDistrictDetails(khachHang.getHuyen());
-        String[] wardDetails = getWardDetails(khachHang.getXa());
-        String provinceName = provinceDetails[1];
-        String districtName = districtDetails[1];
-        String wardName = wardDetails[1];
+        int ship = checkOutResponse.getShip();
 
         HoaDon hoaDon = new HoaDon();
         hoaDon.setKhachHang(khachHang);
-        hoaDon.setDiaChi(provinceName + ", " + districtName + ", " + wardName + ", " + khachHang.getDiaChi());
-        hoaDon.setMaDonHang("#" + UUID.randomUUID().toString().replace("-", "").substring(10).toUpperCase(Locale.ROOT));
-        hoaDon.setTenKhachHang(khachHang.getHoTen());
-        hoaDon.setEmail(khachHang.getEmail());
-        hoaDon.setSoDienThoai(khachHang.getSoDienThoai());
-        hoaDon.setNgayDatHang(new Date());
+        hoaDon.setDiaChi(khachHang.getDiaChi() + ", " + khachHang.getXa() + ", " + khachHang.getHuyen() + ", " + khachHang.getThanhPho());
+        updateBillToSuccess(khachHang, hoaDon);
         hoaDon.setTrangThai("Xác nhận");
+        hoaDon.setTienShip(ship);
         hoaDon.setHinhThuc("Thanh toán bằng VN Pay");
         HoaDon saveHoaDon = hoaDonRepo.save(hoaDon);
 

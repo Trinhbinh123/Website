@@ -9,4 +9,5 @@ import java.util.List;
 public interface HoaDonChiTietRepo extends JpaRepository<HoaDonChiTiet, Integer> {
     List<HoaDonChiTiet> findByHoaDon(HoaDon hoaDon);
 
+    Integer id(int id);
 }

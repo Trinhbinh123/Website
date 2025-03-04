@@ -2,6 +2,7 @@ const idSP = sessionStorage.getItem("idSP");
 const api = "/api/v1/web";
 const apiV1 = "/api/v1/user";
 function loadDetail(){
+    console.log("haha")
     renderNavBar();
     quickView(idSP);
 }
@@ -57,7 +58,6 @@ function quickView(idSP) {
                     <label class="variant-label" id="label-size-${item.id}" for="size-${item.id}">${item.ten_size}</label>
                 </li>`;
             });
-
             // const modal = document.getElementById("modal-quickView");
             // modal.remove();
             document.getElementById("myDetail").innerHTML = `<div class="product-details ps-lg-4">
@@ -111,7 +111,7 @@ function quickView(idSP) {
                                     <div class="misc d-flex align-items-end justify-content-between mt-4">
                                         <div class="quantity d-flex align-items-center justify-content-between">
                                             <button class="qty-btn dec-qty" onclick="dec()"><img src="/static/src/web/assets/img/icon/minus.svg" alt="minus"></button>
-                                            <input class="qty-input" type="number" id="qty" onchange="checkQty()" name="qty" value="1" min="0">
+                                            <input class="qty-input" type="number" id="qty" name="qty" value="1" min="0">
                                             <button class="qty-btn inc-qty" onclick="plus()"><img src="/static/src/web/assets/img/icon/plus.svg" alt="plus"></button>
                                         </div>
                                         <div class="message-popup d-flex align-items-center">
@@ -340,29 +340,6 @@ function quickView(idSP) {
     })
 }
 
-
-function plus(){
-    const qty = document.getElementById("qty");
-    qty.value = parseInt(qty.value, 10) + 1;
-    checkQty();
-}
-function dec(){
-    const qty = document.getElementById("qty");
-    qty.value = parseInt(qty.value, 10) - 1;
-    checkQty();
-}
-
-function checkQty(){
-    const qty = document.getElementById("qty");
-    if(qty.value < 1){
-        showToast("Số lượng phải lớn hơn 0", "warning");
-        qty.value = 1;
-    }else if(qty.value > 3){
-        showToast("Tối đa 3 sản phẩm", "warning");
-        qty.value = 3;
-    }
-}
-
 function reloadPrice(idSP){
     const idColor = checkRadio('color');
     const idSize = checkRadio('size');
@@ -402,10 +379,25 @@ function checkRadio(name) {
     }
 }
 
+function plus(){
+    const qty = document.getElementById("qty");
+    qty.value = parseInt(qty.value, 10) + 1;
+}
+function dec(){
+    const qty = document.getElementById("qty");
+    qty.value = parseInt(qty.value, 10) - 1;
+}
+
 function addToCart(idSP){
     const idColor = checkRadio('color');
     const idSize = checkRadio('size');
+
     const qty = document.getElementById("qty").value;
+    if(qty < 1){
+        showToast("Số lượng sản phẩm phải lớn hơn 0", "info");
+        return;
+    }
+    console.log(qty)
 
     $.ajax({
         url : `/cart/${idSP}/${idColor}/${idSize}/${qty}`,
@@ -482,7 +474,13 @@ function reloadThuocTinh(idSP, target){
 function shopNow(idSP){
     const idColor = checkRadio('color');
     const idSize = checkRadio('size');
+
     const qty = document.getElementById("qty").value;
+    if(qty < 1){
+        showToast("Số lượng sản phẩm phải lớn hơn 0", "info");
+        return;
+    }
+    console.log(qty)
 
     $.ajax({
         url : `/cart/toCheckout/${idSP}/${idColor}/${idSize}/${qty}`,

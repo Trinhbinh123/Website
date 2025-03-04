@@ -50,5 +50,4 @@ public interface HoaDonRepo extends JpaRepository<HoaDon, Integer> {
     List<Object[]> findMonthlyStatistics(@Param("year") Integer year, @Param("month") Integer month);
 
 
-
 }

@@ -45,6 +45,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/admin/**").hasRole("ADMIN");
+                    registry.requestMatchers("/login", "/register","/website").permitAll();
+                    registry.requestMatchers(
+                            "/quenMk/**",
+                            "/api/**",
+                            "/detail/**",
+                            "/static/src/website/css/**",
+                            "/static/src/website/js/**",
+                            "/static/src/website/css/**",
+                            "/static/src/website/**",
+                            "/static/src/website/lib/**").permitAll();
                     registry.requestMatchers("/login", "/register").permitAll();
 //                    registry.requestMatchers("/website",
 //                            "/cart/**",

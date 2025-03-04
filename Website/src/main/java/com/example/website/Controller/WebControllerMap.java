@@ -153,6 +153,7 @@ public class WebControllerMap {
     public String newPass(Authentication authentication, Model model, @PathVariable String email){
         model.addAttribute("user", getCurrentUser(authentication));
         KhachHang khachHang = khachHangRepo.findByEmail(email);
+        System.out.println( khachHang);
         model.addAttribute("id", khachHang.getId());
         return "src/Web/new-password";
     }

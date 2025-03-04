@@ -52,8 +52,8 @@ public class GioHangControllerApi {
         List<GioHang> gioHangs = gioHangRepo.findByKhachHang(khachHang);
         for(GioHang gh : gioHangs){
             if(gh.getSanPhamChiTiet().equals(sanPhamChiTiet)){
-                if(gh.getSoLuong() + soLuong > 3){
-                    return "Đã có " + gh.getSoLuong() + " sản phẩm trong giỏ hàng (Tối đa 3 sản phẩm)";
+                if(gh.getSoLuong() + soLuong > sanPhamChiTiet.getSo_luong()){
+                    return "Đã có " + gh.getSoLuong() + " sản phẩm trong giỏ hàng. Bạn chỉ có thể thêm " + (sanPhamChiTiet.getSo_luong() - gh.getSoLuong()) + " sản phẩm vào giỏ hàng";
                 }
                 gh.setSoLuong(gh.getSoLuong() + soLuong);
                 gh.setTongTien((int) (sanPhamChiTiet.getGia_ban() * gh.getSoLuong()));
@@ -144,9 +144,6 @@ public class GioHangControllerApi {
         if(status.equals("cong")){
             gioHang.setSoLuong(gioHang.getSoLuong() + 1);
             getGia_ban(sanPhamChiTiet, gioHang);
-            if(gioHang.getSoLuong() > 3){
-                return null;
-            }
         }else {
             if(gioHang.getSoLuong() <= 1){
                 return null;
